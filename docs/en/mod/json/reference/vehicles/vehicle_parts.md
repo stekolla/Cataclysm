@@ -151,7 +151,7 @@ See also `vehicles_spawning.md`
 
 ```json
 "id": "shopping_cart",                     // Internally-used name.
-"name": "Shopping Cart",                   // Display name, subject to i18n.
+"name": "Shopping Cart",                   // English display name.
 "blueprint": "#",                          // Preview of vehicle - ignored by the code, so use only as documentation
 "parts": [                                 // Parts list
     {"x": 0, "y": 0, "part": "box"},       // Part definition, positive x direction is to the left, positive y is to the right

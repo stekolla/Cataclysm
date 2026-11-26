@@ -35,7 +35,6 @@
 #include "item_group.h"
 #include "json.h"
 #include "json_export.h"
-#include "language.h"
 #include "magic/magic.h"
 #include "map/map.h"
 #include "map/mapbuffer_registry.h"
@@ -177,7 +176,6 @@ enum debug_menu_index {
     DEBUG_CRASH_GAME,
     DEBUG_SHOW_WORKER_MSG,
     DEBUG_CRASH_WORKER,
-    DEBUG_RELOAD_TRANSLATIONS,
     DEBUG_MAP_EXTRA,
     DEBUG_DISPLAY_NPC_PATH,
     DEBUG_PRINT_FACTION_INFO,
@@ -272,7 +270,6 @@ static int info_uilist( bool display_all_entries = true )
             { uilist_entry( DEBUG_CRASH_GAME, true, 'C', _( "Crash game (test crash handling)" ) ) },
             { uilist_entry( DEBUG_SHOW_WORKER_MSG, true, 0, _( "Show debug message (worker thread)" ) ) },
             { uilist_entry( DEBUG_CRASH_WORKER, true, 0, _( "Crash worker thread (test crash handling)" ) ) },
-            { uilist_entry( DEBUG_RELOAD_TRANSLATIONS, true, 'L', _( "Reload translations" ) ) },
             { uilist_entry( DEBUG_DISPLAY_NPC_PATH, true, 'n', _( "Toggle NPC pathfinding on map" ) ) },
             { uilist_entry( DEBUG_PRINT_FACTION_INFO, true, 'f', _( "Print faction info to console" ) ) },
             { uilist_entry( DEBUG_PRINT_NPC_MAGIC, true, 'M', _( "Print NPC magic info to console" ) ) },
@@ -2141,9 +2138,6 @@ void debug()
             get_thread_pool().submit( []() {
                 raise( SIGSEGV );
             } );
-            break;
-        case DEBUG_RELOAD_TRANSLATIONS:
-            l10n_data::reload_catalogues();
             break;
         case DEBUG_MAP_EXTRA: {
             const std::vector<std::string> &mx_str = MapExtras::get_all_function_names();

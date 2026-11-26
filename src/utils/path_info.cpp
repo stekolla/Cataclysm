@@ -2,7 +2,6 @@
 
 #include "enums.h"
 #include "filesystem.h"
-#include "language.h"
 #include "options.h"
 #include "title_screen.h"
 
@@ -148,14 +147,8 @@ void PATH_INFO::set_standard_filenames() {
 auto find_translated_file(
     const std::string& base_path, const std::string& extension, const std::string& fallback)
     -> std::string {
-    std::vector<std::string> opts = get_lang_path_substring(get_language().id);
-
-    for (const std::string& s : opts) {
-        const std::string local_path = base_path + s + extension;
-        if (file_exist(local_path)) { return local_path; }
-    }
-
-    return fallback;
+    const std::string english_path = base_path + "en" + extension;
+    return file_exist(english_path) ? english_path : fallback;
 }
 
 auto PATH_INFO::autopickup() -> std::string { return autopickup_value; }
@@ -176,9 +169,6 @@ auto PATH_INFO::fontconfig() -> std::string { return datadir_value + "raw/" + "f
 auto PATH_INFO::user_fontconfig() -> std::string { return config_dir_value + "fonts.json"; }
 auto PATH_INFO::fontdir() -> std::string { return datadir_value + "font/"; }
 auto PATH_INFO::user_fontdir() -> std::string { return user_dir_value + "font/"; }
-auto PATH_INFO::language_defs_file() -> std::string {
-    return datadir_value + "raw/" + "languages.json";
-}
 auto PATH_INFO::graveyarddir() -> std::string { return user_dir_value + "graveyard/"; }
 auto PATH_INFO::help() -> std::string { return datadir_value + "help/" + "texts.json"; }
 auto PATH_INFO::keybindingsdir() -> std::string { return datadir_value + "raw/keybindings/"; }

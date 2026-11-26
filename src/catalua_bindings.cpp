@@ -442,25 +442,17 @@ void cata::detail::forbid_unsafe_functions( sol::state &lua )
     g["loadstring"] = sol::nil;
 }
 
-// We have to alias the function here because VS compiler
-// confuses namespaces 'detail' and 'cata::detail'
 const auto &gettext_raw = sol::resolve<const char *( const char * )>
                           ( &detail::_translate_internal );
 
 void cata::detail::reg_locale_api( sol::state &lua )
 {
-    DOC( "Localization API." );
+    DOC( "English string helpers. These functions return the supplied English text." );
     luna::userlib lib = luna::begin_lib( lua, "locale" );
-
-    DOC( "Expects english source string, returns translated string." );
     luna::set_fx( lib, "gettext", gettext_raw );
-    DOC( "First is english singular string, second is english plural string. Number is amount to translate for." );
     luna::set_fx( lib, "vgettext", &vgettext );
-    DOC( "First is context string. Second is english source string." );
     luna::set_fx( lib, "pgettext", &pgettext );
-    DOC( "First is context string. Second is english singular string. third is english plural. Number is amount to translate for." );
     luna::set_fx( lib, "vpgettext", &vpgettext );
-
     luna::finalize_lib( lib );
 }
 
@@ -1225,7 +1217,6 @@ void cata::reg_all_bindings( sol::state &lua )
     forbid_unsafe_functions( lua );
     reg_debug_api( lua );
     reg_game_api( lua );
-    reg_locale_api( lua );
     reg_date_time_api( lua );
     reg_units( lua );
     reg_skill_level_map( lua );
@@ -1233,6 +1224,7 @@ void cata::reg_all_bindings( sol::state &lua )
     reg_creature_family( lua );
     reg_point_tripoint( lua );
     reg_item( lua );
+    reg_locale_api( lua );
     reg_map( lua );
     reg_distribution_grid( lua );
     reg_ui_elements( lua );

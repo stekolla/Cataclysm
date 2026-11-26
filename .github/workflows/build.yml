@@ -44,11 +44,6 @@ on:
             { "name": "Android ARM64", "platform": "android", "artifact": "android-x64", "os": "ubuntu-latest", "android": "arm64", "tiles": true, "sound": true, "ext": "apk", "content-type": "application/apk" },
             { "name": "Android Bundle", "platform": "android", "artifact": "android-bundle", "os": "ubuntu-latest", "android": "bundle", "tiles": true, "sound": true, "ext": "aab", "content-type": "application/aab" }
           ]
-      download-translations:
-        description: "Download prebuilt translation artifact"
-        required: false
-        type: boolean
-        default: true
       bundle-tilesets:
         description: "Bundle external tilesets into tiles builds"
         required: false
@@ -74,11 +69,6 @@ on:
         required: false
         type: string
         default: "[]"
-      android-localize:
-        description: "Build Android assets with localization"
-        required: false
-        type: boolean
-        default: true
       upload-to-release:
         description: "Upload to GitHub release"
         required: false
@@ -157,13 +147,6 @@ jobs:
           name: ${{ inputs.shader-artifact || format('generated-shaders-{0}', fromJSON(inputs.matrix-json)[0].artifact) }}
           path: data/shaders
 
-      - name: Download translation artifacts
-        if: inputs.download-translations
-        uses: actions/download-artifact@v7
-        with:
-          name: translations
-          path: .
-
       - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
 
       - name: Create VERSION.TXT
@@ -231,18 +214,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: x64
-
-      - name: Setup msys2 (windows msvc)
-        if: runner.os == 'Windows'
-        uses: msys2/setup-msys2@3c51bf698df1e37b2261f53cb67797b97761185c # v2
-        with:
-          msystem: mingw64
-          install: gettext
-
-      - name: Compile translations (windows msvc)
-        if: runner.os == 'Windows' && inputs.download-translations
-        shell: msys2 {0}
-        run: lang/compile_mo.sh all
 
       - name: Install stable CMake
         if: runner.os == 'Windows'
@@ -313,7 +284,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libncursesw5-dev \
-            libpulse-dev mold gettext parallel libsqlite3-dev zlib1g-dev libvulkan-dev mesa-vulkan-drivers xvfb \
+            libpulse-dev mold parallel libsqlite3-dev zlib1g-dev libvulkan-dev mesa-vulkan-drivers xvfb \
             autoconf autoconf-archive automake libtool libltdl-dev
 
       - name: Setup LLVM build tools (Linux)
@@ -365,10 +336,10 @@ jobs:
       - name: Install build dependencies (mac)
         if: runner.os == 'macOS'
         run: |
-          HOMEBREW_NO_AUTO_UPDATE=yes HOMEBREW_NO_INSTALL_CLEANUP=yes brew install sdl3 sdl3_image sdl3_ttf sdl3_mixer gettext parallel astyle sqlite3 zlib ncurses flac pkg-config dylibbundler
+          HOMEBREW_NO_AUTO_UPDATE=yes HOMEBREW_NO_INSTALL_CLEANUP=yes brew install sdl3 sdl3_image sdl3_ttf sdl3_mixer parallel astyle sqlite3 zlib ncurses flac pkg-config dylibbundler
           python3 -m venv ./venv
           source ./venv/bin/activate
-          pip3 install mac_alias==2.2.0 dmgbuild==1.6.1 biplist polib luaparser
+          pip3 install mac_alias==2.2.0 dmgbuild==1.6.1 biplist luaparser
           echo "CMAKE_PREFIX_PATH=$(brew --prefix ncurses):$(brew --prefix flac)" >> "$GITHUB_ENV"
           echo "PKG_CONFIG_PATH=$(brew --prefix flac)/lib/pkgconfig" >> "$GITHUB_ENV"
           echo "$PWD/venv/bin" >> "$GITHUB_PATH"
@@ -465,7 +436,6 @@ jobs:
       - name: Create distribution package (Linux)
         if: runner.os == 'Linux' && (matrix.android == '' || matrix.android == 'none') && inputs.package-artifacts && (!inputs.upload-artifacts || matrix.upload-artifact == true)
         run: |
-          mkdir -p lang/mo
           cmake --install build --prefix cataclysmbn-${{ inputs.version-label }}
           tar -czvf cbn-${{ matrix.artifact }}-${{ inputs.version-label }}.tar.gz \
             cataclysmbn-${{ inputs.version-label }}
@@ -505,13 +475,9 @@ jobs:
         env:
           VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}\.github\vcpkg_triplets
         run: |
-          $localize = "False"
           $tests = "False"
           $release = "ON"
           $fastLink = "OFF"
-          if ("${{ inputs.download-translations }}" -eq "true") {
-            $localize = "True"
-          }
           if ("${{ inputs.mode }}" -eq "ci") {
             $release = "OFF"
             $fastLink = "ON"
@@ -528,7 +494,6 @@ jobs:
             -DVCPKG_TARGET_TRIPLET=x64-windows-static `
             -DDYNAMIC_LINKING=False `
             -DCURSES=False `
-            "-DLOCALIZE=$localize" `
             -DTILES=True `
             -DSOUND=True `
             "-DTESTS=$tests" `
@@ -575,7 +540,6 @@ jobs:
         run: |
           $dist = "cataclysmbn-${{ inputs.version-label }}"
           Remove-Item -Recurse -Force $dist -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force lang/mo
           cmake --install out/build/windows-tiles-sounds-x64-msvc --prefix $dist --config Release
           if ("${{ matrix.tiles }}" -eq "true" -and "${{ matrix.sound }}" -eq "true" -and "${{ inputs.bundle-registry-mods }}" -eq "true") {
             Compress-Archive -Force -Path $dist/* -DestinationPath cbn-${{ matrix.artifact }}-no-soundpack-${{ inputs.version-label }}.zip
@@ -682,7 +646,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.android != '' && matrix.android != 'none'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gettext autoconf autoconf-archive automake libtool libltdl-dev
+          sudo apt-get install -y autoconf autoconf-archive automake libtool libltdl-dev
 
       - name: Setup C++ build tools (android host)
         if: runner.os == 'Linux' && matrix.android != '' && matrix.android != 'none'
@@ -744,7 +708,6 @@ jobs:
           else
             echo "::warning::Android signing secrets are unavailable; building unsigned release artifacts"
           fi
-          mkdir -p ../lang/mo
           chmod +x gradlew
 
           # Determine build variant based on version label
@@ -773,9 +736,9 @@ jobs:
 
           build_android_artifact() {
             if [ "${{ matrix.android }}" = arm64 ]; then
-              gradle_retry -Pj=$(nproc) -Pabi_arm_32=false -Plocalize=${{ inputs.android-localize }} assemble${VARIANT}Release ${VERSION_ARG}
+              gradle_retry -Pj=$(nproc) -Pabi_arm_32=false assemble${VARIANT}Release ${VERSION_ARG}
             elif [ "${{ matrix.android }}" = bundle ]; then
-              gradle_retry -Pj=$(nproc) -Plocalize=${{ inputs.android-localize }} bundle${VARIANT}Release ${VERSION_ARG}
+              gradle_retry -Pj=$(nproc) bundle${VARIANT}Release ${VERSION_ARG}
             else
               echo "Unsupported Android artifact type: ${{ matrix.android }}" >&2
               return 1

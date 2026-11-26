@@ -156,8 +156,8 @@ Each entry in "name" can also have an optional context:
 "name": [ { "ctxt": "ECIG", "str": "Smoke" } ]
 ```
 
-In this case, the game will translate the name with the given context "ECIG", which makes it
-possible to distinguish the verb "Smoke" from the noun "Smoke" in other languages.
+The `ctxt` field is accepted for compatibility with existing data. The game displays the English
+string as written.
 
 ```json
 "speed_name" : "XYZ"        - Defaults to the first name value

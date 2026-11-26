@@ -63,32 +63,19 @@ Examples:
 "//" : "comment", // Preferred method of leaving comments inside json files.
 ```
 
-Some json strings are extracted for translation, for example item names, descriptions, etc. The
-exact extraction is handled in `lang/extract_json_strings.py`. Apart from the obvious way of writing
-a string without translation context, the string can also have an optional translation context (and
-sometimes a plural form), by writing it like:
+Text fields can provide English singular and plural forms when the text depends on a count:
 
 ```json
-"name": { "ctxt": "foo", "str": "bar", "str_pl": "baz" }
+"name": { "str": "bar", "str_pl": "baz" }
 ```
 
 or, if the plural form is the same as the singular form:
 
 ```json
-"name": { "ctxt": "foo", "str_sp": "foo" }
+"name": { "str_sp": "foo" }
 ```
 
-You can also add comments for translators by adding a "//~" entry like below. The order of the
-entries does not matter.
-
-```json
-"name": {
-    "//~": "as in 'foobar'",
-    "str": "bar"
-}
-```
-
-[Currently, only some JSON values support this syntax](./../../../i18n/reference/translation#supported-json-values).
+The `ctxt` member is accepted for compatibility and does not affect displayed text.
 
 ## Description and content of each JSON file
 
@@ -750,8 +737,7 @@ Used to classify weapons (guns or melee) into groups, mainly for use in martial 
 }
 ```
 
-`"name"` is a translatable string used for UI display in martial arts UI, while ID is used for JSON
-entries.
+`"name"` is the English string shown in the martial arts UI, while ID is used for JSON entries.
 
 ## Obsoletion and migration
 

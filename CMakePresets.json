@@ -18,7 +18,6 @@
         "TILES": "ON",
         "CURSES": "OFF",
         "SOUND": "OFF",
-        "LANGUAGES": "none",
         "BACKTRACE": "OFF",
         "DYNAMIC_LINKING": "OFF",
         "BUILD_SDL3": "ON",
@@ -42,7 +41,6 @@
         "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo;Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CURSES": "False",
-        "LOCALIZE": "True",
         "TILES": "True",
         "SOUND": "True",
         "TESTS": "True",
@@ -180,7 +178,7 @@
     {
       "name": "dist-tiles",
       "binaryDir": "${sourceDir}/build",
-      "displayName": "Linux Distribution (Tiles, Sounds, Languages)",
+      "displayName": "Linux Distribution (Tiles, Sounds)",
       "description": "For creating portable distribution packages with tiles and sound.",
       "generator": "Ninja",
       "cacheVariables": {
@@ -197,7 +195,6 @@
         "TILES": "ON",
         "SOUND": "ON",
         "BUILD_SDL3": "ON",
-        "LANGUAGES": "all",
         "BACKTRACE": "ON",
         "LIBBACKTRACE": "ON",
         "JSON_FORMAT": "ON",
@@ -208,7 +205,7 @@
     {
       "name": "dist-curses",
       "binaryDir": "${sourceDir}/build",
-      "displayName": "Linux Distribution (Curses, Languages)",
+      "displayName": "Linux Distribution (Curses)",
       "description": "For creating portable distribution packages with curses.",
       "generator": "Ninja",
       "cacheVariables": {
@@ -225,7 +222,6 @@
         "TILES": "OFF",
         "SOUND": "OFF",
         "BUILD_SDL3": "ON",
-        "LANGUAGES": "all",
         "BACKTRACE": "ON",
         "LIBBACKTRACE": "ON",
         "JSON_FORMAT": "ON",
@@ -246,7 +242,6 @@
         "CMAKE_FIND_FRAMEWORK": "FIRST",
         "USE_HOME_DIR": "ON",
         "USE_PREFIX_DATA_DIR": "OFF",
-        "LANGUAGES": "all",
         "BACKTRACE": "ON",
         "JSON_FORMAT": "ON",
         "TESTS": "OFF",
@@ -257,7 +252,7 @@
     {
       "name": "osx-curses-x64-dist",
       "inherits": ["osx-dist-base"],
-      "displayName": "macOS x64 Distribution (Curses, Languages)",
+      "displayName": "macOS x64 Distribution (Curses)",
       "description": "For creating portable macOS x64 distribution packages with curses.",
       "cacheVariables": {
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
@@ -269,7 +264,7 @@
     {
       "name": "osx-tiles-x64-dist",
       "inherits": ["osx-dist-base"],
-      "displayName": "macOS x64 Distribution (Tiles, Sounds, Languages)",
+      "displayName": "macOS x64 Distribution (Tiles, Sounds)",
       "description": "For creating portable macOS x64 distribution packages with tiles and sound.",
       "cacheVariables": {
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
@@ -281,7 +276,7 @@
     {
       "name": "osx-curses-arm-dist",
       "inherits": ["osx-dist-base"],
-      "displayName": "macOS ARM Distribution (Curses, Languages)",
+      "displayName": "macOS ARM Distribution (Curses)",
       "description": "For creating portable macOS ARM distribution packages with curses.",
       "cacheVariables": {
         "CMAKE_OSX_ARCHITECTURES": "arm64",
@@ -293,7 +288,7 @@
     {
       "name": "osx-tiles-arm-dist",
       "inherits": ["osx-dist-base"],
-      "displayName": "macOS ARM Distribution (Tiles, Sounds, Languages)",
+      "displayName": "macOS ARM Distribution (Tiles, Sounds)",
       "description": "For creating portable macOS ARM distribution packages with tiles and sound.",
       "cacheVariables": {
         "CMAKE_OSX_ARCHITECTURES": "arm64",
@@ -305,7 +300,7 @@
     {
       "name": "osx-arm-dist",
       "inherits": ["osx-tiles-arm-dist"],
-      "displayName": "macOS ARM Distribution (Tiles, Sounds, Languages)",
+      "displayName": "macOS ARM Distribution (Tiles, Sounds)",
       "description": "For creating portable macOS ARM distribution packages with tiles and sound."
     },
     {
@@ -347,7 +342,6 @@
         "TILES": "OFF",
         "CURSES": "ON",
         "SOUND": "OFF",
-        "LOCALIZE": "OFF",
         "BACKTRACE": "ON",
         "LIBBACKTRACE": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -373,8 +367,6 @@
         "TILES": "ON",
         "CURSES": "OFF",
         "SOUND": "ON",
-        "LOCALIZE": "ON",
-        "LANGUAGES": "all",
         "BACKTRACE": "ON",
         "LIBBACKTRACE": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -390,21 +382,21 @@
       "name": "windows-msvc-debug",
       "configurePreset": "windows-tiles-sounds-x64-msvc",
       "configuration": "Debug",
-      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter", "translations"],
+      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter"],
       "description": "Debug build for Windows with tiles and sounds using MSVC."
     },
     {
       "name": "windows-msvc-release",
       "configurePreset": "windows-tiles-sounds-x64-msvc",
       "configuration": "Release",
-      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter", "translations"],
+      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter"],
       "description": "Release build for Windows with tiles and sounds using MSVC."
     },
     {
       "name": "windows-msvc-relwithdebinfo",
       "configurePreset": "windows-tiles-sounds-x64-msvc",
       "configuration": "RelWithDebInfo",
-      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter", "translations"],
+      "targets": ["cataclysm-bn-tiles", "cata_test-tiles", "json_formatter"],
       "description": "Release build with debug symbols for Windows with tiles and sounds using MSVC."
     },
     {
@@ -440,13 +432,13 @@
     {
       "name": "dist-tiles",
       "configurePreset": "dist-tiles",
-      "targets": ["cataclysm-bn-tiles", "json_formatter", "translations"],
+      "targets": ["cataclysm-bn-tiles", "json_formatter"],
       "description": "Build for tiles distribution."
     },
     {
       "name": "dist-curses",
       "configurePreset": "dist-curses",
-      "targets": ["cataclysm-bn", "json_formatter", "translations"],
+      "targets": ["cataclysm-bn", "json_formatter"],
       "description": "Build for curses distribution."
     },
     {

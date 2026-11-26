@@ -36,7 +36,7 @@ jobs:
       - id: skip_code_check
         uses: fkirc/skip-duplicate-actions@master
         with:
-          paths_ignore: '["android/**", "docs/**", "doxygen_doc/**", "msvc-**", "tools/**", "utilities/**", "scripts/**", "data/**", "lang/**"]'
+          paths_ignore: '["android/**", "docs/**", "doxygen_doc/**", "msvc-**", "tools/**", "utilities/**", "scripts/**", "data/**"]'
       - id: skip_data_check
         uses: fkirc/skip-duplicate-actions@master
         with:
@@ -83,7 +83,7 @@ jobs:
             ccache_key: linux-clang-curses
             always-run: true
 
-          - title: clang, tiles, i18n
+          - title: clang, tiles
             preset: ci-tiles
             os: ubuntu-24.04
             tiles: 1
@@ -203,7 +203,6 @@ jobs:
         env:
           VERSION_LABEL: pr-${{ github.event.pull_request.number || github.run_id }}
         run: |
-          mkdir -p lang/mo
           cmake --install build --prefix cataclysmbn-${VERSION_LABEL}
           tar -czvf cbn-linux-tiles-x64-${VERSION_LABEL}.tar.gz cataclysmbn-${VERSION_LABEL}
 
@@ -219,10 +218,9 @@ jobs:
       - name: pack test executable
         if: ${{ github.ref_name != 'main' && env.SKIP == 'false' }}
         run: |
-          mkdir -p lang/mo
           find build -name '*.so*' > test-files
           echo build/tests/cata_test${{ matrix.tiles == 1 && '-tiles' || '' }} >> test-files
-          tar --zstd -cf cata-test.tar.zst -T test-files lang/mo
+          tar --zstd -cf cata-test.tar.zst -T test-files
 
       - name: upload test executable
         if: ${{ github.ref_name != 'main' && env.SKIP == 'false' }}
@@ -336,7 +334,6 @@ jobs:
         [
           { "name": "Windows MSVC", "platform": "windows", "artifact": "windows-tiles-x64-msvc", "os": "windows-2022", "arch": "x64", "tiles": true, "sound": true, "ext": "zip", "content-type": "application/zip" }
         ]
-      download-translations: false
       bundle-tilesets: false
       package-artifacts: false
       run-tests: true
@@ -361,11 +358,9 @@ jobs:
           { "name": "macOS Tiles ARM", "platform": "macos", "artifact": "osx-tiles-arm", "os": "macos-15", "preset": "osx-tiles-arm-dist", "tiles": true, "sound": true, "ext": "dmg", "content-type": "application/x-apple-diskimage" },
           { "name": "Android ARM64", "platform": "android", "artifact": "android-x64", "os": "ubuntu-latest", "android": "arm64", "tiles": true, "sound": true, "ext": "apk", "content-type": "application/apk" }
         ]
-      download-translations: false
       bundle-tilesets: false
       package-artifacts: false
       run-tests: false # no job runs the macOS test executables
-      android-localize: false
       upload-artifacts: false
     secrets: inherit
 
@@ -382,7 +377,6 @@ jobs:
         [
           { "name": "Windows MSVC", "platform": "windows", "artifact": "windows-tiles-x64-msvc", "os": "windows-2022", "arch": "x64", "tiles": true, "sound": true, "ext": "zip", "content-type": "application/zip", "upload-artifact": true }
         ]
-      download-translations: false
       bundle-tilesets: false
       bundle-registry-mods: false
       package-artifacts: true
@@ -407,11 +401,9 @@ jobs:
           { "name": "macOS Curses ARM", "platform": "macos", "artifact": "osx-curses-arm", "os": "macos-15", "preset": "osx-curses-arm-dist", "tiles": false, "sound": false, "ext": "dmg", "content-type": "application/x-apple-diskimage" },
           { "name": "Android ARM64", "platform": "android", "artifact": "android-x64", "os": "ubuntu-latest", "android": "arm64", "tiles": true, "sound": true, "ext": "apk", "content-type": "application/apk", "upload-artifact": true }
         ]
-      download-translations: false
       bundle-tilesets: false
       bundle-registry-mods: false
       package-artifacts: true
       run-tests: false # no job runs the macOS test executables
-      android-localize: false
       upload-artifacts: true
     secrets: inherit

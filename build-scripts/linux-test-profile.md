@@ -3,7 +3,7 @@
 Sources:
 
 - Baseline: old Linux non-slow shard from successful PR run: `706.837s`.
-- CI profile: PR #9515 run 27586856606, `clang, tiles, i18n` job 81560362204.
+- CI profile: PR #9515 run 27586856606, `clang, tiles` job 81560362204.
 - CI resource check: PR #9515 run 27596058861 showed llvmpipe-backed shards stalling under four unrestricted software-GPU processes.
 - Local profile: rebased branch at 69d0c9ec6d9, `cata_test-tiles --filenames-as-tags --rng-seed 1 --gpu-backend=software`.
 

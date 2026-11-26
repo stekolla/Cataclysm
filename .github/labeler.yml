@@ -14,10 +14,6 @@ mods:
   - changed-files:
       - any-glob-to-any-file: data/mods/**/*
 
-translation:
-  - changed-files:
-      - any-glob-to-any-file: lang/**/*
-
 docs:
   - changed-files:
       - any-glob-to-any-file: docs/**/*

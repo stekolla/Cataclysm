@@ -36,7 +36,7 @@ jobs:
       - env: { DEBIAN_FRONTEND: noninteractive }
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends astyle gettext cmake ninja-build g++-14 pipx
+          sudo apt-get install -y --no-install-recommends astyle cmake ninja-build g++-14 pipx
           pipx install clang-format==${{ env.CLANG_FORMAT_VERSION }}
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "CXX=g++-14" >> "$GITHUB_ENV"
@@ -121,33 +121,6 @@ jobs:
           github.event.action == 'edited' ||
           github.event.action == 'reopened'
         uses: scarf005/conventional-prs@v0.5.1
-
-      - name: Checkout base docs warning script
-        if: always() && github.event.pull_request.head.ref != github.event.repository.default_branch
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 1
-          sparse-checkout: |
-            docs
-            scripts/docs_translation_warning.ts
-            scripts/git_changed_files.ts
-            deno.jsonc
-            deno.lock
-
-      - name: Setup Deno for docs warning
-        if: always() && github.event.pull_request.head.ref != github.event.repository.default_branch
-        continue-on-error: true
-        uses: denoland/setup-deno@v2
-        with: { cache: true }
-
-      - name: Update docs translation PR body
-        if: always() && github.event.pull_request.head.ref != github.event.repository.default_branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          ref=refs/remotes/pull/${{ github.event.pull_request.number }}/merge
-          git fetch --no-tags --filter=blob:none --depth=2 origin "+refs/pull/${{ github.event.pull_request.number }}/merge:$ref" || exit 0
-          deno task docs:translation-warning ${{ github.event.pull_request.number }} --base "$ref^1" --head "$ref" || true
 
       - name: Comment and close pull request
         if: >-

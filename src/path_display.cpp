@@ -72,7 +72,6 @@ auto defaults_directory() -> std::string
         { _( "color templates" ), PATH_INFO::color_templates() },
         { _( "colors" ), PATH_INFO::colors() },
         { _( "font config" ), PATH_INFO::fontconfig() },
-        { _( "language definitions file" ), PATH_INFO::language_defs_file() },
         { _( "sokoban" ), PATH_INFO::sokoban() },
         { _( "main menu tips" ), PATH_INFO::main_menu_tips() },
         { _( "keybindings" ), PATH_INFO::keybindingsdir() },

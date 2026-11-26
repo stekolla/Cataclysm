@@ -32,8 +32,6 @@ CataclysmBN:
 > [!NOTE]
 > Dependancies marked with * will be built automatically if missing.
 
-In order to compile localization files, you'll also need `gettext` package.
-
 ## Build Environment
 
 You can obtain the source code tarball for the latest version from
@@ -57,7 +55,7 @@ Obtain packages specified above with your system package manager.
 sudo apt install git cmake ninja-build mold clang-22 llvm-22 ccache \
 libsdl3-dev libsdl3-image-dev libsdl3-ttf-dev \
 libfreetype-dev bzip2 zlib1g-dev libvorbis-dev libncurses-dev \
-gettext libflac++-dev libsqlite3-dev zlib1g-dev
+libflac++-dev libsqlite3-dev zlib1g-dev
 ```
 
 - For Fedora-based distros:
@@ -65,7 +63,7 @@ gettext libflac++-dev libsqlite3-dev zlib1g-dev
 ```sh
 sudo dnf install git cmake ninja-build mold clang llvm ccache \
 SDL3-devel SDL3_image-devel SDL3_ttf-devel \
-freetype glibc bzip2 zlib-ng libvorbis ncurses gettext flac-devel \
+freetype glibc bzip2 zlib-ng libvorbis ncurses flac-devel \
 sqlite-devel zlib-devel
 ```
 
@@ -116,7 +114,7 @@ Install dependencies via [Homebrew](https://brew.sh/):
 
 ```sh
 brew install cmake ninja ccache sdl3 sdl3_image sdl3_ttf sdl3_mixer \
-  freetype gettext sqlite pkg-config ncurses flac
+  freetype sqlite pkg-config ncurses flac
 ```
 
 > [!NOTE]
@@ -139,7 +137,6 @@ pacman -S mingw-w64-x86_64-toolchain msys/git \
    	  mingw-w64-x86_64-cmake \
    	  mingw-w64-x86_64-SDL2_{image,mixer,ttf} \
    	  ncurses-devel \
-      gettext \
       base-devel
 ```
 
@@ -271,7 +268,6 @@ cataclysmbn-linux-tiles/
 ├── json_formatter         # JSON formatting tool
 ├── data/                  # Game data files
 ├── gfx/                   # Tilesets
-├── lang/                  # Translations
 ├── doc/                   # Documentation
 ├── README.md
 ├── LICENSE.txt
@@ -311,8 +307,7 @@ CMake can generate `.sln` and `.vcxproj` files used either by Visual Studio itse
 command line compiler (if you don't want a full fledged IDE) and have more "native" binaries than
 what MSYS/Cygwin can provide.
 
-At the moment only a limited combination of options is supported (tiles only, no localizations, no
-backtrace).
+At the moment only a limited combination of options is supported (tiles only, no backtrace).
 
 Get the tools:
 
@@ -350,7 +345,7 @@ Run the CMake configuration step
 
 ```sh
 cd <path to cbn sources>
-cmake -B out/build/msbuild -DTILES=ON -DLANGUAGES=none -DBACKTRACE=OFF -DSOUND=ON
+cmake -B out/build/msbuild -DTILES=ON -DBACKTRACE=OFF -DSOUND=ON
 ```
 
 Build!
@@ -419,7 +414,6 @@ Installation prefix for binaries, resources, and documentation files.
 | `CURSES`              | `ON`                                    | Build curses version.                                                             |
 | `TILES`               | `OFF`                                   | Build graphical tileset version.                                                  |
 | `SOUND`               | `ON`                                    | Build audio support.                                                              |
-| `LANGUAGES`           | `" "`                                   | Build specificed language support.                                                |
 | `TESTS`               | `ON`                                    | Build test units.                                                                 |
 | `USE_HOME_DIR`        | `ON` (`OFF` on WIN32)                   | Use $HOME directory for save and config files.                                    |
 | `USE_XDG_DIR`         | `OFF`                                   | Use XDG directories for save and config files.                                    |
@@ -448,14 +442,14 @@ Check the [cmake docs](https://cmake.org/cmake/help/latest/manual/cmake-presets.
 | `linux-cross-aarch64`      |                                                     |
 | `linux-slim-cross-aarch64` |                                                     |
 | `linux-full-cross-aarch64` |                                                     |
-| `dist-tiles`               | Linux Distribution (Tiles, Sounds, Languages)       |
-| `dist-curses`              | Linux Distribution (Curses, Languages)              |
-| `osx-curses-x64-dist`      | macOS x64 Distribution (Curses, Languages)          |
-| `osx-tiles-x64-dist`       | macOS x64 Distribution (Tiles, Sounds, Languages)   |
+| `dist-tiles`               | Linux Distribution (Tiles, Sounds)       |
+| `dist-curses`              | Linux Distribution (Curses)              |
+| `osx-curses-x64-dist`      | macOS x64 Distribution (Curses)          |
+| `osx-tiles-x64-dist`       | macOS x64 Distribution (Tiles, Sounds)   |
 | `osx-arm-slim`             | macOS ARM Slim Build (Tiles, Sounds)                |
-| `osx-curses-arm-dist`      | macOS ARM Distribution (Curses, Languages)          |
-| `osx-tiles-arm-dist`       | macOS ARM Distribution (Tiles, Sounds, Languages)   |
-| `osx-arm-dist`             | macOS ARM Distribution (Tiles, Sounds, Languages)   |
+| `osx-curses-arm-dist`      | macOS ARM Distribution (Curses)          |
+| `osx-tiles-arm-dist`       | macOS ARM Distribution (Tiles, Sounds)   |
+| `osx-arm-dist`             | macOS ARM Distribution (Tiles, Sounds)   |
 | `lint`                     | Lint and Format Only                                |
 | `ci-curses`                | CI Build (Curses)                                   |
 | `ci-tiles`                 | CI Build (Tiles, Sound)                             |
@@ -468,56 +462,3 @@ Check the [cmake docs](https://cmake.org/cmake/help/latest/manual/cmake-presets.
 > ```sh
 > python3 -m pip install dmgbuild biplist
 > ```
-
-### Building with Translations Locally
-
-Starting in 2026, translation files (`.po` files) are no longer kept in the repository. CI pulls them from Transifex, stores them in workflow artifacts, and uses them to build release packages.
-
-For local builds, use one of the following:
-
-#### Option 1: Build Without Translations (Fastest)
-
-If you are not working on translations, disable them:
-
-```sh
-cmake --preset linux-full -DLANGUAGES=none
-cmake --build --preset linux-full
-```
-
-#### Option 2: Pull Translations from Transifex
-
-If you need to test translations locally and have Transifex access:
-
-1. Install the Transifex CLI:
-
-```sh
-curl -sL https://github.com/transifex/cli/releases/download/v1.6.17/tx-linux-amd64.tar.gz | sudo tar zxvf - -C /usr/bin tx
-```
-
-2. Pull the translation files:
-
-```sh
-tx pull --force --all
-```
-
-3. Build with translations enabled:
-
-```sh
-cmake --preset linux-full -DLANGUAGES=all
-cmake --build --preset linux-full
-```
-
-#### Option 3: Download the `translations` Workflow Artifact
-
-If you do not have Transifex access, use the artifact produced by the translation workflow:
-
-1. Open a recent successful workflow run in [Actions](https://github.com/cataclysmbn/Cataclysm-BN/actions)
-2. Download the `translations` artifact
-3. Extract `lang/po` and `src/lang_stats.inc` into your local checkout
-4. Build normally with `-DLANGUAGES=all`
-
-> [!NOTE]
-> Most code changes do not need translations. Use `-DLANGUAGES=none` unless you are testing localized output.
-
-> [!NOTE]
-> Release archives only include compiled `lang/mo` files for packaged builds. They do not contain the `lang/po` sources required to rebuild translations locally.

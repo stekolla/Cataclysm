@@ -32,7 +32,7 @@
 #include "game_ui.h"
 #include "init.h"
 #include "input.h"
-#include "language.h"
+#include "locale.h"
 #include "loading_ui.h"
 #include "runtime_handlers.h"
 #include "string_formatter.h"
@@ -756,7 +756,7 @@ int main( int argc, char *argv[] )
 
     setupDebug( DebugOutput::file );
 
-    if( !init_language_system() ) {
+    if( !init_locale() ) {
         exit_handler( -999 );
     }
 
@@ -777,7 +777,7 @@ int main( int argc, char *argv[] )
     get_options().init();
     get_options().load();
     get_options().save();
-    set_language(); // Have to set locale before initializing ncurses
+    load_english_names(); // Have to set locale before initializing ncurses
 #if defined(CATA_SDL)
     switch( use_offscreen_video_driver_for_headless_sdl() ) {
         case offscreen_sdl_hint_result::applied:
@@ -832,7 +832,7 @@ int main( int argc, char *argv[] )
         get_options().init();
         get_options().load();
     }
-    set_language();
+    load_english_names();
 #endif
 
     rng_set_engine_seed( seed );
@@ -906,7 +906,6 @@ int main( int argc, char *argv[] )
     sigaction( SIGINT, &sigIntHandler, nullptr );
 #endif
 
-    prompt_select_lang_on_startup();
     replay_buffered_debugmsg_prompts();
 
     while( true ) {

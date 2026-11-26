@@ -45,7 +45,6 @@
 #include "item_category.h"
 #include "item_factory.h"
 #include "json.h"
-#include "language.h"
 #include "loading_ui.h"
 #include "lru_cache.h"
 #include "lua_sidebar_widgets.h"
@@ -724,7 +723,6 @@ void DynamicDataLoader::unload_data()
     base_weathers::reset();
     world_types::reset();
     zone_type::reset_zones();
-    l10n_data::unload_mod_catalogues();
     RGBColor::unload_names();
     perk::reset();
 #if defined(TILES)
@@ -821,7 +819,6 @@ void DynamicDataLoader::finalize_loaded_data( loading_ui &ui )
             { _( "Anatomies" ), &anatomy::finalize_all },
             { _( "Mutations" ), &mutation_branch::finalize },
             { _( "Achievements" ), &achievement::finalize },
-            { _( "Localization" ), &l10n_data::load_mod_catalogues },
             { _( "Enchantments" ), &enchantment::finalize_all },
             { _( "Perks" ), &perk::finalize_all },
 #if defined(TILES)

@@ -42,12 +42,11 @@ or, if the singular and plural forms are the same:
 "name": { "ctxt": "fish", "str_sp": "bass" }
 ```
 
-Name displayed in-game, and optionally the plural name and a translation context (ctxt).
+English name displayed in-game, and optionally the plural name.
 
 If the plural name is not specified, it defaults to singular name + "s".
 
-Ctxt is used to help translators in case of homonyms (two different things with the same name). For
-example, pike the fish and pike the weapon.
+`ctxt` is accepted for compatibility with existing data. It does not affect the English name.
 
 ## "description"
 

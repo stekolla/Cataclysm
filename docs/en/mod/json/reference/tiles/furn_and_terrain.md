@@ -461,7 +461,7 @@ break save compatibility.
 
 #### `name`
 
-Displayed name of the object. This will be translated.
+Displayed name of the object, written in English.
 
 #### `flags`
 
@@ -593,7 +593,7 @@ TODO
 #### `sound`, `sound_fail`, `sound_vol`, `sound_fail_vol`
 
 (Optional) Sound and volume of the sound that appears upon destroying the bashed object or upon
-unsuccessfully bashing it (failing). The sound strings are translated (and displayed to the player).
+unsuccessfully bashing it (failing). The sound strings are displayed to the player in English.
 
 #### `furn_set`, `ter_set`
 

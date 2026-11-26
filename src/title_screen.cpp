@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "filesystem.h"
-#include "language.h"
 #include "mod_manager.h"
 #include "path_info.h"
 #include "rng.h"
@@ -48,32 +47,12 @@ auto parent_path( const std::string &path ) -> std::string
 
 auto get_language_priority() -> std::vector<std::string>
 {
-    auto result = std::vector<std::string> {};
-    for( const auto &language : get_lang_path_substring( get_language().id ) ) {
-        if( !language.empty() && !std::ranges::contains( result, language ) ) {
-            result.emplace_back( language );
-        }
-    }
-    if( !std::ranges::contains( result, "en" ) ) {
-        result.emplace_back( "en" );
-    }
-    return result;
+    return { "en" };
 }
 
 auto get_all_languages() -> std::vector<std::string>
 {
-    auto result = std::vector<std::string> {};
-    for( const auto &info : list_available_languages() ) {
-        for( const auto &language : get_lang_path_substring( info.id ) ) {
-            if( !language.empty() && !std::ranges::contains( result, language ) ) {
-                result.emplace_back( language );
-            }
-        }
-    }
-    if( !std::ranges::contains( result, "en" ) ) {
-        result.emplace_back( "en" );
-    }
-    return result;
+    return { "en" };
 }
 
 auto humanize_title_name( std::string name ) -> std::string

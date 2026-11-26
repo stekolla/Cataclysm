@@ -31,7 +31,7 @@
 #include "filesystem.h"
 #include "game.h"
 #include "init.h"
-#include "language.h"
+#include "locale.h"
 #include "loading_ui.h"
 #include "mod_manager.h"
 #include "options.h"
@@ -191,8 +191,8 @@ static void init_global_game_state(
         assert(!"Unable to make templates directory.  Check permissions.");
     }
 
-    if (!init_language_system()) {
-        DebugLog(DL::Error, DC::Main) << "Failed to init language system.";
+    if (!init_locale()) {
+        DebugLog(DL::Error, DC::Main) << "Failed to initialize process locale.";
     }
 
     get_options().init();

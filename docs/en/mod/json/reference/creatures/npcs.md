@@ -196,10 +196,10 @@ list are processed normally.
 }
 ```
 
-#### A line to be translated with gender context
+#### A line with legacy gender metadata
 
-The line is to be given a gender context for the NPC, player, or both, to aid translation in
-languages where that matters. For example:
+The `relevant_genders` field is accepted for compatibility, but does not change the English line.
+For example:
 
 ```json
 {
@@ -207,8 +207,6 @@ languages where that matters. For example:
   "relevant_genders": ["npc"]
 }
 ```
-
-("Thank you" is different for male and female speakers in e.g. Portuguese).
 
 Valid choices for entries in the `"relevant_genders"` list are `"npc"` and `"u"`.
 

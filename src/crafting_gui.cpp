@@ -758,7 +758,7 @@ const recipe *select_crafting_recipe( int &batch_size_out, Character &crafter )
         return data;
     };
 
-    // always re-translate the category names in case the language has changed
+    // Refresh category names after loading updated recipe data.
     translate_all();
 
     const int headHeight = 3;

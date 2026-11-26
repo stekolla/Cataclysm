@@ -25,7 +25,6 @@
 #include "game_constants.h"
 #include "input.h"
 #include "json.h"
-#include "language.h"
 #include "line.h"
 #include "mapsharing.h"
 #include "mod_manager.h"
@@ -1773,18 +1772,6 @@ void options_manager::add_options_interface()
     const auto add_empty_line = [&]() {
         this->add_empty_line( interface );
     };
-
-    std::vector<options_manager::id_and_option> lang_options = {
-        { "", translate_marker( "System language" ) },
-    };
-    for( const language_info &info : list_available_languages() ) {
-        lang_options.emplace_back( info.id, no_translation( info.name ) );
-    }
-
-    add( "USE_LANG", interface, translate_marker( "Language" ),
-         translate_marker( "Switch Language." ), lang_options, "" );
-
-    add_empty_line();
 
     add( title_screen::option_id, interface, translate_marker( "Title screen" ),
          translate_marker( "Title screen ASCII art to display on the main menu." ),
@@ -4017,7 +4004,6 @@ std::string options_manager::show( bool ingame, const bool world_options_only,
     //Look for changes
     bool options_changed = false;
     bool world_options_changed = false;
-    bool lang_changed = false;
     bool used_tiles_changed = false;
     bool pixel_minimap_changed = false;
     bool terminal_size_changed = false;
@@ -4050,8 +4036,6 @@ std::string options_manager::show( bool ingame, const bool world_options_only,
                     iter.first == "ENHANCED_NIGHT_VISION_DEFAULT_COLOR" ) {
                     force_tile_change = true;
                 }
-            } else if( iter.first == "USE_LANG" ) {
-                lang_changed = true;
 
             } else if( iter.first == "TERMINAL_X" || iter.first == "TERMINAL_Y" ) {
                 terminal_size_changed = true;
@@ -4085,7 +4069,6 @@ std::string options_manager::show( bool ingame, const bool world_options_only,
             }
             g->on_options_changed();
         } else {
-            lang_changed = false;
             terminal_size_changed = false;
             used_tiles_changed = false;
             pixel_minimap_changed = false;
@@ -4097,9 +4080,6 @@ std::string options_manager::show( bool ingame, const bool world_options_only,
         }
     }
 
-    if( lang_changed ) {
-        set_language();
-    }
     calendar::set_eternal_season( ::get_option<bool>( "ETERNAL_SEASON" ) );
     calendar::set_season_length( ::get_option<int>( "SEASON_LENGTH" ) );
 

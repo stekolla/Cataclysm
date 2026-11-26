@@ -1,72 +1,30 @@
 #include "translations.h"
 
-#include <algorithm>
+#include <functional>
 
 #include "cached_options.h"
-#include "cata_libintl.h"
-#include "catacharset.h"
 #include "json.h"
-#include "language.h"
-#include "rng.h"
 #include "string_utils.h"
 
-// int version/generation that is incremented each time language is changed
-// used to invalidate translation cache
-static int current_language_version = INVALID_LANGUAGE_VERSION + 1;
-
-int detail::get_current_language_version()
+const char *detail::_translate_internal( const char *msg ) // *NOPAD*
 {
-    return current_language_version;
+    return msg;
 }
 
-void invalidate_translations()
+const char *vgettext( const char *msgid, const char *msgid_plural, size_t n ) // *NOPAD*
 {
-    // increment version to invalidate translation cache
-    do {
-        current_language_version++;
-    } while( current_language_version == INVALID_LANGUAGE_VERSION );
+    return n == 1 ? msgid : msgid_plural;
 }
 
-const char *detail::_translate_internal( const char *msg )
+const char *pgettext( const char * /*context*/, const char *msgid ) // *NOPAD*
 {
-    return l10n_data::get_library().get( msg );
+    return msgid;
 }
 
-const char *vgettext( const char *msgid, const char *msgid_plural, size_t n )
+const char *vpgettext( const char *const /*context*/, const char *const msgid,
+                       const char *const msgid_plural, const size_t n ) // *NOPAD*
 {
-    return l10n_data::get_library().get_pl( msgid, msgid_plural, n );
-}
-
-const char *pgettext( const char *context, const char *msgid )
-{
-    return l10n_data::get_library().get_ctx( context, msgid );
-}
-
-const char *vpgettext( const char *const context, const char *const msgid,
-                       const char *const msgid_plural, const size_t n )
-{
-    return l10n_data::get_library().get_ctx_pl( context, msgid, msgid_plural, n );
-}
-
-std::string gettext_gendered( const GenderMap &genders, const std::string &msg )
-{
-    const std::vector<std::string> &language_genders = get_language().genders;
-
-    std::vector<std::string> chosen_genders;
-    for( const auto &subject_genders : genders ) {
-        // default if no match
-        std::string chosen_gender = language_genders[0];
-        for( const std::string &gender : subject_genders.second ) {
-            if( std::ranges::find( language_genders, gender ) !=
-                language_genders.end() ) {
-                chosen_gender = gender;
-                break;
-            }
-        }
-        chosen_genders.push_back( subject_genders.first + ":" + chosen_gender );
-    }
-    std::string context = join( chosen_genders, " " );
-    return pgettext( context.c_str(), msg.c_str() );
+    return n == 1 ? msgid : msgid_plural;
 }
 
 translation::translation( const plural_tag ) : raw_pl( cata::make_value<std::string>() ) {}
@@ -135,7 +93,6 @@ void translation::make_plural()
         raw_pl = cata::make_value<std::string>();
     }
     // reset the cache
-    cached_language_version = INVALID_LANGUAGE_VERSION;
     cached_translation = nullptr;
 }
 
@@ -150,14 +107,12 @@ void translation::add_context( const std::string &ctxt )
         this->ctxt = cata::make_value<std::string>( ctxt );
     }
     // reset the cache
-    cached_language_version = INVALID_LANGUAGE_VERSION;
     cached_translation = nullptr;
 }
 
 void translation::deserialize( JsonIn &jsin )
 {
     // reset the cache
-    cached_language_version = INVALID_LANGUAGE_VERSION;
     cached_translation = nullptr;
 
 #ifndef CATA_IN_TOOL
@@ -273,30 +228,11 @@ std::string translation::translated( const int num ) const
     if( !needs_translation || raw.empty() ) {
         return raw;
     }
-    // Note1: `raw`, `raw_pl` and `ctxt` are effectively immutable for caching purposes:
-    // in the places where they are changed, cache is explicitly invalidated
-    // Note2: if `raw_pl` is defined, `num` becomes part of the "cache key"
-    // otherwise `num` is ignored (for both translation and cache)
-    if( cached_language_version != current_language_version ||
-        ( raw_pl && cached_num != num ) || !cached_translation ) {
-        cached_language_version = current_language_version;
+    // A count selects the cached plural form when one is present.
+    if( ( raw_pl && cached_num != num ) || !cached_translation ) {
         cached_num = num;
 
-        if( !ctxt ) {
-            if( !raw_pl ) {
-                cached_translation = cata::make_value<std::string>( detail::_translate_internal( raw ) );
-            } else {
-                cached_translation = cata::make_value<std::string>(
-                                         vgettext( raw.c_str(), raw_pl->c_str(), num ) );
-            }
-        } else {
-            if( !raw_pl ) {
-                cached_translation = cata::make_value<std::string>( pgettext( ctxt->c_str(), raw.c_str() ) );
-            } else {
-                cached_translation = cata::make_value<std::string>(
-                                         vpgettext( ctxt->c_str(), raw.c_str(), raw_pl->c_str(), num ) );
-            }
-        }
+        cached_translation = cata::make_value<std::string>( raw_pl && num != 1 ? *raw_pl : raw );
     }
     return *cached_translation;
 }

@@ -1,37 +1,23 @@
 #pragma once
 
-#include <map>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <type_traits>
+#include <tuple>
 #include <utility>
-#include <vector>
 
 #include "value_ptr.h"
 
-constexpr int INVALID_LANGUAGE_VERSION = 0;
-
-namespace detail
-{
-// returns current language generation/version
-int get_current_language_version();
-} // namespace detail
-
-void invalidate_translations();
-
 #if !defined(translate_marker)
 /**
- * Marks a string literal to be extracted for translation. This is only for running `xgettext` via
- * "lang/update_pot.sh". Use `_` to extract *and* translate at run time. The macro itself does not
- * do anything, the argument is passed through it without any changes.
+ * Keeps legacy string markers source-compatible. The argument is passed through unchanged.
  */
 #define translate_marker(x) x
 #endif
 #if !defined(translate_marker_context)
 /**
- * Same as @ref translate_marker, but also provides a context (string literal). This is similar
- * to @ref pgettext, but it does not translate at run time. Like @ref translate_marker it just
- * passes the *second* argument through.
+ * Keeps legacy contextual string markers source-compatible. The second argument is passed through.
  */
 #define translate_marker_context(c, x) x
 #endif
@@ -45,7 +31,7 @@ void invalidate_translations();
 namespace detail
 {
 // same as _(), but without local cache
-const char *_translate_internal( const char *msg ) ATTRIBUTE_FORMAT_ARG( 1 );
+const char *_translate_internal( const char *msg ) ATTRIBUTE_FORMAT_ARG( 1 ); // *NOPAD*
 
 // same as _(), but without local cache
 inline std::string _translate_internal( const std::string &msg )
@@ -60,15 +46,15 @@ template<>
 class local_translation_cache<std::string>
 {
     private:
-        int cached_lang_version = INVALID_LANGUAGE_VERSION;
+        bool has_cached_arg = false;
         std::string cached_arg;
         std::string cached_translation;
     public:
         const std::string &operator()( const std::string &arg ) {
-            if( cached_lang_version != get_current_language_version() || cached_arg != arg ) {
-                cached_lang_version = get_current_language_version();
+            if( !has_cached_arg || cached_arg != arg ) {
                 cached_arg = arg;
                 cached_translation = _translate_internal( arg );
+                has_cached_arg = true;
             }
             return cached_translation;
         }
@@ -78,20 +64,19 @@ template<>
 class local_translation_cache<const char *>
 {
     private:
+        bool has_cached_arg = false;
         std::string cached_arg;
-        int cached_lang_version = INVALID_LANGUAGE_VERSION;
         bool same_as_arg;
         const char *cached_translation;
     public:
-        const char *operator()( const char *arg ) {
-            if( cached_lang_version != get_current_language_version() || cached_arg != arg ) {
-                cached_lang_version = get_current_language_version();
+        const char *operator()( const char *arg ) { // *NOPAD*
+            if( !has_cached_arg || cached_arg != arg ) {
                 cached_translation = _translate_internal( arg );
                 same_as_arg = cached_translation == arg;
                 cached_arg = arg;
+                has_cached_arg = true;
             }
-            // mimic gettext() behavior: return `arg` if no translation is found
-            // `same_as_arg` is needed to ensure that the current `arg` is returned (not a cached one)
+            // Return the current argument to preserve pointer identity.
             return same_as_arg ? arg : cached_translation;
         }
 };
@@ -118,33 +103,19 @@ static inline local_translation_cache<std::string> get_local_translation_cache(
     } )( msg ) )
 
 const char *vgettext( const char *msgid, const char *msgid_plural,
-                      size_t n ) ATTRIBUTE_FORMAT_ARG( 1 );
+                      size_t n ) ATTRIBUTE_FORMAT_ARG( 1 ); // *NOPAD*
 
-const char *pgettext( const char *context, const char *msgid ) ATTRIBUTE_FORMAT_ARG( 2 );
+const char *pgettext( const char *context, const char *msgid ) ATTRIBUTE_FORMAT_ARG( 2 ); // *NOPAD*
 
 // same as pgettext, but supports plural forms like vgettext
 const char *vpgettext( const char *context, const char *msgid, const char *msgid_plural,
-                       size_t n ) ATTRIBUTE_FORMAT_ARG( 2 );
+                       size_t n ) ATTRIBUTE_FORMAT_ARG( 2 ); // *NOPAD*
 
-
-using GenderMap = std::map<std::string, std::vector<std::string>>;
-/**
- * Translation with a gendered context
- *
- * Similar to pgettext, but the context is a collection of genders.
- * @param genders A map where each key is a subject name (a string which should
- * make sense to the translator in the context of the line to be translated)
- * and the corresponding value is a list of potential genders for that subject.
- * The first gender from the list of genders for the current language will be
- * chosen for each subject (or the language default if there are no genders in
- * common).
- */
-std::string gettext_gendered( const GenderMap &genders, const std::string &msg );
 
 class JsonIn;
 
 /**
- * Class for storing translation context and raw string for deferred translation
+ * Class for storing English strings and their optional plural forms.
  **/
 class translation
 {
@@ -162,7 +133,7 @@ class translation
         translation( plural_tag );
 
         /**
-         * Store a string, an optional plural form, and an optional context for translation
+         * Store a string, an optional plural form, and an optional legacy context
          **/
         static translation to_translation( const std::string &raw );
         static translation to_translation( const std::string &ctxt, const std::string &raw );
@@ -170,7 +141,7 @@ class translation
         static translation pl_translation( const std::string &ctxt, const std::string &raw,
                                            const std::string &raw_pl );
         /**
-         * Store a string that needs no translation.
+         * Store a string without a plural form.
          **/
         static translation no_translation( const std::string &str );
 
@@ -178,8 +149,7 @@ class translation
          * Can be used to ensure a translation object has plural form enabled
          * before loading into it from JSON. If plural form has not been enabled
          * yet, the plural string will be set to the original singular string.
-         * `vgettext` will ignore the new plural string and correctly retrieve
-         * the original translation.
+         * `vgettext` will ignore the new plural string and use the English singular form.
          *     Note that a `make_singular()` function is not provided due to the
          * potential loss of information.
          **/
@@ -203,9 +173,7 @@ class translation
         void deserialize( JsonIn &jsin );
 
         /**
-         * Returns raw string if no translation is needed, otherwise returns
-         * the translated string. A number can be used to translate the plural
-         * form if the object has it.
+         * Returns the stored English string. A number selects the plural form when present.
          **/
         std::string translated( int num = 1 ) const;
 
@@ -228,10 +196,7 @@ class translation
         bool empty() const;
 
         /**
-         * Compare translations by their translated strings (singular form).
-         *
-         * Be especially careful when using these to sort translations, as the
-         * translated result will change when switching the language.
+         * Compare the stored English strings (singular form).
          **/
         bool translated_lt( const translation &that ) const;
         bool translated_eq( const translation &that ) const;
@@ -269,7 +234,6 @@ class translation
         cata::value_ptr<std::string> raw_pl = nullptr;
         bool needs_translation = false;
         // translation cache. For "plural" translation only latest `num` is optimistically cached
-        mutable int cached_language_version = INVALID_LANGUAGE_VERSION;
         mutable int cached_num = 0; // `num`, which `cached_translation` corresponds to
         mutable cata::value_ptr<std::string> cached_translation;
 };

@@ -45,8 +45,4 @@ loading-screens:
 playtest *args:
     deno run --allow-read --allow-write --allow-run --allow-env scripts/playtest.ts "$@"
 
-# Download the latest .po files from Transifex (needs `tx` and TX_TOKEN): just pull-po [LANG,...].
-pull-po *LANGS:
-    tx pull --force {{ if LANGS == '' { '--all' } else { '--languages ' + replace(LANGS, ' ', ',') } }}
-
 check: lint

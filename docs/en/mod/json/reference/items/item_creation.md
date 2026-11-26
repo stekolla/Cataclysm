@@ -10,7 +10,7 @@
 "type": "GENERIC",                // Defines this as some generic item
 "id": "socks",                    // Unique ID. Must be one continuous word, use underscores if necessary
 "name": {
-    "ctxt": "clothing",           // Optional translation context. Useful when a string has multiple meanings that need to be translated differently in other languages.
+    "ctxt": "clothing",           // Accepted for compatibility; does not change displayed text.
     "str": "pair of socks",       // The name appearing in the examine box.  Can be more than one word separated by spaces
     "str_pl": "pairs of socks"    // Optional. If a name has an irregular plural form (i.e. cannot be formed by simply appending "s" to the singular form), then this should be specified. "str_sp" can be used if the singular and plural forms are the same
 },

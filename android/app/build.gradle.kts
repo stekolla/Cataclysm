@@ -61,7 +61,6 @@ fun resolveShadercross(configured: String): String {
 }
 
 val njobs = gradleProperty("j")
-val localize = gradleProperty("localize").toBoolean()
 val abiArm32 = gradleProperty("abi_arm_32").toBoolean()
 val abiArm64 = gradleProperty("abi_arm_64").toBoolean()
 val abiX8632 = gradleProperty("abi_x86_32").toBoolean()
@@ -79,7 +78,6 @@ val overrideNdkVersion = gradleProperty("override_ndkVersion")
 val versionHeaderFile = rootProject.file(versionHeaderPath)
 
 println("Using [              njobs]: $njobs")
-println("Using [           localize]: $localize")
 println("Using [               deps]: $deps")
 println("Using [        shadercross]: $shadercross")
 println("Using [             ccache]: ${ccache.ifEmpty { "<disabled>" }}")
@@ -137,20 +135,6 @@ val unzipSqlite by tasks.registering(Copy::class) {
     into("jni/sqlite3")
 }
 
-val compileLocalization by tasks.registering(Exec::class) {
-    workingDir("../..")
-    if (localize) {
-        println("Building with localization'")
-        val operatingSystem = OperatingSystem.current()
-        when {
-            operatingSystem.isLinux -> commandLine("lang/compile_mo.sh", "all")
-            operatingSystem.isWindows -> commandLine("sh.exe", "-c", "lang/compile_mo.sh all")
-            else -> commandLine("echo", "Building without localization")
-        }
-    } else {
-        commandLine("echo", "Building without localization")
-    }
-}
 
 val shaderSourceDir = rootProject.file("../src/shaders")
 val shaderOutputDir = rootProject.file("../data/shaders")
@@ -193,7 +177,6 @@ val compileAndroidShaders by tasks.registering {
     }
 }
 
-unzipDeps.configure { dependsOn(compileLocalization) }
 tasks.named("preBuild") { dependsOn(unzipDeps, unzipSqlite, compileAndroidShaders) }
 
 tasks.configureEach {

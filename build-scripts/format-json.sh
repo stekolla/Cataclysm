@@ -41,7 +41,6 @@ cmake_args=(
     -DTILES=OFF
     -DCURSES=OFF
     -DSOUND=OFF
-    -DLANGUAGES=none
     -DLUA_DOCS_ON_BUILD=OFF
 )
 

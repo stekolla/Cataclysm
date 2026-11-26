@@ -48,7 +48,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            gettext mold jq \
+            mold jq \
             sqlite3 libsqlite3-dev zlib1g-dev libvulkan-dev mesa-vulkan-drivers xvfb \
             autoconf autoconf-archive automake libtool libltdl-dev
 

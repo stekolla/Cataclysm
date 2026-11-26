@@ -149,17 +149,8 @@ jobs:
             echo "upload_assets=false" >> "$GITHUB_OUTPUT"
           fi
 
-  build-translations:
-    needs: [metadata, release]
-    if: ${{ needs.release.outputs.upload_assets == 'true' }}
-    uses: ./.github/workflows/build-translations.yml
-    with:
-      checkout-ref: ${{ needs.metadata.outputs.tag_name }}
-    secrets:
-      TX_TOKEN: ${{ secrets.TX_TOKEN }}
-
   builds:
-    needs: [metadata, release, build-translations]
+    needs: [metadata, release]
     if: ${{ needs.release.outputs.upload_assets == 'true' }}
     uses: ./.github/workflows/build.yml
     with:

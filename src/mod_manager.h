@@ -23,34 +23,28 @@ const std::vector<std::pair<std::string, std::string> > &get_mod_list_categories
 const std::vector<std::pair<std::string, std::string> > &get_mod_list_tabs();
 const std::map<std::string, std::string> &get_mod_list_cat_tab();
 
-struct translatable_mod_info {
+struct mod_display_info {
     private:
-        std::string mod_path;
-        std::string name_raw_;
-        std::string name_tr;
-        std::string description_raw;
-        std::string description_tr;
-        int language_version = 0;
-        void update();
+        std::string name_;
+        std::string description_;
     public:
-        translatable_mod_info();
-        translatable_mod_info( std::string name, std::string description, std::string path );
-        auto name() -> std::string;
-        auto name_raw() const -> std::string;
-        auto description() -> std::string;
+        mod_display_info() = default;
+        mod_display_info( std::string name, std::string description );
+        auto name() const -> std::string;
+        auto description() const -> std::string;
 };
 
 struct MOD_INFORMATION {
     private:
-        mutable translatable_mod_info translatable_info;
+        mod_display_info display_info;
 
     public:
         auto name() const -> std::string;
         auto name_raw() const -> std::string;
         auto description() const -> std::string;
 
-        void set_translatable_info( translatable_mod_info &&tmi ) {
-            translatable_info = std::move( tmi );
+        void set_display_info( mod_display_info &&info ) {
+            display_info = std::move( info );
         }
 
         mod_id ident;

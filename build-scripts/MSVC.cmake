@@ -68,7 +68,6 @@ add_compile_definitions(
     _SCL_SECURE_NO_WARNINGS
     _CRT_SECURE_NO_WARNINGS
     WIN32_LEAN_AND_MEAN
-    LOCALIZE
     USE_VCPKG
 )
 option(CATA_MSVC_FAST_LINK "Link with /DEBUG:FASTLINK and without /OPT:ICF" OFF)

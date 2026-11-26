@@ -40,7 +40,6 @@
 #include "filesystem.h"
 #include "get_version.h"
 #include "input.h"
-#include "language.h"
 #include "mod_manager.h"
 #include "options.h"
 #include "output.h"
