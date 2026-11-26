@@ -4,6 +4,7 @@
 
 #include "cached_options.h"
 #include "json.h"
+#include "rng.h"
 #include "string_utils.h"
 
 const char *detail::_translate_internal( const char *msg ) // *NOPAD*

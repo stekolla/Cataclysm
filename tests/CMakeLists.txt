@@ -11,6 +11,7 @@ if (CATA_TESTS_ONLY)
     add_executable(cata_test ${CATACLYSM_BN_TEST_SOURCES})
     target_link_libraries(cata_test PRIVATE cataclysm-bn-common)
     target_compile_options(cata_test PRIVATE ${CATCH2_COMPILE_OPTIONS})
+    target_compile_definitions(cata_test PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
     add_test(
         NAME test
         COMMAND $<TARGET_FILE:cata_test> --rng-seed 1 "~[slow]~[wasm]"
@@ -19,6 +20,7 @@ elseif (EMSCRIPTEN AND TILES AND NOT CURSES)
     add_executable(cata_test-tiles ${CATACLYSM_BN_TEST_SOURCES})
     target_link_libraries(cata_test-tiles PRIVATE cataclysm-bn-tiles-common)
     target_compile_options(cata_test-tiles PRIVATE ${CATCH2_COMPILE_OPTIONS})
+    target_compile_definitions(cata_test-tiles PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
     set_property(TARGET cata_test-tiles PROPERTY CATA_WASM_TEST_RUNNER ON)
     cata_configure_web_target(cata_test-tiles)
 

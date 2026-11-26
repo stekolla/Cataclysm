@@ -17,6 +17,7 @@
 #    define CATCH_CONFIG_IMPL_ONLY
 #endif
 #define CATCH_CONFIG_RUNNER
+#include "../src/locale.h"
 #include "../src/map/map.h"
 #include "../src/overmap/overmap.h"
 #include "../src/overmap/overmapbuffer.h"
@@ -31,7 +32,6 @@
 #include "filesystem.h"
 #include "game.h"
 #include "init.h"
-#include "locale.h"
 #include "loading_ui.h"
 #include "mod_manager.h"
 #include "options.h"
@@ -191,9 +191,7 @@ static void init_global_game_state(
         assert(!"Unable to make templates directory.  Check permissions.");
     }
 
-    if (!init_locale()) {
-        DebugLog(DL::Error, DC::Main) << "Failed to initialize process locale.";
-    }
+    if (!init_locale()) { DebugLog(DL::Error, DC::Main) << "Failed to initialize process locale."; }
 
     get_options().init();
     get_options().load();

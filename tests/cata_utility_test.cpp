@@ -5,6 +5,8 @@
 #include "units.h"
 #include "units_utility.h"
 
+#include <set>
+
 TEST_CASE("divide_round_up", "[utility]") {
     CHECK(divide_round_up(0, 5) == 0);
     CHECK(divide_round_up(1, 5) == 1);

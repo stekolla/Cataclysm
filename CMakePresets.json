@@ -6,11 +6,14 @@
       "name": "wasm-tiles",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "displayName": "WebAssembly Game",
-      "description": "Build Bright Nights for desktop browsers with Emscripten.",
+      "description": "Build Cataclysm for desktop browsers with Emscripten.",
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
         "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_JOB_POOLS": "compile=6;link=1",
+        "CMAKE_JOB_POOL_COMPILE": "compile",
+        "CMAKE_JOB_POOL_LINK": "link",
         "TILES": "ON",
         "CURSES": "OFF",
         "SOUND": "OFF",
@@ -70,8 +73,20 @@
     }
   ],
   "buildPresets": [
-    { "name": "wasm-tiles", "configurePreset": "wasm-tiles", "targets": ["cataclysm-bn-tiles"] },
-    { "name": "wasm-tests", "configurePreset": "wasm-tests", "targets": ["cataclysm-bn-tiles", "cata_test-tiles"] },
-    { "name": "linux-tests", "configurePreset": "linux-tests", "targets": ["cata_test"] }
+    {
+      "name": "wasm-tiles",
+      "configurePreset": "wasm-tiles",
+      "targets": ["cataclysm-bn-tiles"]
+    },
+    {
+      "name": "wasm-tests",
+      "configurePreset": "wasm-tests",
+      "targets": ["cataclysm-bn-tiles", "cata_test-tiles"]
+    },
+    {
+      "name": "linux-tests",
+      "configurePreset": "linux-tests",
+      "targets": ["cata_test"]
+    }
   ]
 }
