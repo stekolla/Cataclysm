@@ -1,9 +1,12 @@
 # External Tilesets
 
-`data/json/external_tileset` is used for content specific to Bright Nights which are not presently
+`data/json/external_tileset` is used for content specific to Cataclysm which is not presently
 in primary tilesets such as UDP or Ultica, for which `looks_like` is inadequate to depict the
 content to a satisfactory degree. It functions using the `mod_tileset` feature, applying any desired
 new sprites or overriding sprites to the specified tileset.
+
+The browser build bundles only RetroDays; the UDP-specific information below records inherited
+Bright Nights assets and does not describe the current browser tileset.
 
 The primary advantage of this method is to set aside sprites so they won't interfere with updating
 the tilesets themselves (as their sources are in the repositories of the tileset authors), and

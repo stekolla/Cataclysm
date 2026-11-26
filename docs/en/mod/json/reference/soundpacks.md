@@ -1,8 +1,10 @@
 # Soundpacks
 
-A soundpack can be installed in the `data/sound` directory. It has to be a subdirectory that
-contains at least a file named `soundpack.txt`. It can include any number of json files which add
-any number of sound_effect or playlist.
+Sound is disabled in the browser build. This page documents the soundpack data format for
+development reference.
+
+A soundpack is a subdirectory of `data/sound` containing at least a file named `soundpack.txt`.
+It can include JSON files defining sound effects or playlists.
 
 ## soundpack.txt format
 

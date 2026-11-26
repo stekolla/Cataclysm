@@ -2,8 +2,8 @@
   {
     "type": "MOD_INFO",
     "id": "bn",
-    "name": "Bright Nights",
-    "description": "Core content for Cataclysm-BN",
+    "name": "Cataclysm",
+    "description": "Core content for Cataclysm",
     "category": "core",
     "core": true,
     "lua_api_version": 2,

@@ -189,16 +189,6 @@ if (TILES)
         cata_copy_windows_lavapipe_runtime(cataclysm-bn-tiles)
     endif()
 
-    if( LUA_DOCS_ON_BUILD AND DENO_BINARY )
-        add_custom_command(
-            TARGET cataclysm-bn-tiles POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E env --unset=LD_LIBRARY_PATH "CATA_EXE=$<TARGET_FILE:cataclysm-bn-tiles>" ${DENO_BINARY} task docs:gen
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Generating Lua reference/annotations (deno task docs:gen)"
-            VERBATIM
-        )
-    endif()
-
     if (CATA_SHADERS)
         add_dependencies(cataclysm-bn-tiles-common cata_shaders)
     endif ()

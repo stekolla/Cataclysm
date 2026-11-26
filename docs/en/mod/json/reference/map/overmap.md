@@ -196,7 +196,7 @@ referenced overmap terrains (e.g. the `_north` version for all).
 | `id`              | Unique id.                                                                                                                                                                                  |
 | `name`            | Name for the location shown in game.                                                                                                                                                        |
 | `sym`             | Symbol used when drawing the location, like `"F"` (or you may use an ASCII value like `70`).                                                                                                |
-| `color`           | Color to draw the symbol in. See [COLOR.md](../graphics/COLOR.md).                                                                                                                             |
+| `color`           | Color to draw the symbol in. See [COLOR.md](../graphics/color.md).                                                                                                                             |
 | `looks_like`      | Id of another overmap terrain to be used for the graphical tile, if this doesn't have one.                                                                                                  |
 | `connect_group`   | Specify that this overmap terrain might be graphically connected to its neighbours, should a tileset wish to. It will connect to any other `overmap_terrain` with the same `connect_group`. |
 | `see_cost`        | Affects player vision on overmap. Higher values obstruct vision more.                                                                                                                       |
@@ -827,7 +827,7 @@ subset of that for an overmap special, and consequently will not be repeated in 
 City buildings are not subject to the same quantity limitations as overmap specials, and in fact the
 occurrences attribute does not apply at all. Instead, the placement of city buildings is driven by
 the frequency assigned to the city building within the `region_settings`. Consult
-[REGION_SETTINGS.md](REGION_SETTINGS.md) for more details.
+[REGION_SETTINGS.md](region_settings.md) for more details.
 
 ### Fields
 

@@ -11,7 +11,7 @@ async function flushBrowserSaves() {
         await syncUserDirectory(false);
         return 1;
     } catch (error) {
-        console.error("Could not save Bright Nights data to IndexedDB", error);
+        console.error("Could not save Cataclysm data to IndexedDB", error);
         return 0;
     }
 }
@@ -24,13 +24,13 @@ Module["preRun"].push(() => {
 
     async function restore() {
         if (!navigator.locks) {
-            throw new Error("Open Bright Nights on localhost or HTTPS to use browser saves.");
+            throw new Error("Open Cataclysm on localhost or HTTPS to use browser saves.");
         }
 
         // IDBFS reconciles the entire mount. Keep another tab from writing a stale copy.
         await navigator.locks.request("bright-nights-userdata", { ifAvailable: true }, async (lock) => {
             if (!lock) {
-                throw new Error("Close the other Bright Nights tab and reload to use your browser saves.");
+                throw new Error("Close the other Cataclysm tab and reload to use your browser saves.");
             }
             FS.mkdir(userDirectory);
             FS.mount(IDBFS, {}, userDirectory);

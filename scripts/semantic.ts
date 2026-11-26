@@ -77,7 +77,7 @@ export const allModIds = await asynciter(walk("data/mods", {
   .then((xs) => xs.filter((x) => x !== undefined))
 
 /**
- * see `changelog_guidelines.md` for list of all allowed scopes.
+ * see `pr_title_guidelines.md` for list of all allowed scopes.
  */
 export const scopes = {
   /** Default allowed scopes */

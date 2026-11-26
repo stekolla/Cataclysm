@@ -304,7 +304,7 @@ static void debug_error_prompt(
 
     std::string formatted_report = [&]() {
         const char *repetition_string =
-            _( "Excessive error repetition detected.  Please file a bug report at https://github.com/cataclysmbn/Cataclysm-BN/issues" );
+            _( "Excessive error repetition detected.  Please file a bug report at https://github.com/stekolla/Cataclysm-BN/issues" );
         // try to prepend repetition string if we are forcing the display. Right now that's the only reason for this prompt to display.
         std::string pre = force ? string_format(
                               "            %s\n",
@@ -772,7 +772,7 @@ void DebugFile::init( DebugOutput output_mode, const std::string &filename )
                        filename.c_str(), std::ios::out | std::ios::app );
             *file << "\n\n-----------------------------------------\n";
             *file << get_time() << " : Starting log.\n";
-            DebugLog( DL::Info, DC::Main ) << "Cataclysm BN version " << getVersionString() << " " <<
+            DebugLog( DL::Info, DC::Main ) << "Cataclysm version " << getVersionString() << " " <<
                                            game_info::bitness_string();
             if( rename_failed ) {
                 DebugLog( DL::Info, DC::Main ) << "Moving the previous log file to "

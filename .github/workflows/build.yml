@@ -67,7 +67,7 @@ jobs:
 
       - name: Package browser build
         run: |
-          archive="cataclysm-bn-web-${{ inputs.version-label }}.zip"
+          archive="cataclysm-web-${{ inputs.version-label }}.zip"
           cd out/build/wasm-tests/web
           zip -qr "${GITHUB_WORKSPACE}/${archive}" . -x 'cata_test-tiles*'
           echo "archive=${archive}" >> "$GITHUB_OUTPUT"

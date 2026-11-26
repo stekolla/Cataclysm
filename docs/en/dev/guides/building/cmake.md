@@ -1,6 +1,6 @@
 # Build and Run the Browser Game
 
-Cataclysm: Bright Nights is built for desktop browsers with Emscripten and WebAssembly. Native game
+Cataclysm is built for desktop browsers with Emscripten and WebAssembly. Native game
 builds are not supported. The repository's Docker environment provides the pinned Emscripten SDK,
 Linux test toolchain, Deno, and headless Chromium.
 
@@ -30,7 +30,7 @@ Promise Integration (JSPI). The build output is in `out/build/wasm-tiles/web`.
 
 The browser build uses the RetroDays tileset and CPU compute. It runs in English with sound disabled.
 Use **Save and Quit** (`S`) before reloading. Saves stay in that browser profile for the same site
-address and port. Use one Bright Nights tab per site to keep saves consistent.
+address and port. Use one Cataclysm tab per site to keep saves consistent.
 
 To configure and build without the `just` recipes, run these commands inside the Docker environment:
 

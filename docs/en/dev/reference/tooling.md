@@ -46,7 +46,7 @@ safely update a tags file containing source code tags, so if you want both types
 ## clang-tidy
 
 Cataclysm has a
-[clang-tidy configuration file](https://github.com/cataclysmbn/Cataclysm-BN/blob/main/.clang-tidy)
+[clang-tidy configuration file](https://github.com/stekolla/Cataclysm-BN/blob/main/.clang-tidy)
 and if you have `clang-tidy` available you can run it to perform static analysis of the codebase. We
 test with `clang-tidy` from LLVM 22 with CI, so for the most consistent results, you might want to
 use that version.

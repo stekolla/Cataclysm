@@ -42,7 +42,6 @@ cmake_args=(
     -DTILES=OFF
     -DCURSES=OFF
     -DSOUND=OFF
-    -DLUA_DOCS_ON_BUILD=OFF
 )
 
 if [[ -n "${CMAKE_GENERATOR:-}" ]]; then

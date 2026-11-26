@@ -55,7 +55,7 @@ lint-dialogue:
 hooks-setup:
     prek install
 
-# Download loading screen images into data/.
+# Set CATA_LOADING_SCREENS_ARCHIVE_URL to an archive URL before downloading images.
 loading-screens:
     build-scripts/fetch-loading-screens.sh
 

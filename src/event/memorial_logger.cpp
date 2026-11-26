@@ -166,7 +166,7 @@ void memorial_logger::write(std::ostream& file, const std::string& epitaph) cons
     const std::string kill_place = string_format(_("%1$s was killed in a %2$s."), pronoun, locdesc);
 
     // Header
-    file << string_format(_("Cataclysm: Bright Nights version %s memorial file"), getVersionString())
+    file << string_format(_("Cataclysm version %s memorial file"), getVersionString())
          << eol;
     file << eol;
     file << string_format(_("In memory of: %s"), u.name) << eol;

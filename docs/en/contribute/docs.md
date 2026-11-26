@@ -8,16 +8,6 @@ Use standard Markdown and fenced code blocks. Keep screenshots and diagrams in t
 to the page that uses them. Avoid site-specific front matter, HTML widgets, and links that depend on
 site URL routing.
 
-The CLI and Lua API reference pages are generated from the game source. From the repository root,
-run:
-
-```sh
-deno task docs:gen
-```
-
-This updates `docs/en/dev/reference/cli_options.md`, `docs/en/mod/lua/reference/lua.md`, and
-`lua_annotations.lua` (used for Lua IDE autocompletion).
-
 ## License
 
 - By contributing to Markdown files, you agree to license your contributions under

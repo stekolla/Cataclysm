@@ -19,9 +19,6 @@ the code) the error originated from.
 You can press `space` to dismiss the message, or `i` to dismiss the message and all its subsequent
 occurences until game restart.
 
-You can suppress (at your own risk) all debug messages by running the game executable with
-`--dont-debugmsg` command line option.
-
 In code, you can invoke a debug message like this:
 
 ```cpp
@@ -36,7 +33,7 @@ debugmsg( "Failed to open file, code %d", 123 );
 Debug log contains various status messages produced by the game, including general info, warnings or
 hard errors. It's usually the go-to place for initial diagnostic of most bugs.
 
-It's contained in a single file named `debug.log` which is located in user's `config` folder.
+It's contained in `debug.log` in the game's user data.
 
 You can manually control debug log verbosity in game options (`Options` -> `Debug` tab -> `Logging`
 submenu).
@@ -58,15 +55,7 @@ DebugLogFL( DL::Info, DC::Map ) << "My " << "logged" << " info!";
 Crash log contains backtrace after game crash. It's extremely helpful for solving crashes, as it
 essentially holds the info about what code (and where) experienced the crash.
 
-It's contained in a single file named `crash.log` which is located in user's `config` folder.
-
-Sometimes, if crash is "weird" enough, or the executable was compiled without backtrace support,
-crash log is not generated.
-
-In code, you don't have to add any special logic for crash traces, but the build must have
-backtraces enabled. Some builds also support optional `libbacktace` that may make the backtraces
-more readable. If it takes a long time (up to half a minute) to generate backtraces on Linux,
-consider compiling with `clang++` instead of `g++`.
+Depending on the build and failure, a crash log may not be generated.
 
 ## Debug mode
 
@@ -118,9 +107,7 @@ Old or infrequently maintained mods may trigger hundreds of these, so the option
 default. You can enable it in game options (`Options` -> `Debug` tab ->
 `Report unused JSON fields`).
 
-If you'd like to propose your changes to BN, keep in mind that both the testing executable
-`tests/cata_test[.exe]` and automated PR checks in the repository are run with this option
-**enabled**.
+See the [testing guide](../../../dev/guides/testing.md) for the repository's test routes.
 
 TODO: rename the option to imply all listed checks, maybe also enable it by default.
 
@@ -128,7 +115,7 @@ TODO: rename the option to imply all listed checks, maybe also enable it by defa
 
 ## Tileset reload and report
 
-Useful for tileset makers, this feature reloads the active tileset from disk, redraws the screen and
+Useful for tileset makers, this feature reloads the active tileset from game data, redraws the screen and
 writes completeness report to the [debug log](#debug-log).
 
 To use the feature, you'll have to bind `Reload Tileset` action to any key and press it.

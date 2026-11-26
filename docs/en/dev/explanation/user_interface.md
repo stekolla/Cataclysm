@@ -1,7 +1,7 @@
 # User Interface
 
-Cataclysm: Bright Nights uses ncurses, or in the case of the tiles build, an ncurses port, for user
-interface. Window management is achieved by `ui_adaptor`, which requires a resizing callback and a
+Cataclysm's browser build uses a tiles implementation of the curses-style user interface.
+Window management is achieved by `ui_adaptor`, which requires a resizing callback and a
 redrawing callback for each UI to handle resizing and redrawing. Details on how to use `ui_adaptor`
 can be found within `ui_manager.h`.
 

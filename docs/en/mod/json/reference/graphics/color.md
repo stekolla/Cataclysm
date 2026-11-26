@@ -1,6 +1,6 @@
 # Colors
 
-BN is a colorful game. You can use several foreground and background colors in various places:
+Cataclysm uses several foreground and background colors in various places:
 
 - map data (terrain and furniture);
 - item data;

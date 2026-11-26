@@ -4,7 +4,7 @@ if (POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
 endif ()
 
-project(CataclysmBN C CXX)
+project(Cataclysm C CXX)
 
 list(APPEND CMAKE_MODULE_PATH
         ${CMAKE_SOURCE_DIR}/CMakeModules)
@@ -60,12 +60,6 @@ find_program(DENO_BINARY deno)
 if (EMSCRIPTEN AND TESTS AND NOT DENO_BINARY)
     message(FATAL_ERROR "Deno is required to launch browser-based Wasm tests.")
 endif()
-if(DENO_BINARY)
-    set(LUA_DOCS_DEFAULT ON)
-else()
-    set(LUA_DOCS_DEFAULT OFF)
-endif()
-option(LUA_DOCS_ON_BUILD "Generate Lua reference/annotations after building cataclysm-bn-tiles (requires deno)." ${LUA_DOCS_DEFAULT})
 set(CATA_CLANG_TIDY_INCLUDE_DIR "" CACHE STRING
         "Path to internal clang-tidy headers required for plugin (e.g. ClangTidy.h)")
 set(CATA_CHECK_CLANG_TIDY "" CACHE STRING "Path to check_clang_tidy.py for plugin tests")
@@ -135,7 +129,7 @@ if (NOT "${GIT_VERSION}" MATCHES "GIT-NOTFOUND")
 build type: ${BUILD_PRESET_NAME}\n\
 build number: ${_timestamp}\n\
 commit sha: ${_sha1}\n\
-commit url: https://github.com/cataclysmbn/Cataclysm-BN/commit/${_sha1}"
+commit url: https://github.com/stekolla/Cataclysm-BN/commit/${_sha1}"
     )
 endif ()
 
@@ -231,7 +225,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     message(STATUS "Build ${PROJECT_NAME} in development mode --")
     message(STATUS "Binaries will be located in: " ${CMAKE_SOURCE_DIR})
     set(CMAKE_VERBOSE_MAKEFILE ON)
-    # Since CataclysmBN does not respect PREFIX for development builds
+    # Since Cataclysm does not respect PREFIX for development builds
     # and has funny path handlers, we should create resulting Binaries
     # in the source directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} CACHE PATH

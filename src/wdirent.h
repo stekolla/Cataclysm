@@ -28,7 +28,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * Modifications for Cataclysm BN:
+ * Modifications inherited from Cataclysm: Bright Nights:
  * 1. Some functions were removed as dead code.
  * 2. dirent_mbstowcs_s and dirent_wcstombs_s were rewritten to
  *    use MultiByteToWideChar and WideCharToMultiByte

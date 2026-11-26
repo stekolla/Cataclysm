@@ -7,9 +7,9 @@
 > Some parts of the documentation are incomplete or have not been properly updated from older
 > documentation. Contributions to fix this are greatly appreciated.
 
-Certain features of the game can be modified without rebuilding the game from source code. This
-includes professions, monsters, npcs, and more. Just modify the pertinent files and run the game to
-see your changes.
+Certain features of the game can be modified through data files, including professions, monsters,
+and NPCs. The browser build bundles these files, so rebuild it after making changes. See the
+[browser build guide](../../../dev/guides/building/cmake.md).
 
 The majority of modding is done by editing JSON files. An in-depth review of all json files and
 their appropriate fields is available in [JSON_INFO](../reference/json_info.md).
@@ -381,9 +381,8 @@ matching opposite); These editors will also respect escaped characters properly.
 [Notepad++](https://notepad-plus-plus.org/) is a popular, free editor on Windows that contains this
 feature. On Linux, there are a plethora of options, and you probably already have a preferred one 🙂
 
-You may also want to use some online or offline JSON validator, e.g.
-https://dev.narc.ro/cataclysm/format.html , or `json_formatter` bundled with every release of the
-game (just drag-and-drop the .json file on it).
+To format JSON files in a working copy, use `just fmt-json`. See the
+[formatting guide](../../../dev/guides/formatting.md) for details.
 
 ## Addendum
 

@@ -1,17 +1,15 @@
 # Binding new type
 
-### Adding new type to the doc generator without binding internals
+### Registering a type name
 
-If a C++ type has not been registered in the doc generator, it will show up as
-`<cppval: **gibberish** >`. To mitigate this problem, you can add
-`LUNA_VAL( your_type, "YourType" )` in `catalua_luna_doc.h`, and the generator will use `YourType`
-string for argument type.
+Add `LUNA_VAL( your_type, "YourType" )` in `catalua_luna_doc.h` to register a C++ type with its
+Lua-facing name.
 
 ### Binding new type to Lua
 
 First, we need to register the new type with the bindings system. It needs to be done for many
-reasons, including so that the doc generator understands it, and the runtime can deserialize from
-JSON any Lua table that contains that type. If you don't you'll get a compile error saying
+reasons, including so that the runtime can deserialize from JSON any Lua table that contains that
+type. If you don't you'll get a compile error saying
 `Type must implement luna_traits<T>`.
 
 1. In `catala_luna_doc.h`, add declaration for your type. For example, if we're binding an imaginary
@@ -22,7 +20,7 @@ JSON any Lua table that contains that type. If you don't you'll get a compile er
    Complex templated types may need to actually pull in the relevant header, but please avoid it as
    it heavily impacts compilation times.
 
-2. In the same file, register your type with the doc generator. Continuing with the `horde` example,
+2. In the same file, register your type. Continuing with the `horde` example,
    it's done like this:
    ```cpp
    LUNA_VAL( horde, "Horde" );
@@ -215,8 +213,8 @@ Binding enums is similar to binding types. Let's bind an imaginary `horde_type` 
 
 Binding these can be done separately from binding `T` itself.
 
-1. Register your type `T` with the doc generator if you haven't already (see
-   [relevant docs](#adding-new-type-to-the-doc-generator-without-binding-internals)).
+1. Register your type `T` if you haven't already (see
+   [registering a type name](#registering-a-type-name)).
 2. Replace `LUNA_VAL` from step 1 with `LUNA_ID`.
 3. Ensure your type `T` implements operators `<` and `==`. It's usually easy implement them
    manually, and can be done semi-automatically with macro `LUA_TYPE_OPS` found in

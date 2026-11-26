@@ -40,7 +40,7 @@ NOTE: Please read your emails. Anyone mentioned on Github with an @ will receive
 - [ ] This PR used AI assistance.
   - [ ] I added an [`Assisted-by:` trailer](https://docs.kernel.org/process/coding-assistants.html) to every AI-assisted commit.
 - [ ] This PR ports someone else's contribution (e.g from DDA or other fork).
-  - [ ] I have added `port` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
+  - [ ] I have added `port` scope to the PR title (see `docs/en/contribute/pr_title_guidelines.md`).
   - [ ] I have attributed original authors in the commit messages adding [`Co-Authored-By`](https://docs.github.com/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors) in the commit message.
   - [ ] I have linked the URL of original PR(s) in the description.
 - [ ] This is a C++ PR that modifies JSON loading or behavior.
@@ -56,8 +56,8 @@ NOTE: Please read your emails. Anyone mentioned on Github with an @ will receive
 - [ ] This is a PR that removes JSON entities.
   - [ ] The removed JSON entities have new entries in `data/json/obsoletion/` folder or use some other migration process for existing saves.
 - [ ] This PR adds/removes a mod.
-  - [ ] I have added `mods` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
+  - [ ] I have added `mods` scope to the PR title (see `docs/en/contribute/pr_title_guidelines.md`).
   - [ ] The `mod_name` in `data/mods/<mod_name>` matches `id` in `modinfo.json`.
 - [ ] This PR modifies lua scripts or the lua API.
-  - [ ] I have added `lua` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
+  - [ ] I have added `lua` scope to the PR title (see `docs/en/contribute/pr_title_guidelines.md`).
   - [ ] I have added [type annotations](https://emmylua.github.io/annotation.html) to functions so that it's safe and easy to maintain.

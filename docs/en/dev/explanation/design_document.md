@@ -4,12 +4,12 @@ See [Game Balance](../../mod/json/explanation/game_balance.md) and
 [Lore](../../game/lore/factions.md) for more detailed discussion coresponding to particular elements
 of the CDDA design document. This document covers the core philosphy of CBN.
 
-One of the primary priorities of Cataclysm Bright Nights is fun.
+One of the primary priorities of Cataclysm is fun.
 
 Gameplay is more important than realism.
 
 Realism isn't inherently wrong. But it often comes at the expense of the new player experience. So
-the fundamentals of Game Design are a priority for Cataclysm Bright Nights.
+the fundamentals of game design are a priority for Cataclysm.
 
 Depth is preferable to complexity. But complexity is valuable as long as it isn't overwhelming. See
 porting principles 3 and 5. Complexity generally becomes overwhelming when there are too many things

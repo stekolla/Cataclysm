@@ -232,7 +232,7 @@ static int info_uilist( bool display_all_entries = true )
         { uilist_entry( DEBUG_SAVE_SCREENSHOT, true, 'H', _( "Take screenshot" ) ) },
         { uilist_entry( DEBUG_BUG_REPORT, true, 'U', _( "Submit a bug report on github" ) ) },
         { uilist_entry( DEBUG_GAME_REPORT, true, 'r', _( "Generate game report" ) ) },
-        { uilist_entry( DEBUG_JOIN_DISCORD, true, 'J', _( "Join the Discord" ) ) },
+        { uilist_entry( DEBUG_JOIN_DISCORD, true, 'J', _( "Join the Discussion" ) ) },
     };
 
     if( display_all_entries ) {
@@ -2222,7 +2222,7 @@ void debug()
 
         case DEBUG_BUG_REPORT: {
             constexpr const char *const bug_report_url =
-                "https://github.com/cataclysmbn/Cataclysm-BN/issues/new"
+                "https://github.com/stekolla/Cataclysm-BN/issues/new"
                 "?labels=bug"
                 "&template=bug_report.yml"
                 "&versions-and-configuration=";
@@ -2254,8 +2254,8 @@ void debug()
         break;
 
         case DEBUG_JOIN_DISCORD: {
-            open_url( "https://discord.gg/XW7XhXuZ89" );
-            popup( _( "Opened a link to join Bright Nights Discord." ) );
+            open_url( "https://github.com/stekolla/Cataclysm-BN/discussions" );
+            popup( _( "Opened a link to the Cataclysm discussions." ) );
             break;
         }
 

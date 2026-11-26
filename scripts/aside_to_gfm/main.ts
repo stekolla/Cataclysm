@@ -39,9 +39,15 @@ const regex = /:::(?<type>\w+)(?:\{(?<attrs>[^\}]*)\})?\n+(?<content>(?:.|\n)+?)
 const titleRegex = /title\s*=\s*"(?<title>.*?)"/
 const linkRegex = /\[(?<text>[^\]]+)\]:\s*(?<url>.+)/
 
+const paragraph = (strings: TemplateStringsArray, ...values: string[]) =>
+  strings
+    .map((str, i) => str + (values[i] ?? ""))
+    .join("")
+    .replace(/\n(?!\n)/g, " ")
+    .replaceAll("\n", "\n\n")
+
 if (import.meta.main) {
   const { Command } = await import("@cliffy/command")
-  const { paragraph } = await import("../changelog/paragraph.ts")
   const { walk } = await import("@std/fs")
 
   const { args: [path] } = await new Command()

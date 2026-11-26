@@ -48,7 +48,6 @@ Add a module-level JSDoc comment explaining the script's purpose:
 
 This pattern is used in existing scripts like:
 
-- `scripts/gen_cli_docs.ts`
 - `scripts/utils.ts`
 - `scripts/affected_files.ts`
 
@@ -179,15 +178,13 @@ console.error(colors.red("[ERROR] Failed"))
 
 Look at these existing scripts for patterns:
 
-1. **CLI Tool**: `scripts/gen_cli_docs.ts`
-   - Shows proper shebang, module docs, CLI parsing
-2. **Data Processing**: `scripts/utils.ts`
+1. **Data Processing**: `scripts/utils.ts`
    - Shows Valibot usage, type utilities
-3. **GitHub API**: `scripts/affected_files.ts`
+2. **GitHub API**: `scripts/affected_files.ts`
    - Shows async iteration, external API calls
-4. **Git Hooks**: `tools/hooks/pre-commit.ts`
+3. **Git Hooks**: `tools/hooks/pre-commit.ts`
    - Shows command execution, file categorization
-5. **Installer**: `tools/hooks/install-hooks.ts`
+4. **Installer**: `tools/hooks/install-hooks.ts`
    - Shows user interaction, file manipulation
 
 ## Project Structure

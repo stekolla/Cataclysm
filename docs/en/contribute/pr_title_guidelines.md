@@ -1,7 +1,7 @@
-# Changelog Guidelines
+# PR Title Guidelines
 
-PR title follows [Convensional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for easier
-changelog generation. The format is one of:
+PR titles follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+The format is one of:
 
 ```
 <Type>: <PR subject>

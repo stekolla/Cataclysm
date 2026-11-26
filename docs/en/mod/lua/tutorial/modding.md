@@ -27,7 +27,7 @@ entries), or clear it by running `gdebug.clear_lua_log()`.
 
 ## Lua hot-reload
 
-To speed up mod development process, BN supports Lua hot-reload functionality.
+The game supports Lua hot-reload functionality.
 
 There is no filesystem watcher, so hot-reload must be triggered manually via a corresponding
 `Reload Lua Code` hotkey (unbound by default). The hot-reload can also be triggered from console
@@ -35,6 +35,8 @@ window by pressing the corresponding hotkey, or by running `gdebug.reload_lua_co
 Running the command from regular Lua scripts may have unintended consequences, use at your own risk!
 
 Note that not all code can be hot-reloaded, it'll be explained in later sections.
+The browser build bundles its Lua files, so source edits require a rebuild before they are available
+in the game.
 
 ## Game data loading
 
@@ -197,7 +199,7 @@ When script is called, it comes with some standard Lua libraries pre-loaded:
 
 See `Standard Libraries` section in Lua manual for details.
 
-Some of the functions here are overloaded by BN, see [Global overrides](#global-overrides) for
+Some of the functions here are overloaded by Cataclysm, see [Global overrides](#global-overrides) for
 details.
 
 ### Global state
@@ -221,9 +223,8 @@ The game exposes various functions, constants and types to Lua. Functions and co
 organized into "libraries" for organizational purposes. Types are available globally, and may have
 member functions and fields.
 
-To see the full list of functions, constants and types, run the game with `--lua-doc` command line
-argument. This will generate documentation file `lua_doc.md` that will be placed in your `config`
-folder.
+See the binding implementations in `src/catalua_bindings*.cpp` and `src/catalua_bindings/` for the
+available functions, constants, and types.
 
 Many API functions deal with positions in the game world. The game uses a typed coordinate system
 where every position carries both an origin (the reference frame) and a scale (the unit size).

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Download loading screen images from https://github.com/cataclysmbn/loading-screen into data/.
+# Download a project-selected loading screen archive into data/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-curl -fsSL --retry 3 "https://github.com/cataclysmbn/loading-screen/releases/download/release/loading-screens.tar.gz" | tar -xz
+: "${CATA_LOADING_SCREENS_ARCHIVE_URL:?Set CATA_LOADING_SCREENS_ARCHIVE_URL to the archive URL}"
+curl -fsSL --retry 3 "$CATA_LOADING_SCREENS_ARCHIVE_URL" | tar -xz

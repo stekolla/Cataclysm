@@ -1,9 +1,8 @@
 # Compatibility with screen readers
 
-There are people who use screen readers to play Cataclysm Bright Nights. In order for screen readers
-to announce the most important information in a UI, the terminal cursor has to be placed at the
-correct location. This information may be text such as selected item names in a list, etc, and the
-cursor has to be placed exactly at the beginning of the text for screen readers to announce it.
+Terminal screen readers use cursor position to identify information such as the selected item in a
+list. The browser build renders to a canvas rather than a terminal; its screen-reader compatibility
+has not been verified by this guide.
 
 The recommended way to place the cursor is to use `ui_adaptor`. This ensures the desired cursor
 position is preserved when subsequent output code changes the cursor position. You can call

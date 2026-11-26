@@ -184,12 +184,12 @@ with each of the four apartments_mod_tower overmap terrain ids specified.
 
 Some overmap terrains are _linear_. This is used for things like roads, tunnels, etc. where they
 form lines which can connect in various ways. Such terrains are defined with the `LINEAR` flag in
-their `overmap_terrain` definition (see the [OVERMAP docs](OVERMAP.md)).
+their `overmap_terrain` definition (see the [OVERMAP docs](overmap.md)).
 
 When defining the JSON mapgen for such terrain, you must define several instances, for each type of
 connection that might exist. Each gets a suffix added to the `overmap_terrain` id. The suffixes are:
 `_end`, `_straight`, `_curved`, `_tee`, `_four_way`. For an example, see the definitions for `ants`
-in [`ants.json`](../data/json/mapgen/bugs/ants.json).
+in [`ants.json`](../../../../../../data/json/mapgen/bugs/ants.json).
 
 ### Define mapgen "weight"
 

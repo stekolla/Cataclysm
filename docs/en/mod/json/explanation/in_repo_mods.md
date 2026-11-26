@@ -1,12 +1,10 @@
-> **Outdated documentation.**
->
-# In-Repo Mods
+# Historical Bright Nights In-Repo Mod Policy
 
 > [!CAUTION]
 >
-> Current guideline is in favor of removing
-> [in-repo mods](https://github.com/cataclysmbn/Cataclysm-BN/pull/3026). This page is kept for
-> historical purposes.
+> This page records the Bright Nights project's historical policy. It is not a statement of
+> Cataclysm's current policy. Bright Nights later discussed
+> [removing in-repo mods](https://github.com/cataclysmbn/Cataclysm-BN/pull/3026).
 
 BN is not only moddable, but ships with a number of mods available for users to select from even
 without having to obtain mods from a third party source.

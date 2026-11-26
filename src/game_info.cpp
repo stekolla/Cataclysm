@@ -407,7 +407,7 @@ auto game_info::mods_loaded() -> std::string
         return "No loaded mods";
     }
 
-    // e.g. "Bright Nights [bn]".
+    // e.g. "Cataclysm [bn]"; the mod ID remains "bn" for save compatibility.
     const auto mod_names =
     std::views::transform( mod_ids, []( const auto mod ) { return string_format( "%s [%s]", remove_color_tags( mod->name_raw() ), mod->ident.str() ); } )
     | std::ranges::to<std::vector>();

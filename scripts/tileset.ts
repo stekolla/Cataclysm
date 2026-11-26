@@ -1422,7 +1422,7 @@ async function unpack(tilesetDir: string, deleteFile?: string): Promise<void> {
 await new Command()
   .name("tileset")
   .version("0.1.0")
-  .description("Pack and unpack tileset atlases for Cataclysm: Bright Nights")
+  .description("Pack and unpack tileset atlases for Cataclysm")
   .option("--pack", "Pack individual folders into tileset atlas")
   .option("--unpack", "Unpack tileset atlas into individual folders")
   .option("--use-all", "Add unused images with id being their basename")

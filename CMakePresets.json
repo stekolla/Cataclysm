@@ -22,8 +22,7 @@
         "BUILD_SDL3": "ON",
         "USE_PREFIX_DATA_DIR": "OFF",
         "USE_HOME_DIR": "OFF",
-        "TESTS": "OFF",
-        "LUA_DOCS_ON_BUILD": "OFF"
+        "TESTS": "OFF"
       }
     },
     {
@@ -44,7 +43,6 @@
         "USE_PREFIX_DATA_DIR": "OFF",
         "USE_HOME_DIR": "OFF",
         "TESTS": "ON",
-        "LUA_DOCS_ON_BUILD": "OFF",
         "CATA_FORMAT_TARGETS": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
@@ -67,8 +65,7 @@
         "TESTS": "ON",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "USE_PREFIX_DATA_DIR": "OFF",
-        "USE_HOME_DIR": "OFF",
-        "LUA_DOCS_ON_BUILD": "OFF"
+        "USE_HOME_DIR": "OFF"
       }
     }
   ],

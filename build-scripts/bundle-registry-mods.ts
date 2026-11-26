@@ -3,7 +3,7 @@
 /**
  * @module
  *
- * Bundles Cataclysm: Bright Nights registry mods into release data.
+ * Bundles Cataclysm registry mods into release data.
  */
 
 import { Command } from "@cliffy/command"
@@ -13,8 +13,7 @@ import { dirname, join } from "@std/path"
 import * as v from "@valibot/valibot"
 import { zip } from "@deno-library/compress"
 
-const registryUrl = "https://mods.cataclysmbn.org/generated/mods.json"
-const headers = { "User-Agent": "Cataclysm-BN-release-bundler" }
+const headers = { "User-Agent": "Cataclysm-release-bundler" }
 
 const LockSchema = v.array(v.object({
   id: v.string(),
@@ -116,7 +115,7 @@ const findExtractDir = async (entry: BundleEntry, root: string) => {
 }
 
 const extract = async (entry: BundleEntry, archive: string, outputRoot: string) => {
-  const temp = await Deno.makeTempDir({ prefix: "cbn-registry-unzip-" })
+  const temp = await Deno.makeTempDir({ prefix: "cataclysm-registry-unzip-" })
   const target = targetDir(entry, outputRoot)
   try {
     await zip.uncompress(archive, temp)
@@ -152,7 +151,7 @@ const writeCredits = async (entries: BundleEntry[], outputRoot: string) => {
 
 export const bundle = async (options: BundleOptions): Promise<BundleEntry[]> => {
   const entries = selectEntries(options.locks, options.registry, options.excludedPackageTypes)
-  const cacheDir = options.cacheDir ?? await Deno.makeTempDir({ prefix: "cbn-registry-mods-" })
+  const cacheDir = options.cacheDir ?? await Deno.makeTempDir({ prefix: "cataclysm-registry-mods-" })
   try {
     for (const entry of entries) {
       logEntry(entry)
@@ -170,11 +169,11 @@ export const bundle = async (options: BundleOptions): Promise<BundleEntry[]> => 
 const main = () =>
   new Command()
     .name("bundle-registry-mods")
-    .description("Bundle BN mod registry entries into release data.")
+    .description("Bundle entries from an explicitly selected mod registry into release data.")
     .option("--manifest <path:string>", "External registry lockfile path", {
       default: "data/mods/external.json",
     })
-    .option("--registry-url <url:string>", "Registry JSON URL", { default: registryUrl })
+    .option("--registry-url <url:string>", "Registry JSON URL (required)")
     .option("--output-root <path:string>", "Output root to populate", { default: "." })
     .option("--cache-dir <path:string>", "Directory for downloaded archives")
     .option("--exclude-package-type <packageType:string>", "Package type to skip", {
@@ -182,6 +181,9 @@ const main = () =>
     })
     .option("--dry-run", "Validate and print selected entries without downloading")
     .action(async ({ manifest, registryUrl, excludePackageType, dryRun, outputRoot, cacheDir }) => {
+      if (!registryUrl) {
+        throw new Error("Specify --registry-url for a registry maintained by this project.")
+      }
       const [locks, registry] = await Promise.all([
         loadJson(LockSchema, manifest),
         loadJson(RegistrySchema, registryUrl),

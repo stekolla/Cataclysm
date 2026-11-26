@@ -3,7 +3,6 @@
 #include "debug.h"
 
 #include <algorithm>
-#include <clocale>
 #include <functional>
 #include <optional>
 #include <ranges>
@@ -91,46 +90,6 @@ void startup_lua_test()
     } catch( std::runtime_error &e ) {
         debugmsg( "%s", e.what() );
     }
-}
-
-auto generate_lua_docs( const std::filesystem::path &script_path,
-                        const std::filesystem::path &to ) -> bool
-{
-    // Force C locale for consistent string sorting in Lua (strcoll dependency)
-    const auto *prev_locale_ptr = std::setlocale( LC_ALL, nullptr );
-    const auto prev_locale = std::string{ prev_locale_ptr ? prev_locale_ptr : "" };
-    std::setlocale( LC_ALL, "C" );
-
-    sol::state lua = make_lua_state();
-    lua.globals()["doc_gen_func"] = lua.create_table();
-    lua.globals()["print"] = [&]( const sol::variadic_args & va ) {
-        for( auto it : va ) {
-            const auto str = lua["tostring"]( it ).get<std::string>();
-            std::cout << str;
-        }
-        std::cout << std::endl;
-    };
-    lua.globals()["package"]["path"] = string_format(
-                                           "%1$s/?.lua;%1$s/?/init.lua;%2$s/?.lua;%2$s/?/init.lua",
-                                           PATH_INFO::datadir() + "/lua", PATH_INFO::datadir() + "/raw"
-                                       );
-
-    try {
-        run_lua_script( lua, script_path.string() );
-        sol::protected_function doc_gen_func = lua["doc_gen_func"]["impl"];
-        sol::protected_function_result res = doc_gen_func();
-        check_func_result( res );
-        const auto ret = res.get<std::string>();
-        write_to_file( to.string(), [&]( std::ostream & s ) -> void {
-            s << ret;
-        } );
-    } catch( std::runtime_error &e ) {
-        cata_printf( "%s\n", e.what() );
-        std::setlocale( LC_ALL, prev_locale.c_str() );
-        return false;
-    }
-    std::setlocale( LC_ALL, prev_locale.c_str() );
-    return true;
 }
 
 void show_lua_console()

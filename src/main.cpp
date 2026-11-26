@@ -156,12 +156,12 @@ static void report_fatal_error( const std::string &msg )
 #if defined(TILES)
     if( test_mode ) {
 #endif
-        std::cerr << "Cataclysm BN: Fatal error" << '\n' << msg << '\n';
+        std::cerr << "Cataclysm: Fatal error" << '\n' << msg << '\n';
 #if defined(TILES)
     } else {
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_ERROR,
-            "Cataclysm BN: Fatal error",
+            "Cataclysm: Fatal error",
             msg.c_str(),
             nullptr
         );
@@ -229,8 +229,6 @@ int main( int argc, char *argv[] )
     bool verifyexit = false;
     bool check_mods = false;
     auto check_mods_mode = init::check_mods_mode::default_mods;
-    std::filesystem::path lua_doc_output_path;
-    std::filesystem::path lua_types_output_path;
     std::string dump;
     dump_mode dmode = dump_mode::TSV;
     std::vector<std::string> opts;
@@ -458,34 +456,6 @@ int main( int argc, char *argv[] )
                     section_default,
                     []( int, const char ** ) -> int {
                         dont_debugmsg = true;
-                        return 0;
-                    }
-                },
-                {
-                    "--lua-doc", "<output path>",
-                    "Generate Lua docs to given path and exit",
-                    section_default,
-                    [&]( int num_args, const char **params ) -> int {
-                        if( num_args < 1 )
-                        {
-                            return -1;
-                        }
-                        test_mode = true;
-                        lua_doc_output_path = params[0];
-                        return 0;
-                    }
-                },
-                {
-                    "--lua-types", "<output path>",
-                    "Generate Lua types to given path and exit",
-                    section_default,
-                    [&]( int num_args, const char **params ) -> int {
-                        if( num_args < 1 )
-                        {
-                            return -1;
-                        }
-                        test_mode = true;
-                        lua_types_output_path = params[0];
                         return 0;
                     }
                 },
@@ -794,8 +764,7 @@ int main( int argc, char *argv[] )
     }
 #endif
 #elif defined(CATA_SDL)
-    if( test_mode && lua_doc_output_path.empty() && lua_types_output_path.empty() &&
-        !init_sdl_platform( false ) ) {
+    if( test_mode && !init_sdl_platform( false ) ) {
         return 1;
     }
 #endif
@@ -821,10 +790,8 @@ int main( int argc, char *argv[] )
     }
 
 #if defined(CATA_SDL) && !defined(__EMSCRIPTEN__)
-    if( lua_doc_output_path.empty() && lua_types_output_path.empty() ) {
-        cata_gpu::init();
-        atexit( cata_gpu::shutdown );
-    }
+    cata_gpu::init();
+    atexit( cata_gpu::shutdown );
 #endif
 
 #if defined(TILES)
@@ -866,31 +833,6 @@ int main( int argc, char *argv[] )
 
     DebugLog( DL::Info, DC::Main ) << "LAPI version: " << cata::get_lapi_version_string();
     cata::startup_lua_test();
-
-    if( !lua_doc_output_path.empty() || !lua_types_output_path.empty() ) {
-        init_colors();
-        const auto doc_script = std::filesystem::path{PATH_INFO::datadir()} / "raw" / "generate_docs.lua";
-        const auto types_script = std::filesystem::path{PATH_INFO::datadir()} / "raw" /
-                                  "generate_types.lua";
-
-        if( !lua_doc_output_path.empty() ) {
-            const bool doc_result = cata::generate_lua_docs( doc_script, lua_doc_output_path );
-            if( !doc_result ) {
-                cata_printf( "Lua doc: Failed.\n" );
-                return 1;
-            }
-            cata_printf( "Lua doc: Success.\n" );
-        }
-        if( !lua_types_output_path.empty() ) {
-            const bool types_result = cata::generate_lua_docs( types_script, lua_types_output_path );
-            if( !types_result ) {
-                cata_printf( "Lua types: Failed.\n" );
-                return 1;
-            }
-            cata_printf( "Lua types: Success.\n" );
-        }
-        return 0;
-    }
 
     // Now we do the actual game.
 

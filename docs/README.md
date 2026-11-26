@@ -1,4 +1,4 @@
-# Cataclysm: Bright Nights Documentation
+# Cataclysm Documentation
 
 This directory contains the project's documentation in Markdown. Start with the
 [English index](en/index.md).
@@ -6,7 +6,6 @@ This directory contains the project's documentation in Markdown. Start with the
 ## Sections
 
 - [Gameplay](en/game/)
-- [Installation](en/install/install.md)
 - [JSON modding](en/mod/json/tutorial/modding.md)
 - [Lua modding](en/mod/lua/tutorial/modding.md)
 - [Development](en/dev/)

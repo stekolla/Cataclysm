@@ -166,7 +166,7 @@ struct islot_artifact;
 struct islot_seed;
 class islot_milling;
 
-// These definitions help the doc generator
+// Type names used by Lua bindings.
 LUNA_DOC( bool, "bool" );
 LUNA_DOC( std::int16_t, "int" );
 LUNA_DOC( std::uint16_t, "int" );

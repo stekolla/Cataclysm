@@ -17,7 +17,7 @@ reference only: <https://www.python.org/downloads/>,
 
 1. Install Deno.
 2. Get an unpacked tileset repository.
-3. From a Cataclysm: Bright Nights working copy, run the pack command with the unpacked tileset
+3. From a Cataclysm working copy, run the pack command with the unpacked tileset
    directory as input:
 
 ```sh

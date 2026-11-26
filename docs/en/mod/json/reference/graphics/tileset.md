@@ -3,6 +3,7 @@
 A tileset provides graphic images for the game. Each tileset has one or more tilesheets of image
 sprites and a `tile_config.json` file that describes how to map the contents of the sprite sheets to
 various entities in the game. It also has a `tileset.txt` file that provides metadata.
+The browser build bundles only RetroDays.
 
 ## Compositing Tilesets
 
@@ -23,10 +24,10 @@ workflow in [PR #8151](https://github.com/cataclysmbn/Cataclysm-BN/pull/8151).
 
 ```sh
 # Compose individual sprite files and tile entries into tile_config.json and tilesheet PNGs.
-deno run -A scripts/tileset.ts --pack gfx/Retrodays
+deno run -A scripts/tileset.ts --pack path/to/unpacked-tileset
 
 # Write the composed output to another directory.
-deno run -A scripts/tileset.ts --pack gfx/Retrodays /tmp/Retrodays-composed
+deno run -A scripts/tileset.ts --pack path/to/unpacked-tileset /tmp/composed-tileset
 
 # Decompose a legacy tileset into individual sprite files and tile entries.
 deno run -A scripts/tileset.ts --unpack gfx/ChestHole16Tileset

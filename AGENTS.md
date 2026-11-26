@@ -1,4 +1,4 @@
-# Cataclysm: Bright Nights - Agent Guidelines
+# Cataclysm - Agent Guidelines
 
 Read `docs/` and `justfile` first. Large legacy codebase: search for an existing solution before writing one.
 
@@ -52,7 +52,7 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 ## Lua
 
 - Type every function parameter with EmmyLua/LuaLS `---@param` (`---@class`/`---@field` for table shapes), including existing and local helpers; match the file's style. No `---@return` only for enforcement when inferable.
-- Fix missing binding types at the binding/doc-generation source, never by hard-coding classes in `data/raw/generate_types.lua`.
+- Fix missing binding types at the binding source.
 - Test C++ Lua bindings with real bound objects; Lua-only mocks are supplementary.
 
 ## Workflow
@@ -76,11 +76,10 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    just docker-test-fast
    just docker-test-wasm
    ./build-scripts/lint-json.sh
-   deno task docs:gen  # when lua_annotations.lua or docs/en/mod/lua/reference/lua.md conflict
    ```
    UI regression tests follow the production refresh path; do not prepare layout or paging manually.
    Each new test needs a short `///` comment that a developer new to that code can follow: what it checks, why, and how.
-5. Commit atomically with [Conventional Commits](./docs/en/contribute/changelog_guidelines.md); no body/footer unless critical.
+5. Commit atomically with [Conventional Commits](./docs/en/contribute/pr_title_guidelines.md); no body/footer unless critical.
 6. PR: [template](./.github/pull_request_template.md), no fluff, **SHOULD** use ASD-STE100 Simplified Technical English. `git push && gh pr create --web --fill`. Track `gh pr checks` until done; fix branch-owned failures, rerun or report transient ones with the failing job.
 
 If a mistake is found during a task, update AGENTS.md or the skill and fix the current branch before summarizing.

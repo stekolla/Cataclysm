@@ -519,16 +519,16 @@ std::string ensure_valid_file_name( const std::string &file_name )
     return new_file_name;
 }
 
-// This string is 'CataclysmBrightNights' encoded as base64
-const char *CBN = "Q2F0YWNseXNtQnJpZ2h0TmlnaHRz";
+// This string is 'Cataclysm' encoded as base64
+const char *CATA = "Q2F0YWNseXNt";
 
 bool can_write_to_dir( const std::string &dir_path )
 {
     std::string dummy_file;
     if( dir_path.ends_with( "/" ) ) {
-        dummy_file = dir_path + CBN;
+        dummy_file = dir_path + CATA;
     } else {
-        dummy_file = dir_path + "/" + CBN;
+        dummy_file = dir_path + "/" + CATA;
     }
 
     if( file_exist( dummy_file ) ) {
@@ -539,7 +539,7 @@ bool can_write_to_dir( const std::string &dir_path )
 
     const auto writer = []( std::ostream & s ) {
         // Write at least something to check if there is free space on disk
-        s << CBN << '\n';
+        s << CATA << '\n';
     };
 
     if( !write_to_file( dummy_file, writer, "" ) ) {

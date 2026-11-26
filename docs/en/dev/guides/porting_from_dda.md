@@ -1,4 +1,4 @@
-# Working with both BN and DDA
+# Porting changes from DDA
 
 Sometimes you may need to port some changes from DDA. It could be done via adding remote and
 cherry-picking.
@@ -16,7 +16,7 @@ git checkout ddamaster && git pull
 
 ## Setting up
 
-Assuming you have a directory with BN named `Cataclysm-BN`, open a terminal there.
+Open a terminal in your Cataclysm working copy.
 
 Add the remote tracking branch for DDA. Let's name the branch `dda` (doesn't need to be `dda`):
 
@@ -67,7 +67,7 @@ git branch -f ddamaster dda/master
 ## Contributing
 
 ```
-# Switch to BN branch
+# Switch to the Cataclysm branch
 git checkout main
 # Update local content
 git pull
@@ -77,9 +77,9 @@ git checkout -b chainsaw-toothbrush-rebalance
 ...
 # Commit the changes
 git commit -a
-# Upload your changes to your fork of Cataclysm (assuming its branch is named origin)
+# Upload your changes to your Cataclysm fork
 git push -u origin chainsaw-toothbrush-rebalance
-# Go to BN's github and make a pull request
+# Open a pull request against the Cataclysm repository
 ```
 
 # Porting

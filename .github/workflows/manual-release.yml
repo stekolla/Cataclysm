@@ -38,10 +38,10 @@ jobs:
           else
             echo "Release does not exist, creating a new one" >> "$GITHUB_STEP_SUMMARY"
             gh release create ${{ env.VERSION }} \
-              --title "Cataclysm-BN ${{ env.VERSION }}" \
+              --title "Cataclysm ${{ env.VERSION }}" \
               --draft \
               --prerelease \
-              --generate-notes \
+              --notes "Build of commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})." \
               --target ${{ github.sha }}
           fi
         env:
