@@ -48,7 +48,7 @@ runs:
         sudo chown -R "$(id -u):$(id -g)" "$archives"
         echo "key=$KEY-$(ls "$archives"/*.deb 2>/dev/null | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
         if [ "$FOR" = "test" ]; then
-          sudo locale-gen en_US.UTF-8 fr_FR.UTF-8 ru_RU.UTF-8
+          sudo locale-gen en_US.UTF-8
         fi
 
     # A PR cannot read the caches of other PRs, so save from main only. Skip the save when no package changed.

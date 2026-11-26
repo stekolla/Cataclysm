@@ -15,7 +15,6 @@ build
 !build.yml
 !build-scripts
 !build-data
-build-data/gettext
 build-data/mesa
 build-data/mesa*
 build-data/mesa/*
@@ -118,17 +117,6 @@ Thumbs.db
 cscope.*
 tags
 
-# Generated translation source
-/lang/po/*.po
-/lang/po/cataclysm-bn.pot
-
-# Compiled binary translations
-/lang/mo/
-
-# Directory for translatable strings
-/lang/json/*
-!/lang/json/README
-
 # Netbeans IDE folders
 nbproject/
 
@@ -193,9 +181,6 @@ Cataclysm.i64
 Cataclysm.id*
 Cataclysm.til
 Cataclysm.nam
-
-# Transifex Client
-.tx/
 
 # Snapcraft build directories
 prime

@@ -84,14 +84,8 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 
 If a mistake is found during a task, update AGENTS.md or the skill and fix the current branch before summarizing.
 
-## i18n / PO
-
-- Do not reduce requested string/context coverage; handle every named meaning. Add loader support when JSON context needs it.
-- After touching PO files, fix every error from `msgfmt -f -c -o /tmp/ko.mo lang/po/ko.po` (Korean) and `./tools/check_po_printf_format.py`; never dismiss them as pre-existing.
-- Translating docs: look up the glossary first, e.g. `rg -C2 -i 'speedway' lang/po/ko.po | rg -v '^(#:|--)' | head -n 20`.
-
 ## Data and Review
 
 - Digital files keep at least 1 ml volume; zero-volume items are rejected, including scanned books.
 - When generated or pulled files stop being tracked, verify ignore rules (`git status --ignored` or run the generator) and that every CI and release consumer still gets them.
-- References: [Code Style](./docs/en/dev/explanation/code_style.md), [Building](./docs/en/dev/guides/building/cmake.md), [Formatting](./docs/en/dev/guides/formatting.md), [Dev Index](./docs/en/dev/), [LLM Review Guide](./.github/llm_review_guide.md). Use `_( "text" )` for L10n.
+- References: [Code Style](./docs/en/dev/explanation/code_style.md), [Building](./docs/en/dev/guides/building/cmake.md), [Formatting](./docs/en/dev/guides/formatting.md), [Dev Index](./docs/en/dev/), [LLM Review Guide](./.github/llm_review_guide.md). Use `_( "text" )` for user-facing strings.
