@@ -107,7 +107,7 @@ player's current kill count that must be killed to complete the mission.
 ### goal_condition
 
 For "MGOAL_CONDITION", defines the condition that must be satisified for the mission to be
-considered complete. Conditions are explained in more detail in [NPCs.md](./NPCs), and are used here
+considered complete. Conditions are explained in more detail in [NPCs.md](NPCs.md), and are used here
 in exactly the same way.
 
 ### dialogue
@@ -143,7 +143,7 @@ If any of these optional fields are present they can be objects with the followi
 
 #### effect
 
-This is an effects array, exactly as defined in [NPCs.md](./NPCs), and can use any of the values
+This is an effects array, exactly as defined in [NPCs.md](NPCs.md), and can use any of the values
 from effects. In all cases, the NPC involved is the quest giver.
 
 #### reveal_om_ter
@@ -173,7 +173,7 @@ afterwards. The `om_terrain` is the only required field.
 | `min_distance`                             | Range in overmap terrain coordinates. Instances of `om_terrain` in this range will be ignored.                           |
 | `origin_npc`                               | Start the search at the NPC's, rather than the player's, current position.                                               |
 | `z`                                        | If specified, will be used rather than the player or NPC's z when searching.                                             |
-| `offset_x`,<br\>`offset_y`,<br\>`offset_z` | After finding or creating `om_terrain`, offset the mission target terrain by the offsets in overmap terrain coordinates. |
+| `offset_x`,, `offset_y`,, `offset_z` | After finding or creating `om_terrain`, offset the mission target terrain by the offsets in overmap terrain coordinates. |
 
 **example**
 

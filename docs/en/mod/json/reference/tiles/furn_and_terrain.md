@@ -1,6 +1,4 @@
----
-title: Furniture and Terrain
----
+# Furniture and Terrain
 
 ### Furniture
 

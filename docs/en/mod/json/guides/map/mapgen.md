@@ -3,7 +3,7 @@
 This guide will cover the basics of mapgen, which files you need to edit, the tags in each file and
 the differences in creating specials or regular city buildings.
 
-[For full technical information about mapgen entries, visit here](../../reference/map/mapgen)
+[For full technical information about mapgen entries, visit here](../../reference/map/mapgen.md)
 
 First, lets cover some basic concepts and the files you'll add or edit.
 
@@ -84,7 +84,7 @@ Before beginning you’ll want to make some decisions:
 ## The mapgen map:
 
 This covers the mapgen file map flags and what they do in layman’s terms. You can get more extensive
-information from [MAPGEN](../../reference/map/mapgen).
+information from [MAPGEN](../../reference/map/mapgen.md).
 
 the mapgen file has some meta data tags and the `"object"` data which defines everything to make the
 map.
@@ -287,7 +287,7 @@ can put any item_group into the machines, like those bullet ones_.
 
 6. Item spawns: There are many ways to place items. This tutorial will only cover explicit symbol
    placement which is the easiest. There is documentation all about loot spawns you can read for
-   further information. See: [ITEM_SPAWN.md](../../reference/items/item_spawn).
+   further information. See: [ITEM_SPAWN.md](../../reference/items/item_spawn.md).
 
 our sample uses "items": for its tag. others include: "place_item", "place_items", "place_loot".
 Some of these allow for individual item placement and others groups, or both. This will be covered
@@ -642,7 +642,7 @@ You need one entry per mapgen ID:
    appropriate for your location. Others further define the mapgen, like having sidewalks generate.
 
 For further information see:
-[Overmap Terrain section of OVERMAP](../../reference/map/overmap#overmap-terrain).
+[Overmap Terrain section of OVERMAP](../../reference/map/overmap.md#overmap-terrain).
 
 ## Palettes:
 

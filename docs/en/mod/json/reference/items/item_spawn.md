@@ -263,7 +263,7 @@ most useful when the group is very specific to the place it is used and wont eve
 else.
 
 As an example: monster death drops (`death_drops` entry in the `MONSTER` object, check
-[here](../json_info)) can do this. If the monster is very specific (e.g. a special robot, a unique
+[here](../json_info.md)) can do this. If the monster is very specific (e.g. a special robot, a unique
 endgame monster), the item spawned upon its death won't (in that form) appear in any other group.
 
 Therefore, this snippet:
@@ -316,8 +316,8 @@ Example:
 You can test your item groups in the game:
 
 1. Load a game and call the debug menu
-   > _TIP_ (If a key isn't bound to the debug menu or you forgot it, use <kbd>ESC</kbd> >
-   > <kbd>1</kbd>)
+   > _TIP_ (If a key isn't bound to the debug menu or you forgot it, use `\1` >
+   > `\1`)
 
 2. Choose "Test Item Group".
 
@@ -326,7 +326,7 @@ You can test your item groups in the game:
    The game will then spawn items in that group 100 times and count the spawned items. They'll then
    be displayed, sorted by their frequency.
 
-   > _TIP_: You can filter anything in the debug menu using <kbd>/</kbd>
+   > _TIP_: You can filter anything in the debug menu using `\1`
 
 You should not add items to the item group `EMPTY_GROUP`. This group can be used when the game
 requires a group id, but you don't want to spawn any items there. The group will never spawn items.

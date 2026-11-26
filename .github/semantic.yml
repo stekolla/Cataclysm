@@ -6,7 +6,6 @@
 # Validate the PR title, and ignore all commit messages
 enabled: true
 titleOnly: true
-targetUrl: "https://docs.cataclysmbn.org/contribute/changelog_guidelines/"
 types:
   - feat
   - fix

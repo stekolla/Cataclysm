@@ -15,7 +15,7 @@ Kept here for global reference.
 | --------------- | ---------------------------------------------------------------------------- |
 | damage          | (_optional_) The amount of damage the explosion does                         |
 | radius          | (_optional_) The radius of the explosion                                     |
-| fragment        | (_optional_) See [projectiles](/mod/json/reference/misc/projectiles/#fields) |
+| fragment        | (_optional_) See [projectiles](projectile.md#fields) |
 | fragment_effect | (_optional_) Array of [fragment effects](#fragment-effect)                   |
 | fire            | (_optional_) Also spawns fire fields                                         |
 

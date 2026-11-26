@@ -1,6 +1,4 @@
----
-title: Nested Recipe Categories
----
+# Nested Recipe Categories
 
 ### Nested Recipe Categories
 

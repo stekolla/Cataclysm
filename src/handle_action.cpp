@@ -2930,7 +2930,7 @@ bool game::handle_action()
                 if( !get_option<std::string>( "WIKI_DOC_URL" ).empty() ) {
                     open_url( get_option<std::string>( "WIKI_DOC_URL" ) );
                 } else {
-                    add_msg( m_bad, _( "Invalid Wiki URL specified!" ) );
+                    add_msg( m_info, _( "Project documentation is included in the source as Markdown." ) );
 
                 }
 

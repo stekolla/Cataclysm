@@ -45,9 +45,6 @@ tests.
 
 The original sprite files and `tile_entry` JSON files are preserved when composing.
 
-For small examples or quick browser-only checks, see the
-[tileset web tool](/dev/reference/tileset_web_tool/).
-
 ### directory structure
 
 Each compositing tileset has one or more directories in it with a name that starts with `pngs_`,
@@ -586,34 +583,33 @@ For a crouch effect, you might paint the lower portion of the modifier with gree
 
 1. Start with a base UV Identity image:
 
-<img src="./img/uv_identity.png" width="128" height="128">
+![UV identity image](./img/uv_identity.png)
 
 2. Shift pixels around based on translation, rotation, scale, etc. to cause that effect to the result
 3. Paint green channel to shift pixels vertically (< 127 = up, > 127 = down)
 
 As this method may be harder to intuit, here's some examples:
 
-<details><summary>Standing</summary>
+#### Standing
+
 As you can see, "standing" is the normal state, so the UV image is not edited.
 
-<img src="./img/uv_identity.png" width="256" height="256">
-<img src="./img/uv_identity_result.png" width="256" height="256">
-</details>
+![Standing UV image](./img/uv_identity.png)
+![Standing result](./img/uv_identity_result.png)
 
-<details><summary>Crouching</summary>
+#### Crouching
+
 It may be hard to notice, but the pixels just below the character have been adjusted, and the topmost pixels are missing. Most of the UVs have been lowered.
 
-<img src="./img/uv_crouch.png" width="256" height="256">
-<img src="./img/uv_crouch_result.png" width="256" height="256">
-</details>
-</details>
+![Crouching UV image](./img/uv_crouch.png)
+![Crouching result](./img/uv_crouch_result.png)
 
-<details><summary>Lying Down</summary>
+#### Lying Down
+
 This is dead simple. There are some small adjustements to the back to lie flatter, but this largely boils down to rotating the entire UV image and moving it down slightly.
 
-<img src="./img/uv_lying_down.png" width="256" height="256">
-<img src="./img/uv_lying_down_result.png" width="256" height="256">
-</details>
+![Lying down UV image](./img/uv_lying_down.png)
+![Lying down result](./img/uv_lying_down_result.png)
 
 ---
 

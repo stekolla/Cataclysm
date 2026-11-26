@@ -1,6 +1,4 @@
----
-title: Monster Spawning System
----
+# Monster Spawning System
 
 > [!NOTE]
 >

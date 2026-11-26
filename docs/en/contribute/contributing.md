@@ -52,12 +52,12 @@ There are a couple of guidelines we suggest sticking to:
 ### C++
 
 C++ style is enforced by the repository formatter helpers. Run `just fmt` before committing; see
-[CODE_STYLE](./../dev/explanation/code_style.md) for details.
+[CODE_STYLE](../dev/explanation/code_style.md) for details.
 
 ### JSON
 
 JSON files are formatted using custom formatter available in `tools/format`. Visit
-[JSON Style Guide](./../mod/json/explanation/json_style.md) for details.
+[JSON Style Guide](../mod/json/explanation/json_style.md) for details.
 
 ### Markdown
 
@@ -79,7 +79,7 @@ VSCode, you can set following configuration to auto-format markdown files on sav
 
 Lua files are formatted using [`dprint`](https://dprint.dev)'s built-in formatter. Run
 [`deno task dprint fmt`](https://github.com/RubixDev/dprint-plugin-stylua) anywhere to format Lua files. For details,
-see [Lua Style Guide](./../mod/lua/explanation/lua_style.md).
+see [Lua Style Guide](../mod/lua/explanation/lua_style.md).
 
 ## Documentation
 
@@ -317,7 +317,7 @@ See https://help.github.com/articles/closing-issues-using-keywords for more.
 ## Tooling support
 
 Various tools are available to help you keep your contributions conforming to the appropriate style.
-See [DEVELOPER_TOOLING](./../dev/reference/tooling) for more details.
+See [DEVELOPER_TOOLING](../dev/reference/tooling.md) for more details.
 
 ## Advanced Techniques
 
@@ -455,4 +455,4 @@ $ git pull --ff-only upstream main
 $ git checkout new_branch
 ```
 
-For more frequently asked questions, see the [developer FAQ](./../dev/reference/faq.md).
+For more frequently asked questions, see the [developer FAQ](../dev/reference/faq.md).

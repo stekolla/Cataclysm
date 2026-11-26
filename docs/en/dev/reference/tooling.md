@@ -33,7 +33,7 @@ just hooks-setup
 
 ## JSON style
 
-See the [JSON style guide](../../mod/json/explanation/json_style).
+See the [JSON style guide](../../mod/json/explanation/json_style.md).
 
 ## ctags
 

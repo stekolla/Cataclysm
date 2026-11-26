@@ -86,15 +86,13 @@ jobs:
 
             <details><summary>I do not want the automated commit</summary>
 
-            1. [Format your code locally](https://docs.cataclysmbn.org/contribute/contributing/#code-style), then commit it.
+            1. Run `just fmt` locally, then commit the formatted files.
             2. Run `git push --force` to force push your branch. This will overwrite the automated commit on remote with your local one.
             3. Continue working.
 
             </details>
 
             If you don't do this, your following commits will be based on the old commit, and cause **MERGE CONFLICT**.
-
-            [code-style]: https://docs.cataclysmbn.org/contribute/contributing/#code-style
 
       - name: lint and test typescript files
         run: |
@@ -131,7 +129,7 @@ jobs:
         run: |
           body="$(cat <<\BODY
           <!-- reject-main-branch-pr -->
-          This pull request was opened from `main`, which can cause conflicts when updating your fork's `main` branch later. Please open a new pull request from a [feature branch](https://docs.cataclysmbn.org/contribute/contributing/#make-your-changes) instead.
+          This pull request was opened from `main`, which can cause conflicts when updating your fork's `main` branch later. Please open a new pull request from a feature branch instead.
 
           <details>
           <summary>How to open a new PR from a branch</summary>

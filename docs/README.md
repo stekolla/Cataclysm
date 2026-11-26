@@ -1,16 +1,16 @@
-# Documentation Site
+# Cataclysm: Bright Nights Documentation
 
-Visit <docs.cataclysmbn.org/> to see the deployed version of this site.
+This directory contains the project's documentation in Markdown. Start with the
+[English index](en/index.md).
 
-## Contributing
+## Sections
 
-run the wiki with
+- [Gameplay](en/game/)
+- [Installation](en/install/install.md)
+- [JSON modding](en/mod/json/tutorial/modding.md)
+- [Lua modding](en/mod/lua/tutorial/modding.md)
+- [Development](en/dev/)
+- [Contributing](en/contribute/contributing.md)
 
-```sh
-deno task serve
-```
-
-## License
-
-[AGPL 3.0 only](./LICENSE), except subdirectories named language code, such as `en`, `ko`, `de`,
-`ru`, which follows the same license as the game. See [License.txt](../LICENSE.txt) for details.
+Edit Markdown files directly and submit changes in a pull request. See the
+[documentation guide](en/contribute/docs.md).

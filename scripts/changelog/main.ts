@@ -104,7 +104,7 @@ ${commitsSection(commits)}
 
 ## How to help:
 
-https://docs.cataclysmbn.org/contribute/contributing/
+See `docs/en/contribute/contributing.md` in the source repository for contribution details.
 
 - **Contributing via code changes.**
 - **Contributing via JSON changes.** Yes, we need modders and content makers help.

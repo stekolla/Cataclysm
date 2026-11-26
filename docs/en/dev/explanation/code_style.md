@@ -18,7 +18,7 @@ For example, from `vi`, set marks a and b around the block, then:
 :'a,'b ! astyle --style=1tbs --attach-inlines --indent=spaces=4 --align-pointer=name --max-code-length=100 --break-after-logical --indent-classes --indent-switches --indent-preproc-define --indent-col1-comments --min-conditional-indent=0 --pad-oper --add-braces --convet-tabs --unpad-paren --pad-paren-in --keep-one-line-blocks
 ```
 
-See [DEVELOPER_TOOLING.md](../reference/tooling) for other environments.
+See [DEVELOPER_TOOLING.md](../reference/tooling.md) for other environments.
 
 ## Code Example
 

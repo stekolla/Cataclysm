@@ -1791,8 +1791,9 @@ void options_manager::add_options_interface()
     add_empty_line();
 
     add( "WIKI_DOC_URL", interface, translate_marker( "Wiki URL" ),
-         translate_marker( "The URL opened by pressing the open wiki keybind." ),
-         "https://docs.cataclysmbn.org", 60
+         translate_marker( "Optional URL opened by the open wiki keybind. Leave empty to show the "
+                           "in-repository documentation path." ),
+         "", 60
        );
 
     add( "HHG_URL", interface, translate_marker( "Hitchhiker's Guide URL" ),

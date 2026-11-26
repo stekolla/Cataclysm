@@ -24,7 +24,6 @@ type Config = {
   types: readonly string[]
   allowMergeCommits: boolean
   allowRevertCommits: boolean
-  targetUrl: string
 }
 
 const types = [
@@ -91,8 +90,6 @@ export const scopes = {
 const config: Partial<Config> = {
   enabled: true,
   titleOnly: true,
-  targetUrl: "https://docs.cataclysmbn.org/contribute/changelog_guidelines/",
-
   types,
   scopes: Object.values(scopes).flat(),
 }

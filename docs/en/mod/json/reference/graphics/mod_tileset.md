@@ -81,4 +81,4 @@ The `state-modifiers` array goes inside a `tiles-new` entry alongside `tiles`. E
 | `use_offset` | bool   | `true` for offset mode, `false` for normalized UV mode.     |
 | `tiles`      | array  | State-to-sprite mappings.                                   |
 
-See the [State Modifiers section in Tilesets](./tileset.md#state-modifiers) for full documentation on UV mapping modes and creating modifier sprites.
+See the [State Modifiers section in Tilesets](tileset.md#state-modifiers) for full documentation on UV mapping modes and creating modifier sprites.

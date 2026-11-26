@@ -6,7 +6,7 @@ pre-spawned vehicles are. It ranges from `0.0` to `4.0` in steps of `0.1`, and d
 ## When it applies
 
 The option only affects vehicles spawned with a non-mint status, i.e. `status` of `-1` (light
-damage, the default) or `1` (disabled). See [Spawning vehicles](/mod/json/reference/vehicles/vehicles_spawning/).
+damage, the default) or `1` (disabled). See [Spawning vehicles](../../mod/json/reference/vehicles/vehicles_spawning.md).
 Vehicles spawned with `status: 0` are always intact.
 
 Each vehicle part is rolled independently, so one vehicle usually has a mix of intact, damaged and
@@ -51,114 +51,6 @@ Things to note:
 | 2.0    | 16 / 40             | 37.6%  | 62.4%   | 0%     | 12.5%       |
 | 3.0    | 24 / 60             | 91.9%  | 8.1%    | 0%     | 0.5%        |
 | 4.0    | 32 / 80             | 100%   | 0%      | 0%     | 0%          |
-
-## Interactive chart
-
-Try any other value with the chart below. Each row is one possible `4d8` result, from the highest
-roll at the top to the lowest at the bottom. The bar length is the chance of that roll, and its color
-is the outcome:
-
-- **Intact**: light green.
-- **Damaged**: green, yellow-green, yellow, orange or red, one color per 20% of remaining HP.
-- **Broken**: gray, like broken parts in the vehicle interface.
-
-<style>
-#vehicle-damage-tool {
-  --vds-full: rgb(0 255 0);
-  --vds-broken: #8c8c8c;
-  --vds-line: currentColor;
-  margin: 1.5rem 0;
-}
-#vehicle-damage-tool .vds-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-}
-#vehicle-damage-tool .vds-controls input[type="range"] {
-  flex: 1 1 14rem;
-}
-#vehicle-damage-tool .vds-controls input[type="number"] {
-  width: 5rem;
-}
-#vehicle-damage-tool .vds-summary {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
-}
-#vehicle-damage-tool .vds-swatch {
-  display: inline-block;
-  width: 0.8em;
-  height: 0.8em;
-  margin-right: 0.35em;
-  border-radius: 2px;
-  vertical-align: middle;
-}
-#vehicle-damage-tool .vds-swatch.vds-full { background: var(--vds-full); }
-#vehicle-damage-tool .vds-swatch.vds-damaged {
-  background: linear-gradient(
-    90deg,
-    #d7301f 0 20%,
-    #f08c1e 20% 40%,
-    #e8c21a 40% 60%,
-    #9ccb2f 60% 80%,
-    #2e8b3e 80%
-  );
-}
-#vehicle-damage-tool .vds-swatch.vds-broken { background: var(--vds-broken); }
-#vehicle-damage-tool .vds-chart {
-  font-family: monospace;
-  font-size: 0.85rem;
-}
-#vehicle-damage-tool .vds-header,
-#vehicle-damage-tool .vds-row {
-  display: grid;
-  grid-template-columns: 2.5rem 1fr 4.5rem 3.5rem;
-  gap: 0.5rem;
-  align-items: center;
-}
-#vehicle-damage-tool .vds-header {
-  font-weight: bold;
-  border-bottom: 1px solid var(--vds-line);
-  margin-bottom: 0.25rem;
-}
-#vehicle-damage-tool .vds-row {
-  min-height: 1.15rem;
-}
-#vehicle-damage-tool .vds-roll,
-#vehicle-damage-tool .vds-prob,
-#vehicle-damage-tool .vds-hp {
-  text-align: right;
-}
-#vehicle-damage-tool .vds-bar {
-  display: block;
-  height: 0.8rem;
-  border-radius: 2px;
-}
-#vehicle-damage-tool .vds-row.vds-full .vds-bar { background: var(--vds-full); }
-#vehicle-damage-tool .vds-row.vds-broken .vds-bar { background: var(--vds-broken); }
-</style>
-<div id="vehicle-damage-tool">
-  <div class="vds-controls">
-    <label for="vehicle-damage-slider">Vehicle damage scaling factor</label>
-    <input id="vehicle-damage-slider" type="range" min="0" max="4" step="0.1" value="1" />
-    <input id="vehicle-damage-number" type="number" min="0" max="4" step="0.1" value="1.0" aria-label="Vehicle damage scaling factor" />
-  </div>
-  <ul id="vehicle-damage-summary" class="vds-summary"></ul>
-  <div class="vds-chart">
-    <div class="vds-header">
-      <span class="vds-roll">roll</span>
-      <span>distribution</span>
-      <span class="vds-prob">P(roll)</span>
-      <span class="vds-hp">HP</span>
-    </div>
-    <div id="vehicle-damage-chart"></div>
-  </div>
-</div>
-
-<script type="module" src="/tools/vehicle_damage_scaling.js"></script>
 
 ## Older worlds
 

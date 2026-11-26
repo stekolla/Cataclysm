@@ -1,11 +1,8 @@
 # Cataclysm: Bright Nights
 
-<header align="center">
-  <a><img src="docs/en/contribute/img/readme-title.png" title="screenshots of (clockwise from upper-right: Chaosvolt (x2), ExecutorBill, scarf005"></a>
+![Cataclysm: Bright Nights screenshots](docs/en/contribute/img/readme-title.png)
 
 [![en][icon-en]][en] [![ko][icon-ko]][ko] [![ja][icon-ja]][ja]
-
-</header>
 
 [en]: ./README.md
 [icon-en]: https://img.shields.io/badge/lang-en-red?style=flat-square
@@ -28,7 +25,7 @@ who want what you have.
 Find a way to stop the Cataclysm ... or become one of its strongest monsters.
 
 > Cataclysm: Bright Nights is a fork of Cataclysm: Dark Days Ahead.
-> [see the differences from its ancestor.](https://docs.cataclysmbn.org/game/changelog/).
+> [See the project changelog](docs/en/game/changelog/index.md) for changes from its ancestor.
 
 ## Downloads
 
@@ -65,7 +62,7 @@ Bright Nights uses a [mod registry](https://mods.cataclysmbn.org/) for easier di
 
 #### Building from source
 
-Please read the official docs for details:
+Read the in-repository documentation for details:
 
 - [building with cmake](docs/en/dev/guides/building/cmake.md)
 
@@ -77,20 +74,16 @@ Please read the official docs for details:
 > project is not part of the project and is released under different software licenses, the files
 > covered by different software licenses have their own license notices.
 
-Please check the [official docs](https://docs.cataclysmbn.org/contribute/contributing/) for
-details.
+Please read the [contributor guide](docs/en/contribute/contributing.md) for details.
 
 ## Documentation
 
-Gameplay and developing documentation is available in the [doc](./docs/) directory
-in markdown format. You can also
-
-- visit the [official docs](https://docs.cataclysmbn.org/) site
-- [build and serve the documentation locally](./docs/en/contribute/docs.md)
+Gameplay and development documentation is available as Markdown in the
+[docs directory](docs/README.md).
 
 ## Community
 
-[![Official Docs](https://img.shields.io/badge/Docs-LightGray?style=for-the-badge)][docs]
+[![Documentation](https://img.shields.io/badge/Docs-Markdown-lightgrey?style=for-the-badge)][docs]
 [![Discussions](https://img.shields.io/badge/Discussions-black?style=for-the-badge&logo=github)][discussion]
 [![Discord](https://img.shields.io/discord/830879262763909202?style=for-the-badge&logo=discord)][discord]
 [![Discussions](https://img.shields.io/badge/CDDA%20Modding-green?style=for-the-badge&logo=discord)][modding]
@@ -98,7 +91,7 @@ in markdown format. You can also
 [discussion]: https://github.com/cataclysmbn/Cataclysm-BN/discussions
 [discord]: https://discord.gg/XW7XhXuZ89
 [modding]: https://discord.gg/B5q4XCa "Unofficial DDA modding community discord has a BN channel"
-[docs]: https://docs.cataclysmbn.org "Official BN documentation"
+[docs]: docs/README.md "Project documentation"
 
 ## Frequently Asked Questions
 

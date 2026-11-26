@@ -1,6 +1,4 @@
----
-title: Monster Factions
----
+# Monster Factions
 
 > [!NOTE]
 >

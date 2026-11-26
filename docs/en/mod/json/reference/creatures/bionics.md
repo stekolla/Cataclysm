@@ -13,7 +13,7 @@ item as described [here](#paired-item-definition). Even for a faulty bionic.
 | id                         | (_mandatory_) Unique string id                                                                                                                                       |
 | name                       | (_mandatory_) In game name of the bionic                                                                                                                             |
 | description                | (_mandatory_) In game description of the bionic                                                                                                                      |
-| flags                      | (_optional_) Array of json flags. See [the list](/mod/json/reference/json_flags/#bionics)                                                                            |
+| flags                      | (_optional_) Array of json flags. See [the list](../json_flags.md#bionics)                                                                            |
 | capacity                   | (_optional_) Bionic power gained from this bionic                                                                                                                    |
 | act_cost                   | (_optional_) Power cost to activate bionic.                                                                                                                          |
 | deact_cost                 | (_optional_) Power cost to deactivate bionic.                                                                                                                        |
@@ -30,7 +30,7 @@ item as described [here](#paired-item-definition). Even for a faulty bionic.
 | coverage_power_gen_penalty | (_optional_) multiplies `fuel_efficiency` by coverage from items of `occupied_bodyparts` and this value ( 50% bodypart coverage + )                                  |
 | exothermic_power_gen       | (_optional_) If fuel not converted to power is converted to heat                                                                                                     |
 | remote_fuel_draw           | (_optional_) Power draw from a connected exterior cable ( I.E. Cable Charger System )                                                                                |
-| power_gen_emission         | (_optional_) [field id](/mod/json/reference/map/field_type) to produce while making power                                                                            |
+| power_gen_emission         | (_optional_) [field id](../map/field_type.md) to produce while making power                                                                            |
 | weight_capacity_modifier   | (_optional_) Multiplier on weight capacity                                                                                                                           |
 | weight_capacity_bonus      | (_optional_) Addition on weight capacity                                                                                                                             |
 | upgraded_bionic            | (_optional_) Bionic id which can be upgraded by installing this bionic                                                                                               |

@@ -1,6 +1,4 @@
----
-title: Construction Info
----
+# Construction Info
 
 > [!NOTE]
 >
@@ -21,7 +19,7 @@ title: Construction Info
 "needs_diggable": true,                                          // (Optional) Whether the pre-terrain must be diggable
 "pre_terrain": "t_pit",                                             // (Optional) Required terrain to build on
 "pre_furniture": "f_sandbag_half",                                  // (Optional) Required furniture to build on
-"pre_special": "check_down_OK",                                     // (Optional) Hardcoded tile validity checks, refer to construction.cpp 
+"pre_special": "check_down_OK",                                     // (Optional) Hardcoded tile validity checks, refer to construction.cpp
 "post_terrain": "t_pit_spiked",                                     // (Optional) Terrain type after construction is complete
 "post_furniture": "f_sandbag_wall",                                 // (Optional) Furniture type after construction is complete
 "post_special": "done_dig_stair",                                   // (Optional) Hardcoded completion function, refer to construction.cpp

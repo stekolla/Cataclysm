@@ -547,8 +547,8 @@ List of known flags, used in both `terrain.json` and `furniture.json`.
   with this flag constantly functions.
 - `FREEZER` This item freezes items inside. Preserving them extremely well. Unlike vehicle parts,
   any furniture with this flag constantly functions.
-- `GOES_DOWN` Can use <kbd>></kbd> to go down a level.
-- `GOES_UP` Can use <kbd><</kbd> to go up a level.
+- `GOES_DOWN` Can use `\1` to go down a level.
+- `GOES_UP` Can use `\1` to go up a level.
 - `GROWTH_SEED` This plant is in its seed stage of growth.
 - `GROWTH_SEEDLING` This plant is in its seedling stage of growth.
 - `GROWTH_MATURE` This plant is in a mature stage of a growth.
@@ -586,7 +586,7 @@ List of known flags, used in both `terrain.json` and `furniture.json`.
 - `ROUGH` May hurt the player's feet.
 - `RUG` Enables the `Remove Carpet` Construction entry.
 - `SALT_WATER` Source of salt water (works for terrains with examine action "water_source").
-- `SEALED` Can't use <kbd>e</kbd> to retrieve items; must smash them open first.
+- `SEALED` Can't use `\1` to retrieve items; must smash them open first.
 - `SEEN_FROM_ABOVE` Visible from a higher level (provided the tile above has no floor)
 - `SHARP` May do minor damage to players/monsters passing through it.
 - `SHOOT_ME` Players can aim at terrain or furniture with this flag like they can with

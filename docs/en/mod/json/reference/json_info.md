@@ -35,8 +35,8 @@ positioning your cursor over an id and hitting the appropriate key combination.
 
 Entries are distinguished by their `type` property. This property is mandatory for all entries.
 Setting this entry to 'armor' for example means the game will expect properties specific to armor in
-that entry. Also ties in with [`copy-from`](./items/json_inheritance.md#copy-from), if you want to
-[inherit properties of another object](./items/json_inheritance.md), it must be of the same tipe.
+that entry. Also ties in with [`copy-from`](items/json_inheritance.md#copy-from), if you want to
+[inherit properties of another object](items/json_inheritance.md), it must be of the same tipe.
 
 ## Formatting
 

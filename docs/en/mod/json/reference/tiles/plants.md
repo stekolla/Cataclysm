@@ -1,6 +1,4 @@
----
-title: Plants
----
+# Plants
 
 > [!NOTE]
 >

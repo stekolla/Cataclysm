@@ -1,6 +1,4 @@
----
-title: Formatting & Linting
----
+# Formatting & Linting
 
 This guide explains how to format and lint code in Cataclysm: Bright Nights.
 

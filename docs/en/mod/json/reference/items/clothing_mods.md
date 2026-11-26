@@ -1,6 +1,4 @@
----
-title: Clothing Modifications
----
+# Clothing Modifications
 
 ### clothing_mod
 

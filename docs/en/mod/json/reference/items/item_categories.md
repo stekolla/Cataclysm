@@ -1,6 +1,4 @@
----
-title: Item Categories
----
+# Item Categories
 
 ### Item Category
 

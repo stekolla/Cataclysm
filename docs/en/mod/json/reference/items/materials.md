@@ -1,6 +1,4 @@
----
-title: Material Definitions
----
+# Material Definitions
 
 > [!NOTE]
 >

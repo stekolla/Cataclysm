@@ -51,7 +51,7 @@ There are two types of ammo_effects. Hardcoded ammo effects and jsonized ammo ef
 | id           | (_mandatory_) Unique ID.                                                                      |
 | aoe          | (_optional_) Object, see [aoe](#aoe) for fields                                               |
 | trail        | (_optional_) Object, see [trail](#trail) for fields                                           |
-| explosion    | (_optional_) Object, see [explosions](/mod/json/reference/misc/explosions/#fields) for fields |
+| explosion    | (_optional_) Object, see [explosions](../misc/explosions.md#fields) for fields |
 | do_flashbang | (_optional_) Do flashbang effect                                                              |
 | do_emp_blast | (_optional_) Do Emp effect                                                                    |
 

@@ -1,6 +1,4 @@
----
-title: Build for the Browser
----
+# Build for the Browser
 
 Cataclysm: Bright Nights builds with the Emscripten SDK for desktop browsers. Native game builds
 are not supported.

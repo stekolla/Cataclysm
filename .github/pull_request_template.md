@@ -1,5 +1,6 @@
 <!-- for small, obvious fixes (e.g docs), it's okay to ignore this template.
-warning: PRs with AI-generated summary will be closed. see https://docs.cataclysmbn.org/contribute/contributing/#ai-assisted-pull-requests
+Warning: PRs with AI-generated summaries will be closed. See
+`docs/en/contribute/contributing.md` for the AI assistance policy.
 -->
 
 ## Purpose of change (The Why)
@@ -30,16 +31,16 @@ NOTE: Please read your emails. Anyone mentioned on Github with an @ will receive
 
 ### Mandatory
 
-- [ ] I linked any relevant issues using [github keyword syntax](https://docs.cataclysmbn.org/contribute/contributing/#pull-request-notes) like `closes #1234` in [Summary of the PR](#purpose-of-change-the-why) so it can be closed automatically.
+- [ ] I linked relevant issues using GitHub keywords like `closes #1234` so they close automatically.
 
 ### Optional
 
 <!-- please remove checkboxes unrelated to this PR. -->
 
 - [ ] This PR used AI assistance.
-  - [ ] I added an [`Assisted-by:` trailer](https://docs.cataclysmbn.org/contribute/contributing/#ai-assisted-pull-requests) to every AI-assisted commit in the [Linux kernel format](https://docs.kernel.org/process/coding-assistants.html).
+  - [ ] I added an [`Assisted-by:` trailer](https://docs.kernel.org/process/coding-assistants.html) to every AI-assisted commit.
 - [ ] This PR ports someone else's contribution (e.g from DDA or other fork).
-  - [ ] I have added [`port` scope](https://docs.cataclysmbn.org/contribute/changelog_guidelines/#port%3A-ports-from-dda-or-other-forks) to the PR title.
+  - [ ] I have added `port` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
   - [ ] I have attributed original authors in the commit messages adding [`Co-Authored-By`](https://docs.github.com/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors) in the commit message.
   - [ ] I have linked the URL of original PR(s) in the description.
 - [ ] This is a C++ PR that modifies JSON loading or behavior.
@@ -55,8 +56,8 @@ NOTE: Please read your emails. Anyone mentioned on Github with an @ will receive
 - [ ] This is a PR that removes JSON entities.
   - [ ] The removed JSON entities have new entries in `data/json/obsoletion/` folder or use some other migration process for existing saves.
 - [ ] This PR adds/removes a mod.
-  - [ ] I have added [`mods` scope](https://docs.cataclysmbn.org/contribute/changelog_guidelines/#mods-or-mods%2F<mod_id>%3A-mods) to the PR title.
+  - [ ] I have added `mods` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
   - [ ] The `mod_name` in `data/mods/<mod_name>` matches `id` in `modinfo.json`.
 - [ ] This PR modifies lua scripts or the lua API.
-  - [ ] I have added [`lua` scope](https://docs.cataclysmbn.org/contribute/changelog_guidelines/#lua%3A-changes-to-lua-api) to the PR title.
+  - [ ] I have added `lua` scope to the PR title (see `docs/en/contribute/changelog_guidelines.md`).
   - [ ] I have added [type annotations](https://emmylua.github.io/annotation.html) to functions so that it's safe and easy to maintain.

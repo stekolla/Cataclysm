@@ -1,10 +1,6 @@
----
-title: In-Repo Mods
-sidebar:
-  badge:
-    text: Outdated
-    variant: caution
----
+> **Outdated documentation.**
+>
+# In-Repo Mods
 
 > [!CAUTION]
 >

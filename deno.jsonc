@@ -1,9 +1,5 @@
 {
   "tasks": {
-    "docs": {
-      "description": "documentation site generation",
-      "command": "deno task --cwd docs",
-    },
     "docs:gen": {
       "description": "automated documentation generation for CLI and Lua API",
       "command": "deno fmt",

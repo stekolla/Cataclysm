@@ -1,8 +1,4 @@
----
-title: Monsters
-tableOfContents:
-  maxHeadingLevel: 4
----
+# Monsters
 
 ## Monster types
 
@@ -113,7 +109,7 @@ List of scenttype_id ignored by this monster. scent_types are defined in scent_t
 (string)
 
 Symbol and color representing monster in-game. The symbol must be a UTF-8 string, that is exactly
-one console cell width (may be several Unicode characters). See [COLOR.md](../graphics/COLOR) for
+one console cell width (may be several Unicode characters). See [COLOR.md](../graphics/COLOR.md) for
 details.
 
 ## "size"
@@ -327,7 +323,7 @@ Monster dodge skill. 0 to 10 in base game. See GAME_BALANCE.txt for an explanati
 
 | Property            | Description                                                                       |
 | ------------------- | --------------------------------------------------------------------------------- |
-| `damage_type`       | Type of damage. See [damage types](/mod/json/reference/misc/damage/#damage-types) |
+| `damage_type`       | Type of damage. See [damage types](../misc/damage.md#damage-types) |
 | `amount`            | Amount of damage dealt.                                                           |
 | `armor_penetration` | Amount of armor ignored by this damage instance.                                  |
 | `armor_multiplier`  | Multiplier applied to `armor_penetration`.                                        |

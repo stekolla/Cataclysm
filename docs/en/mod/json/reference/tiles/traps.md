@@ -1,6 +1,4 @@
----
-title: Traps
----
+# Traps
 
 ### trap
 

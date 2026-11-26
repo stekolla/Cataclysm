@@ -1,6 +1,4 @@
----
-title: Recipes
----
+# Recipes
 
 > [!NOTE]
 >
@@ -10,7 +8,7 @@ title: Recipes
 
 Recipes represent both craft and uncraft (disassembly) recipes.
 
-See [Nested Recipe Categories](nested_categories) for creating hierarchical
+See [Nested Recipe Categories](nested_categories.md) for creating hierarchical
 crafting menu groupings.
 
 ```json
@@ -19,7 +17,7 @@ crafting menu groupings.
 "result": "javelin",         // ID of resulting item. By default, also used as the ID of the recipe.
 "id_suffix": "",             // Optional (default: empty string). Some suffix to make the ID of the recipe unique. The ID of the recipe is "<result><id_suffix>".
 "category": "CC_WEAPON",     // Category of crafting recipe. CC_NONCRAFT used for disassembly recipes
-"subcategory": "",           // Subcategory of crafting recipe. 
+"subcategory": "",           // Subcategory of crafting recipe.
 "override": false,           // Optional (default: false). If false and the ID of the recipe is already used by another recipe, loading of recipes fails. If true and a recipe with the ID is already defined, the existing recipe is replaced by the new recipe.
 "obsolete": false,           // Optional (default: false). Marks this recipe as obsolete. Use this instead of outright deleting it to preserve save compatibility.
 "delete_flags": [ "CANNIBALISM" ], // Optional (default: empty list). Flags specified here will be removed from the resultant item upon crafting. This will override flag inheritance, but *will not* delete flags that are part of the item type itself.

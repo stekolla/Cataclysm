@@ -10,7 +10,7 @@ Kept here for global reference.
 
 | Identifier        | Description                                                                                             |
 | ----------------- | ------------------------------------------------------------------------------------------------------- |
-| impact            | (_mandatory_) A [damage instance](/mod/json/reference/misc/damage/#damage-instance) for each projectile |
+| impact            | (_mandatory_) A [damage instance](damage.md#damage-instance) for each projectile |
 | range             | (_mandatory_) The range of the projectile                                                               |
 | speed             | (_optional_) Speed of the projectile in meters per second                                               |
 | aimedcritbonus    | (_optional_) The minimum bonus from a crit                                                              |

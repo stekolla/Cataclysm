@@ -520,7 +520,7 @@ For compatibility, the loader also accepts these legacy forms:
 | `base_wind_season_variation`  | How wind varies with season. Lower values produce more variation.                                                                                                                              |
 | `temperature_daily_amplitude` | Half the difference between the coldest and warmest parts of the day.                                                                                                                          |
 | `temperature_noise_amplitude` | Half the difference contributed by 3D weather noise.                                                                                                                                           |
-| `weather_types`               | Ids of the weather types allowed in this region. The first entry is the default weather type. Declaration order affects weather selection; see [WEATHER_TYPE.md](weather_type) for details.    |
+| `weather_types`               | Ids of the weather types allowed in this region. The first entry is the default weather type. Declaration order affects weather selection; see [WEATHER_TYPE.md](weather_type.md) for details.    |
 | `weather_patterns`            | Optional list of `weather_pattern` ids applied on top of the base weather. Patterns add location and time dependent modifiers and can gate weather types that require specific pattern values. |
 
 ### Example

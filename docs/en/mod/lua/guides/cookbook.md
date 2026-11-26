@@ -22,8 +22,7 @@ for _, item in pairs(items) do
 end
 ```
 
-<details>
-<summary>Example output</summary>
+#### Example output
 
 ```
 wielded: smartphone
@@ -40,8 +39,6 @@ matchbook
 clean water (plastic bottle)
 clean water
 ```
-
-</details>
 
 ## Monsters
 
@@ -91,14 +88,11 @@ Then connect the hook to the function ONLY ONCE.
 game.add_hook("on_creature_performed_technique", function(...) return on_creature_performed_technique(...) end)
 ```
 
-<details>
-<summary>Example output</summary>
+#### Example output
 
 ```
 Ramiro Waters performed Power Hit on zombie (DI: 27.96 , MC: 58)
 ```
-
-</details>
 
 ## Item Durability
 
@@ -442,8 +436,8 @@ local items = you:all_items(false)
 
 for _, item in pairs(items) do
     print(
-        item:tname(1, false, 0) 
-        .. " { attack cost: " .. item:attack_cost() 
+        item:tname(1, false, 0)
+        .. " { attack cost: " .. item:attack_cost()
         .. ", stamina cost: " .. item:stamina_cost()
         .. ", melee stamina cost: " .. you:get_melee_stamina_cost(item)
         .. " }"

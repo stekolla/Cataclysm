@@ -28,5 +28,5 @@ The first path is the unpacked tileset root. It should contain files such as `ti
 `tile_info.json`, and `pngs_*` directories. The second path is where the composed `tile_config.json`
 and tilesheet PNG files will be written.
 
-For more detail, see [Tilesets](/mod/json/reference/graphics/tileset/#typescript-tileset-tool).
-For small checks in a browser, see the [Tileset Web Tool](/dev/reference/tileset_web_tool/).
+For more detail, see [Tilesets](../reference/graphics/tileset.md#typescript-tileset-tool).
+Use the [TypeScript tileset tool](../reference/graphics/tileset.md#typescript-tileset-tool) to compose and decompose tilesets.
