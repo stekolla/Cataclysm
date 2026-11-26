@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cataclysm: Bright Nights</title>
+    <style>
+        body { margin: 0; background: #151515; color: #eee; font: 1rem system-ui; }
+        main { display: grid; min-height: 100vh; place-content: center; }
+        canvas { display: block; max-width: 100vw; max-height: 100vh; object-fit: contain; }
+        #status { text-align: center; }
+    </style>
+</head>
+<body>
+    <main>
+        <p id="status" role="status">Loading Bright Nights…</p>
+        <canvas id="canvas" aria-label="Cataclysm: Bright Nights" tabindex="0"></canvas>
+    </main>
+    <script>
+        const statusElement = document.querySelector("#status");
+        const canvas = document.querySelector("#canvas");
+        canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+        canvas.addEventListener("pointerdown", () => canvas.focus());
+
+        var Module = {
+            canvas,
+            setStatus(message) {
+                statusElement.textContent = message || "Starting Bright Nights…";
+            },
+            onRuntimeInitialized() {
+                statusElement.hidden = true;
+                canvas.focus();
+            },
+            onAbort(reason) {
+                statusElement.hidden = false;
+                statusElement.textContent = `Bright Nights stopped: ${reason}`;
+            }
+        };
+    </script>
+    {{{ SCRIPT }}}
+</body>
+</html>

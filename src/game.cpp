@@ -134,6 +134,7 @@
 #include "path_info.h"
 #include "pathfinding.h"
 #include "pickup.h"
+#include "platform/browser_storage.h"
 #include "player.h"
 #include "player_activity.h"
 #include "point_float.h"
@@ -1909,6 +1910,7 @@ bool game::cleanup_at_end()
         if( gamemode ) {
             gamemode = std::make_unique<special_game>(); // null gamemode or something..
         }
+        browser_storage::flush_with_feedback();
     }
 
     //Reset any offset due to driving
@@ -4522,7 +4524,10 @@ bool game::save( bool quitting )
             world_generator->save_last_world_info();
             world_generator->active_world->info->add_save( save_t::from_save_id( u.get_save_id() ) );
 
-            auto duration = world->commit_save_tx();
+            const auto duration = world->commit_save_tx();
+            if( !browser_storage::flush_with_feedback() ) {
+                return false;
+            }
             add_msg( m_info, _( "World Saved (took %dms)." ), duration );
             return true;
         }
@@ -16352,12 +16357,11 @@ void game::quicksave()
     ui_manager::redraw();
     refresh_display();
 
-    time_t now = time( nullptr ); //timestamp for start of saving procedure
-
-    //perform save
-    save( false );
-    //Now reset counters for autosaving, so we don't immediately autosave after a quicksave or autosave.
-    moves_since_last_save = 0;
+    const auto now = time( nullptr );
+    if( save( false ) ) {
+        moves_since_last_save = 0;
+    }
+    // Rate-limit automatic retries while keeping unsaved moves for a manual retry.
     last_save_timestamp = now;
 }
 

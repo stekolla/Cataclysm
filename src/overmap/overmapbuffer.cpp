@@ -1167,12 +1167,16 @@ struct find_task_generator {
 
 auto overmapbuffer::find_all(const tripoint_abs_omt& origin, const omt_find_params& params)
     -> std::vector<tripoint_abs_omt> {
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+    return find_all_sync(origin, params);
+#else
     const auto concurrency = std::max(1u, std::thread::hardware_concurrency() - 1);
     if (params.force_sync || concurrency == 1) {
         return find_all_sync(origin, params);
     } else {
         return find_all_async(origin, params);
     }
+#endif
 }
 
 auto overmapbuffer::find_all_sync(const tripoint_abs_omt& origin, const omt_find_params& params)

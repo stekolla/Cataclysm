@@ -199,6 +199,32 @@ This will place the executable into `out/build/linux-slim/` or `out/build/osx-ar
 > cmake --build --preset linux-slim --target cataclysm-bn-tiles --parallel 4
 > ```
 
+#### Build for the Browser (WebAssembly)
+
+Install CMake, Ninja, and the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html).
+Run these commands from the SDK directory to install and activate Emscripten 6.0.8.
+
+```sh
+./emsdk install 6.0.8
+./emsdk activate 6.0.8
+source ./emsdk_env.sh
+```
+
+Run the following from the Bright Nights checkout to build and serve the game.
+
+```sh
+cmake --preset wasm-tiles
+cmake --build --preset wasm-tiles
+python3 -m http.server 8000 --bind 127.0.0.1 --directory out/build/wasm-tiles/web
+```
+
+Open [the local game](http://127.0.0.1:8000/cataclysm-bn-tiles.html) in a desktop browser with WebGL and
+WebAssembly JavaScript Promise Integration (JSPI).
+The browser build uses RetroDays tiles and CPU compute. It runs in English with sound disabled.
+Use **Save and Quit** (`S`) before reloading, then select the same character under **Load**.
+Saves are stored in the current browser profile for the same site address and port. Serve the game
+from localhost or HTTPS, and use one Bright Nights tab per site to keep saves consistent.
+
 #### Build without Presets
 
 To build CataclysmBN out of source:

@@ -2335,9 +2335,14 @@ void options_manager::add_options_graphics()
        );
     get_option( "COLORED_LIGHTING" ).setPrerequisite( "USE_TILES" );
 
+#if defined(__EMSCRIPTEN__)
+    const auto default_tileset = "retrodays";
+#else
+    const auto default_tileset = "UNDEAD_PEOPLE_BASE";
+#endif
     add( "TILES", graphics, translate_marker( "Choose tileset" ),
          translate_marker( "Choose the tileset you want to use." ),
-         build_tilesets_list(), "UNDEAD_PEOPLE_BASE", COPT_CURSES_HIDE
+         build_tilesets_list(), default_tileset, COPT_CURSES_HIDE
        ); // populate the options dynamically
 
     get_option( "TILES" ).setPrerequisite( "USE_TILES" );
@@ -2351,7 +2356,7 @@ void options_manager::add_options_graphics()
 
     add( "OVERMAP_TILES", graphics, translate_marker( "Choose overmap tileset" ),
          translate_marker( "Choose the overmap tileset you want to use." ),
-         build_tilesets_list(), "UNDEAD_PEOPLE_BASE", COPT_CURSES_HIDE
+         build_tilesets_list(), default_tileset, COPT_CURSES_HIDE
        ); // populate the options dynamically
 
     get_option( "OVERMAP_TILES" ).setPrerequisite( "USE_TILES_OVERMAP" );
@@ -2485,10 +2490,15 @@ void options_manager::add_options_graphics()
 #endif
 
 #if !defined(__ANDROID__) // Android is always fullscreen
+#   if defined(__EMSCRIPTEN__)
+    const auto default_fullscreen = "no";
+#   else
+    const auto default_fullscreen = "windowedbl";
+#   endif
     add( "FULLSCREEN", graphics, translate_marker( "Fullscreen" ),
          translate_marker( "Starts Cataclysm in one of the fullscreen modes.  Requires restart." ),
     { { "no", translate_marker( "No" ) }, { "maximized", translate_marker( "Maximized" ) }, { "fullscreen", translate_marker( "Fullscreen" ) }, { "windowedbl", translate_marker( "Windowed borderless" ) } },
-    "windowedbl", COPT_CURSES_HIDE
+    default_fullscreen, COPT_CURSES_HIDE
        );
 
     add( "MINIMIZE_ON_FOCUS_LOSS", graphics,
@@ -2504,15 +2514,19 @@ void options_manager::add_options_graphics()
     "software", COPT_CURSES_HIDE );
 #   else
     std::vector<options_manager::id_and_option> renderer_list = cata_tiles::build_renderer_list();
+#       if defined(__EMSCRIPTEN__)
+    const auto default_renderer = "opengles2";
+#       else
     std::string default_renderer = renderer_list.front().first;
-#   if defined(_WIN32)
+#           if defined(_WIN32)
     for( const id_and_option &renderer : renderer_list ) {
         if( renderer.first == "direct3d11" ) {
             default_renderer = renderer.first;
             break;
         }
     }
-#   endif
+#           endif
+#       endif
     add( "RENDERER", graphics, translate_marker( "Renderer" ),
          translate_marker( "Set which renderer to use.  Requires restart." ), renderer_list,
          default_renderer, COPT_CURSES_HIDE );
@@ -2577,7 +2591,7 @@ void options_manager::add_options_graphics()
     "1", COPT_CURSES_HIDE );
 #endif
 
-#if defined(CATA_SDL)
+#if defined(CATA_SDL) && !defined(__EMSCRIPTEN__)
     add_empty_line();
     add( "COMPUTE_ACCELERATION", graphics, translate_marker( "Compute Acceleration" ),
          translate_marker( "Controls compute backend selection for lighting, visibility, and line of sight.  Requires restart." ),

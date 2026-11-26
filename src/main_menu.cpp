@@ -26,6 +26,7 @@
 #include "output.h"
 #include "overmap/overmapbuffer.h"
 #include "path_info.h"
+#include "platform/browser_storage.h"
 #include "pldata.h"
 #include "popup.h"
 #include "safemode_ui.h"
@@ -1073,7 +1074,9 @@ void main_menu::world_tab( const std::string &worldname )
 {
     // Create world
     if( sel2 == 0 ) {
-        world_generator->make_new_world();
+        if( world_generator->make_new_world() ) {
+            browser_storage::flush_with_feedback();
+        }
         return;
     }
 
@@ -1097,6 +1100,7 @@ void main_menu::world_tab( const std::string &worldname )
 
     auto clear_world = [this, &worldname]( bool do_delete ) {
         world_generator->delete_world( worldname, do_delete );
+        browser_storage::flush_with_feedback();
         savegames.clear();
         MAPBUFFER.clear();
         get_primary_overmapbuffer().clear();
@@ -1111,6 +1115,7 @@ void main_menu::world_tab( const std::string &worldname )
         MAPBUFFER.clear();
         get_primary_overmapbuffer().clear();
         world_generator->convert_to_v2( worldname );
+        browser_storage::flush_with_feedback();
     };
 
     switch( opt_val ) {
@@ -1142,10 +1147,13 @@ void main_menu::world_tab( const std::string &worldname )
                               "Proceed?"
                           ) ) ) {
                 world_generator->edit_active_world_mods( world );
+                browser_storage::flush_with_feedback();
             }
             break;
         case 2: // Copy World settings
-            world_generator->make_new_world( true, worldname );
+            if( world_generator->make_new_world( true, worldname ) ) {
+                browser_storage::flush_with_feedback();
+            }
             break;
         case 3: // Character to Template
             if( load_character_tab( worldname ) ) {

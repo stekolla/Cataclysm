@@ -87,6 +87,9 @@ cata_thread_pool &get_thread_pool()
     // only once).  Changes to THREAD_POOL_WORKERS or MULTITHREADING_ENABLED
     // require a restart.
     static cata_thread_pool pool( []() -> unsigned int {
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+        return 0u;
+#else
         // Respect the "disable multi-threading" setting.  This is read via
         // get_option<bool>() directly (not the cached parallel_enabled global)
         // because cache_to_globals() has not yet run at pool-init time.
@@ -102,6 +105,7 @@ cata_thread_pool &get_thread_pool()
         // 0 = auto: hardware_concurrency()-1, leaving one core for the main/SDL thread.
         const unsigned int hc = std::thread::hardware_concurrency();
         return hc > 1u ? hc - 1u : 0u;
+#endif
     }() );
     return pool;
 }

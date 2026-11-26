@@ -64,6 +64,10 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    cmake --preset linux-full
    cmake --build --preset linux-full --target cataclysm-bn-tiles cata_test-tiles
    ```
+   For Emscripten, match the setjmp/longjmp implementation of C dependencies to the game's C++ exception mode.
+   With native Wasm exceptions, select FreeType's `freetype-legacysjlj` port archive.
+   Use JSPI for browser waits with native Wasm exceptions. Asyncify's Wasm rewriting cannot reliably combine the two.
+   Keep unsaved moves available for a manual retry after failed autosaves, and rate-limit automatic retries.
 4. Add/update Catch2 tests in `tests/` and run checks:
    ```sh
    ./out/build/linux-full/tests/cata_test-tiles "[optional-filter]"

@@ -820,7 +820,7 @@ int main( int argc, char *argv[] )
 #endif
     }
 
-#if defined(CATA_SDL)
+#if defined(CATA_SDL) && !defined(__EMSCRIPTEN__)
     if( lua_doc_output_path.empty() && lua_types_output_path.empty() ) {
         cata_gpu::init();
         atexit( cata_gpu::shutdown );

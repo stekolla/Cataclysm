@@ -17,6 +17,9 @@ enum class backend : int {
 };
 
 inline auto selected_backend() -> backend {
+#if defined(__EMSCRIPTEN__)
+    return backend::cpu_compute;
+#else
     using preload_config::compute_accel;
 
     switch (preload_config::get_compute_accel()) {
@@ -28,11 +31,12 @@ inline auto selected_backend() -> backend {
             return backend::sdl_gpu_hardware;
         case compute_accel::auto_select:
         default:
-#if defined(CATA_SDL)
+#    if defined(CATA_SDL)
             if (cata_gpu::get_device() != nullptr) { return backend::sdl_gpu_hardware; }
-#endif
+#    endif
             return backend::cpu_compute;
     }
+#endif
 }
 
 inline auto selected_backend_name() -> std::string_view {

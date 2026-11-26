@@ -25,7 +25,7 @@ file(GLOB_RECURSE CATACLYSM_BN_HEADERS CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src
 list(FILTER CATACLYSM_BN_HEADERS EXCLUDE REGEX "/src/(lua|sol|third-party)/")
 
 add_subdirectory(lua)
-if (UNIX)
+if (UNIX AND NOT EMSCRIPTEN)
     target_compile_definitions(liblua PUBLIC LUA_USE_LINUX)
 elseif (APPLE)
     target_compile_definitions(liblua PUBLIC LUA_USE_MACOSX)
@@ -60,16 +60,16 @@ function(setup_common_target_properties target_name)
     target_link_libraries(${target_name} PUBLIC SQLite3::SQLite3)
 
     # Setup threading
-    if (CMAKE_USE_PTHREADS_INIT)
+    if (CMAKE_USE_PTHREADS_INIT AND NOT EMSCRIPTEN)
         target_compile_options(${target_name} PUBLIC "-pthread")
     endif ()
 
-    if (CMAKE_THREAD_LIBS_INIT)
+    if (CMAKE_THREAD_LIBS_INIT AND NOT EMSCRIPTEN)
         target_link_libraries(${target_name} PUBLIC ${CMAKE_THREAD_LIBS_INIT})
     endif ()
 
     target_compile_definitions(${target_name} PUBLIC LUA)
-    if (UNIX)
+    if (UNIX AND NOT EMSCRIPTEN)
         target_compile_definitions(${target_name} PUBLIC LUA_USE_LINUX)
     elseif (APPLE)
         target_compile_definitions(${target_name} PUBLIC LUA_USE_MACOSX)
@@ -156,6 +156,9 @@ if (TILES)
         target_compile_definitions(cataclysm-bn-tiles-common PUBLIC DYNAMIC_ATLAS)
     endif()
     target_link_libraries(cataclysm-bn-tiles PRIVATE cataclysm-bn-tiles-common)
+    if (EMSCRIPTEN)
+        cata_configure_web_target(cataclysm-bn-tiles)
+    endif ()
 
     # Windows specific tiles libraries
     if (WIN32)

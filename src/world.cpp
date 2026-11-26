@@ -576,7 +576,12 @@ sqlite_map_db::sqlite_map_db( const std::string &path )
     : path_( path )
     , writer_db_( open_db( path ) )
 {
+#if defined(__EMSCRIPTEN__)
+    // The browser has one writer. Commit to the main file before syncing to IndexedDB.
+    exec_sql( writer_db_, "PRAGMA journal_mode=DELETE" );
+#else
     exec_sql( writer_db_, "PRAGMA journal_mode=WAL" );
+#endif
 }
 
 sqlite_map_db::~sqlite_map_db()
