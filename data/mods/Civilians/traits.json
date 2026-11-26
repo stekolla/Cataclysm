@@ -1,8 +1,0 @@
-[
-  {
-    "type": "mutation",
-    "id": "PROF_FERAL",
-    "copy-from": "PROF_FERAL",
-    "anger_relations": [ [ "HUMAN", 100 ] ]
-  }
-]
