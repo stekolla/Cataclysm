@@ -9,7 +9,9 @@ list(REMOVE_ITEM CATACLYSM_BN_SOURCES ${MAIN_CPP} ${MESSAGES_CPP})
 
 # Lua binding translation units are template-heavy and primarily run at startup;
 # compile them with no optimization to reduce build times.
-file(GLOB CATALUA_BINDINGS_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/catalua_bindings*.cpp)
+file(GLOB CATALUA_BINDINGS_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/src/catalua_bindings*.cpp
+    ${CMAKE_SOURCE_DIR}/src/catalua_bindings/*.cpp)
 if (MSVC)
     set(CATALUA_BINDINGS_COMPILE_OPTIONS /Od /Ob0)
 else ()
