@@ -1,4 +1,4 @@
-# Cataclysm Documentation
+# Cataclysm: Fault Lines Documentation
 
 This directory contains the project's documentation in Markdown. Start with the
 [English index](en/index.md).

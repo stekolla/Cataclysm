@@ -129,7 +129,7 @@ if (NOT "${GIT_VERSION}" MATCHES "GIT-NOTFOUND")
 build type: ${BUILD_PRESET_NAME}\n\
 build number: ${_timestamp}\n\
 commit sha: ${_sha1}\n\
-commit url: https://github.com/stekolla/Cataclysm-BN/commit/${_sha1}"
+commit url: https://github.com/stekolla/Cataclysm/commit/${_sha1}"
     )
 endif ()
 

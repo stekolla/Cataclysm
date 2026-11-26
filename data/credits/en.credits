@@ -2,7 +2,7 @@
 # Longer lines will be automatically folded
 ##############################################################################
 <color_white>Project Repository:</color>
-<color_yellow>stekolla/Cataclysm-BN</color>
+<color_yellow>stekolla/Cataclysm</color>
 
 <color_white>Original creators:</color>
 <color_yellow>Whales, TheDarklingWolf, GlyphGryph</color> (<color_dark_gray>retired</color>)    
@@ -17,7 +17,7 @@
 <color_yellow>Cataclysm: Dark Days Ahead Development Team</color> - For providing solid foundation for fork and for help.
 
 <color_white>For a full list of contributors please see:</color>
-<color_cyan>https://github.com/stekolla/Cataclysm-BN/contributors</color>
+<color_cyan>https://github.com/stekolla/Cataclysm/contributors</color>
 
 Cataclysm inherits content from <color_light_blue>Bright Nights</color> and is released under <color_white>CC-BY-SA 3.0</color>:
 <color_cyan>https://creativecommons.org/licenses/by-sa/3.0/</color>

@@ -5,7 +5,7 @@
     <developer id="org.cataclysmbn">
         <name>Cataclysm Contributors</name>
     </developer>
-    <name>Cataclysm</name>
+    <name>Cataclysm: Fault Lines</name>
     <summary>Try to survive the apocalypse</summary>
     <branding>
         <color type="primary" scheme_preference="light">#8df7a9</color>
@@ -32,7 +32,7 @@
 
     <description>
         <p>
-            Cataclysm is a roguelike with sci-fi elements set in a post-apocalyptic world.
+            Cataclysm: Fault Lines is a roguelike with sci-fi elements set in a post-apocalyptic world.
         </p>
         <p>
             While some have described it as a &quot;zombie game&quot;, there is far more to Cataclysm than that. Struggle to survive in a harsh, persistent, procedurally generated world. Scavenge the remnants of a dead civilization for food, equipment, or, if you are lucky, a vehicle with a full tank of gas to get you the hell out of there.
@@ -68,19 +68,19 @@
         <content_attribute id="language-discrimination">intense</content_attribute>
     </content_rating>
     <url type="homepage">
-        https://github.com/stekolla/Cataclysm-BN
+        https://github.com/stekolla/Cataclysm
     </url>
     <url type="bugtracker">
-        https://github.com/stekolla/Cataclysm-BN/issues
+        https://github.com/stekolla/Cataclysm/issues
     </url>
     <url type="vcs-browser">
-        https://github.com/stekolla/Cataclysm-BN
+        https://github.com/stekolla/Cataclysm
     </url>
     <launchable type="desktop-id">org.cataclysmbn.CataclysmBN.desktop</launchable>
     <screenshots>
         <screenshot type="default" xml:lang="en">
             <caption>Screenshots from the playthroughs of (clock-wise order) Chaosvolt x2, ExecutorBill, and Scarf005.</caption>
-            <image>https://raw.githubusercontent.com/stekolla/Cataclysm-BN/main/docs/en/contribute/img/readme-title.png</image>
+            <image>https://raw.githubusercontent.com/stekolla/Cataclysm/main/docs/en/contribute/img/readme-title.png</image>
         </screenshot>
     </screenshots>
 </component>

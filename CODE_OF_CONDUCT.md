@@ -22,7 +22,7 @@ appearance, race, religion, or sexual identity and orientation.
    cater to them.
 6. Don't raise unrelated political issues.
 7. If you feel these standards are being violated, please alert the project maintainers through
-   [project discussions](https://github.com/stekolla/Cataclysm-BN/discussions).
+   [project discussions](https://github.com/stekolla/Cataclysm/discussions).
 
 ## Attribution
 

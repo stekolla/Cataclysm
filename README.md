@@ -1,8 +1,8 @@
-# Cataclysm
+# Cataclysm: Fault Lines
 
 ![Cataclysm screenshots](docs/en/contribute/img/readme-title.png)
 
-Cataclysm is a roguelike with sci-fi elements set in a post-apocalyptic world.
+Cataclysm: Fault Lines is a roguelike with sci-fi elements set in a post-apocalyptic world.
 
 While some have described it as a "zombie game", there is far more to Cataclysm than that. Struggle
 to survive in a harsh, persistent, procedurally generated world. Scavenge the remnants of a dead
@@ -43,7 +43,7 @@ Gameplay and development documentation is available as Markdown in the
 [![Documentation](https://img.shields.io/badge/Docs-Markdown-lightgrey?style=for-the-badge)][docs]
 [![Discussions](https://img.shields.io/badge/Discussions-black?style=for-the-badge&logo=github)][discussion]
 
-[discussion]: https://github.com/stekolla/Cataclysm-BN/discussions
+[discussion]: https://github.com/stekolla/Cataclysm/discussions
 [docs]: docs/README.md "Project documentation"
 
 ## Frequently Asked Questions
@@ -70,7 +70,7 @@ Sound is disabled in the browser build.
 
 #### I've found a bug. What should I do?
 
-[Bug report](https://github.com/stekolla/Cataclysm-BN/issues/new) can
+[Bug report](https://github.com/stekolla/Cataclysm/issues/new) can
 be submitted via debug menu.
 
 Run `Submit a bug report on github` inside the game to submit an issue.
@@ -86,8 +86,8 @@ It will open a bug report on browser with `Version and configuration` filled in.
 #### I would like to make a suggestion. What should I do?
 
 - For simple ideas: please visit
-  [the project Discussions page](https://github.com/stekolla/Cataclysm-BN/discussions/categories/ideas).
+  [the project Discussions page](https://github.com/stekolla/Cataclysm/discussions/categories/ideas).
   It could be a new feature, a port request, a mod idea, or anything else.
 - Please submit an issue on
-  [the project GitHub page](https://github.com/stekolla/Cataclysm-BN/issues/) using
-  [the feature request form](https://github.com/stekolla/Cataclysm-BN/issues/new).
+  [the project GitHub page](https://github.com/stekolla/Cataclysm/issues/) using
+  [the feature request form](https://github.com/stekolla/Cataclysm/issues/new).

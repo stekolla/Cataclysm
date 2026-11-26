@@ -2222,7 +2222,7 @@ void debug()
 
         case DEBUG_BUG_REPORT: {
             constexpr const char *const bug_report_url =
-                "https://github.com/stekolla/Cataclysm-BN/issues/new"
+                "https://github.com/stekolla/Cataclysm/issues/new"
                 "?labels=bug"
                 "&template=bug_report.yml"
                 "&versions-and-configuration=";
@@ -2254,7 +2254,7 @@ void debug()
         break;
 
         case DEBUG_JOIN_DISCORD: {
-            open_url( "https://github.com/stekolla/Cataclysm-BN/discussions" );
+            open_url( "https://github.com/stekolla/Cataclysm/discussions" );
             popup( _( "Opened a link to the Cataclysm discussions." ) );
             break;
         }

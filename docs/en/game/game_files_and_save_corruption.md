@@ -10,4 +10,4 @@ Open the game on HTTPS or localhost and use one Cataclysm tab per site. If anoth
 close it and reload the page to access your saves.
 
 If a save fails to load or behaves incorrectly, report the problem using the
-[bug report form](https://github.com/stekolla/Cataclysm-BN/issues/new).
+[bug report form](https://github.com/stekolla/Cataclysm/issues/new).

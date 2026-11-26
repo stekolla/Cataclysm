@@ -167,7 +167,7 @@ $ git config --local commit.template .gitmessage
 ```sh
 $ cd Cataclysm-BN
 # Changes the active directory in the prompt to the newly cloned "Cataclysm-BN" directory
-$ git remote add -f upstream https://github.com/stekolla/Cataclysm-BN.git
+$ git remote add -f upstream https://github.com/stekolla/Cataclysm.git
 # Assigns the original repository to a remote called "upstream"
 ```
 
@@ -193,8 +193,8 @@ $ git remote -v
 
 origin  git@github.com:YOUR_USERNAME/Cataclysm-BN.git (fetch)
 origin  git@github.com:YOUR_USERNAME/Cataclysm-BN.git (push)
-upstream        https://github.com/stekolla/Cataclysm-BN.git (fetch)
-upstream        https://github.com/stekolla/Cataclysm-BN.git (push)
+upstream        https://github.com/stekolla/Cataclysm.git (fetch)
+upstream        https://github.com/stekolla/Cataclysm.git (push)
 ```
 
 and when you type `git branch -vv` you should see `[upstream/main]` next to `main` branch like:
@@ -369,7 +369,7 @@ Branch new_feature_2 set up to track remote branch main from upstream.
 
 ```sh
 $ git push
-error: The requested URL returned error: 403 while accessing https://github.com/stekolla/Cataclysm-BN.git
+error: The requested URL returned error: 403 while accessing https://github.com/stekolla/Cataclysm.git
 fatal: HTTP request failed
 $ git push origin
 ....
@@ -437,7 +437,7 @@ from `upstream/main`, and then reset `main` to that point.
 
 ```sh
 $ git pull --ff-only upstream main
-From https://github.com/stekolla/Cataclysm-BN
+From https://github.com/stekolla/Cataclysm
  * branch            main     -> FETCH_HEAD
 fatal: Not possible to fast-forward, aborting.
 $ git branch new_branch main          # mark the current commit with a tmp branch
