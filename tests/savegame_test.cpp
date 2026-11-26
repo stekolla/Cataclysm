@@ -29,7 +29,7 @@ TEST_CASE("failed save load blocks saving over the broken save", "[save][load]")
     const auto fixture_path = fs::path("tests/data/save/broken_load_save/#QnJva2VuU2F2ZQ==.sav");
     const auto world_path = fs::path(g->get_active_world()->info->folder_path());
     const auto save_path = world_path / "#QnJva2VuU2F2ZQ==.sav";
-    CHECK(fs::copy_file(fixture_path, save_path, fs::copy_options::overwrite_existing));
+    REQUIRE(copy_file(fixture_path.string(), save_path.string()));
 
     const auto before_load = read_entire_file(save_path.string());
     auto loaded = true;

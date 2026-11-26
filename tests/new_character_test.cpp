@@ -17,7 +17,6 @@
 
 #include <array>
 #include <cstddef>
-#include <functional>
 #include <list>
 #include <memory>
 #include <optional>
@@ -106,13 +105,11 @@ struct failure {
     std::string reason;
 };
 
-namespace std {
-template <> struct less<failure> {
+struct failure_by_profession {
     auto operator()(const failure& lhs, const failure& rhs) const -> bool {
         return lhs.prof < rhs.prof;
     }
 };
-} // namespace std
 
 // TODO: According to profiling (interrupt, backtrace, wait a few seconds, repeat) with a sample
 // size of 20, 70% of the time is due to the call to Character::set_mutation in try_set_traits.
@@ -262,7 +259,7 @@ TEST_CASE("starting_items", "[slow]") {
         scen_prof_combos[scenario::generic()].push_back(id);
     }
 
-    std::set<failure> failures;
+    auto failures = std::set<failure, failure_by_profession>{};
 
     avatar& ch = get_avatar();
 

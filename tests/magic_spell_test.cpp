@@ -28,7 +28,7 @@
 //
 // Other tags used include: [level], [damage], [duration], [range], [aoe]
 //
-// All these test cases use spells from data/mods/TEST_DATA/magic.json, to have predictable data
+// All these test cases use spells from tests/data/TEST_DATA/magic.json, to have predictable data
 // unaffected by in-game balance and mods.
 
 
@@ -43,7 +43,7 @@
 //
 TEST_CASE("spell name", "[magic][spell][name]") {
     clear_all_state();
-    // Test spells from data/mods/TEST_DATA/magic.json
+    // Test spells from tests/data/TEST_DATA/magic.json
     spell_id pew_id("test_spell_pew");
     spell_id lava_id("test_spell_lava");
     spell_id kiss_id("test_spell_kiss");

@@ -117,7 +117,8 @@ float visible_surface_light( int x, int y, int z )
         }
 
         int nidx = tile_index( nx, ny, z );
-        if( seen_all[nidx] == 0.0 && asfloat( camera_all[nidx] ) == 0.0 ) {
+        bool faces_player = ( nx - x ) * ( player_x - x ) + ( ny - y ) * ( player_y - y ) > 0;
+        if( ( !faces_player || seen_all[nidx] == 0.0 ) && asfloat( camera_all[nidx] ) == 0.0 ) {
             continue;
         }
         best = max( best, asfloat( lm_all[nidx] ) );

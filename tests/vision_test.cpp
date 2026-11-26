@@ -46,8 +46,7 @@ static auto operator!(vision_test_flags f) -> bool { return !static_cast<unsigne
 
 static void full_map_test(
     const std::vector<std::string>& setup, const std::vector<std::string>& expected_results,
-    const time_point& time, const vision_test_flags flags, const std::string vehicle_id,
-    const units::angle vehicle_rotation) {
+    const time_point& time, const vision_test_flags flags) {
     const ter_id t_brick_wall("t_brick_wall");
     const ter_id t_window_frame("t_window_frame");
     const ter_id t_floor("t_floor");
@@ -56,9 +55,13 @@ static void full_map_test(
     const ter_id t_flat_roof("t_flat_roof");
     const ter_id t_open_air("t_open_air");
 
+    const auto reset_light = on_out_of_scope([] { g->reset_light_level(); });
+    const auto restore_time = restore_on_out_of_scope<time_point>(calendar::turn);
+    const auto restore_weather = restore_on_out_of_scope<weather_type_id>(get_weather().weather_id);
     Character& player_character = get_player_character();
     g->place_player(tripoint_bub_ms(60, 60, 0));
     get_weather().weather_id = weather_type_id("clear");
+    calendar::turn = time;
     g->reset_light_level();
 
     if (!!(flags & vision_test_flags::crouching)) {
@@ -72,8 +75,6 @@ static void full_map_test(
     REQUIRE(!player_character.has_effect(effect_narcosis));
 
     player_character.recalc_sight_limits();
-
-    calendar::turn = time;
 
     int height = setup.size();
     REQUIRE(height > 0);
@@ -117,7 +118,6 @@ static void full_map_test(
     }
 
     map& here = get_map();
-    vehicle* veh = nullptr;
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             const auto p = origin + point_rel_ms(x, y);
@@ -146,13 +146,6 @@ static void full_map_test(
                 case 'U':
                 case 'V':
                     // Already handled above
-                    break;
-                case 'C':
-                    veh = here.add_vehicle(vproto_id(vehicle_id), p, vehicle_rotation, 0, 0);
-                    REQUIRE(veh != nullptr);
-                    for (const vpart_reference& vp : veh->get_avail_parts("OPENABLE")) {
-                        veh->close(vp.part_index());
-                    }
                     break;
                 default:
                     FAIL("unexpected setup char '" << setup[y][x] << "'");
@@ -264,10 +257,6 @@ struct vision_test_case {
     std::vector<std::string> expected_results;
     time_point time;
     vision_test_flags flags;
-    // NOLINTNEXTLINE(readability-redundant-string-init)
-    std::string vehicle_id = "";
-    units::angle vehicle_rotation = 0_degrees;
-
     static void transpose(std::vector<std::string>& v) {
         if (v.empty()) { return; }
         std::vector<std::string> new_v(v[0].size());
@@ -294,9 +283,7 @@ struct vision_test_case {
         std::reverse(expected_results.begin(), expected_results.end());
     }
 
-    void test() const {
-        full_map_test(setup, expected_results, time, flags, vehicle_id, vehicle_rotation);
-    }
+    void test() const { full_map_test(setup, expected_results, time, flags); }
 
     void test_all_transformations() const {
         // Three reflections generate all possible rotations and reflections of
@@ -334,7 +321,6 @@ static const time_point midday = calendar::turn_zero + 12_hours;
 // 'L' - light, indoors
 // '#' - wall
 // '=' - window frame
-// 'C' - The origin of the vehicle
 
 TEST_CASE("vision_daylight", "[shadowcasting][vision]") {
     clear_all_state();
@@ -574,6 +560,42 @@ TEST_CASE("vision_single_tile_skylight", "[shadowcasting][vision]") {
     t.test_all();
 }
 
+/// A light-override field blocks skylight diffusion along a roofed corridor.
+TEST_CASE("daylight_diffusion_respects_light_override", "[shadowcasting][vision]") {
+    clear_all_state();
+    const auto reset_light = on_out_of_scope([] { g->reset_light_level(); });
+    const auto restore_time = restore_on_out_of_scope<time_point>(calendar::turn);
+    const auto restore_weather = restore_on_out_of_scope<weather_type_id>(get_weather().weather_id);
+    const auto cleanup = on_out_of_scope([] { clear_map(); });
+    auto& here = get_map();
+    const auto origin = tripoint_bub_ms(60, 60, 0);
+    g->place_player(origin);
+    get_weather().weather_id = weather_type_id("clear");
+    calendar::turn = midday;
+    g->reset_light_level();
+
+    for (auto x = -1; x <= 8; ++x) {
+        for (auto y = -1; y <= 1; ++y) {
+            const auto p = origin + tripoint_rel_ms(x, y, 0);
+            const auto wall = y != 0 || x == -1 || x == 8;
+            here.ter_set(p, ter_id(wall ? "t_brick_wall" : "t_floor"));
+            if (x != 0 || y != 0) { here.ter_set(p + tripoint_above, ter_id("t_flat_roof")); }
+        }
+    }
+
+    const auto target = origin + tripoint_rel_ms(3, 0, 0);
+    const auto sample = [&]() -> float {
+        here.invalidate_map_cache(0);
+        here.build_map_cache(0);
+        const auto& cache = here.access_cache(0);
+        return cache.lm[cache.idx(target.x(), target.y())];
+    };
+    const auto open_light = sample();
+    REQUIRE(here.add_field(origin + tripoint_rel_ms(1, 0, 0), field_type_id("fd_shadow"), 1));
+    const auto blocked_light = sample();
+    CHECK(open_light > blocked_light);
+}
+
 TEST_CASE("vision_player_opaque_neighbors_still_visible_night", "[shadowcasting][vision]") {
     clear_all_state();
     /**
@@ -602,69 +624,49 @@ TEST_CASE("vision_player_opaque_neighbors_still_visible_night", "[shadowcasting]
     t.test_all();
 }
 
-TEST_CASE("vision_see_out_of_vehicle", "[shadowcasting][vision]") {
-
+namespace {
+auto check_vehicle_vision(const bool from_inside) -> void {
     clear_all_state();
-    vision_test_case t{
-        {
-            "                 ",
-            "            C    ",
-            "                 ",
-            "                 ",
-            "         U       ",
-            "                 ",
-            "                 ",
-            "                 ",
-        },
-        {
-            "66666666666666666",
-            "66666666666666666",
-            "66666666661166666",
-            "66666666441666666",
-            "66666666411666666",
-            "66666661111466666",
-            "66666661114466666",
-            "66666666666666666",
-        },
-        midday,
-        vision_test_flags::none,
-        "cube_van",
-        -45_degrees};
+    const auto reset_light = on_out_of_scope([] { g->reset_light_level(); });
+    const auto restore_time = restore_on_out_of_scope<time_point>(calendar::turn);
+    const auto restore_weather = restore_on_out_of_scope<weather_type_id>(get_weather().weather_id);
+    const auto cleanup = on_out_of_scope([] { clear_map(); });
+    auto& here = get_map();
+    auto* const veh =
+        here.add_vehicle(vproto_id("cube_van_test"), tripoint_bub_ms(60, 60, 0), -45_degrees, 0, 0);
+    REQUIRE(veh != nullptr);
+    for (const auto& part : veh->get_avail_parts("OPENABLE")) { veh->close(part.part_index()); }
 
-    t.test();
+    const auto inside = veh->mount_to_bubble(tripoint_mnt_veh(0, 0, 0));
+    const auto window = veh->mount_to_bubble(tripoint_mnt_veh(1, 0, 0));
+    const auto outside = window + (window - inside);
+    REQUIRE(inside != window);
+    g->place_player(from_inside ? inside : outside);
+    get_weather().weather_id = weather_type_id("clear");
+    calendar::turn = midday;
+    g->reset_light_level();
+    get_player_character().recalc_sight_limits();
+    here.invalidate_map_cache(0);
+    here.build_map_cache(0);
+    here.update_visibility_cache(0);
+    here.invalidate_map_cache(0);
+    here.build_map_cache(0);
+    here.update_visibility_cache(0);
+
+    const auto target = from_inside ? outside : inside;
+    const auto& cache = here.access_cache(0);
+    CHECK(cache.transparency_cache[cache.idx(window.x(), window.y())] > LIGHT_TRANSPARENCY_SOLID);
+    CHECK(cache.seen_cache[cache.idx(target.x(), target.y())] > 0.0f);
+    CHECK(
+        here.apparent_light_at(target, here.get_visibility_variables_cache()) != lit_level::BLANK);
 }
+} // namespace
 
-TEST_CASE("vision_see_into_vehicle", "[shadowcasting][vision]") {
+/// Check that a survivor inside a rotated vehicle can see outside through its windshield.
+TEST_CASE("vision_see_out_of_vehicle", "[shadowcasting][vision]") { check_vehicle_vision(true); }
 
-    clear_all_state();
-    vision_test_case t{
-        {
-            "                 ",
-            "            C    ",
-            "                 ",
-            "                 ",
-            "                 ",
-            "            U    ",
-            "                 ",
-            "                 ",
-        },
-        {
-            "66666666666666666",
-            "66666666666666664",
-            "66666666666666444",
-            "66666666666664444",
-            "66666666666144444",
-            "66666666666444444",
-            "66666666644444444",
-            "66666666664444444",
-        },
-        midday,
-        vision_test_flags::none,
-        "cube_van",
-        -45_degrees};
-
-    t.test();
-}
+/// Check that a survivor outside a rotated vehicle can see its cabin through the windshield.
+TEST_CASE("vision_see_into_vehicle", "[shadowcasting][vision]") { check_vehicle_vision(false); }
 
 TEST_CASE("lighting_circular_distances", "[shadowcasting][vision]") {
     clear_all_state();

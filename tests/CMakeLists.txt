@@ -14,7 +14,7 @@ if (CATA_TESTS_ONLY)
     target_compile_definitions(cata_test PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
     add_test(
         NAME test
-        COMMAND $<TARGET_FILE:cata_test> --rng-seed 1 "~[slow]~[wasm]"
+        COMMAND $<TARGET_FILE:cata_test> --rng-seed 1 "~[slow]~[wasm]~[.]"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 elseif (EMSCRIPTEN AND TILES AND NOT CURSES)
     add_executable(cata_test-tiles ${CATACLYSM_BN_TEST_SOURCES})

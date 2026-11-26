@@ -16,7 +16,7 @@ async function flushBrowserSaves() {
     }
 }
 
-Module["arguments"] = ["--userdir", userDirectory];
+Module["arguments"] ??= ["--userdir", userDirectory];
 Module["preRun"] ??= [];
 Module["preRun"].push(() => {
     const dependency = "browser-save-data";

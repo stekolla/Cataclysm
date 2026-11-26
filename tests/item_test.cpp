@@ -402,7 +402,7 @@ TEST_CASE("stacking_corpses", "[item]") {
 }
 
 TEST_CASE("gunmod_weight_volume_test", "[item][gunmod]") {
-    // All test items are defined in data/mods/TEST_DATA/items.json
+    // All test items are defined in tests/data/TEST_DATA/items.json
     // glock_19: weight=600g, volume=500ml
     // test_mod_neg_int: integral_weight=-100g, integral_volume=-100ml
     // test_mod_mult: weight_multiplier=0.90, volume_multiplier=0.90

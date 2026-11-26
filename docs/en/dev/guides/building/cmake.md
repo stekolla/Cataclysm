@@ -51,12 +51,15 @@ just docker-test-wasm
 ```
 
 `docker-test-fast` builds and runs the Linux curses test-only configuration. It does not build a
-native game. It runs the Catch2 selection excluding `[slow]` and `[wasm]` tests in one process, so
-the suite can still take a while.
+native game. It runs the Catch2 selection excluding hidden, `[slow]`, and `[wasm]` tests in one
+process, so the suite can still take a while.
 
 `docker-test-wasm` builds the browser game and Wasm test runner, then runs the tests in headless
 Chromium. Mark tests that need video or GPU initialization with the `[wasm]` Catch2 tag. The browser
 runner uses a fixed random seed and CPU compute.
+Both test runners load the fixtures in `tests/data/TEST_DATA` into a temporary test user directory.
+The browser game archive does not include those fixtures.
+The Wasm test runner also embeds the ASCII and isometric tilesets used by the tile-context tests.
 
 For direct CMake commands inside Docker:
 

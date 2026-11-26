@@ -55,6 +55,7 @@
 #include <cstring>
 #include <ctime>
 #include <exception>
+#include <filesystem>
 #include <memory>
 #include <ostream>
 #include <stdexcept>
@@ -89,6 +90,9 @@ namespace {
 bool s_sdl_platform_initialized = false;
 
 auto test_compute_accel() -> preload_config::compute_accel {
+#    if defined(__EMSCRIPTEN__)
+    return preload_config::compute_accel::cpu;
+#    else
     auto const* const env_accel = std::getenv("CATA_TEST_COMPUTE_ACCELERATION");
     if (env_accel != nullptr && env_accel[0] != '\0') {
         return preload_config::compute_accel_from_string(env_accel);
@@ -101,6 +105,7 @@ auto test_compute_accel() -> preload_config::compute_accel {
     }
 
     return preload_config::compute_accel::gpu_software;
+#    endif
 }
 
 auto init_test_sdl_gpu() -> void {
@@ -178,6 +183,22 @@ static void init_global_game_state(
     PATH_INFO::init_user_dir(user_dir);
     PATH_INFO::set_standard_filenames();
     PATH_INFO::set_config_dir(PATH_INFO::user_dir() + "config/");
+
+    const auto test_data = std::filesystem::path("tests/data/TEST_DATA");
+    if (!std::filesystem::is_regular_file(test_data / "modinfo.json")) {
+        throw std::runtime_error("Missing test fixture pack: " + test_data.string());
+    }
+    const auto test_mod = std::filesystem::path(PATH_INFO::user_moddir()) / "TEST_DATA";
+    std::filesystem::create_directories(test_mod);
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(test_data)) {
+        const auto destination = test_mod / entry.path().lexically_relative(test_data);
+        if (entry.is_directory()) {
+            std::filesystem::create_directories(destination);
+        } else if (!entry.is_regular_file()
+                   || !copy_file(entry.path().string(), destination.string())) {
+            throw std::runtime_error("Could not copy test fixture: " + entry.path().string());
+        }
+    }
 
     if (!assure_dir_exist(PATH_INFO::config_dir())) {
         assert(!"Unable to make config directory.  Check permissions.");

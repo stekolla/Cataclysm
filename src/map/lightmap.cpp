@@ -1335,7 +1335,6 @@ void map::generate_lightmap_worker(const int zlev) {
     constexpr std::array<int, 4> dir_d = {{90, 0, 180, 270}}; //    [3]
 
     const float natural_light = g->natural_light_level(zlev);
-
     std::vector<std::pair<tripoint_bub_ms, float>> lm_override;
     {
         ZoneScopedN("generate_lightmap_collect");
@@ -1680,6 +1679,73 @@ void map::generate_lightmap_worker(const int zlev) {
 
     } // ZoneScopedN generate_lightmap_collect
 
+    // Match the GPU daylight diffusion pass, including light-override barriers.
+    if (m_solar.direct_active) {
+        const auto size = static_cast<std::size_t>(map_cache.cache_x * map_cache.cache_y);
+        auto seeds = std::vector<float>(size, 0.0f);
+        auto overridden = std::vector<bool>(size, false);
+        for (const auto& entry : lm_override) {
+            overridden[map_cache.idx(entry.first.x(), entry.first.y())] = true;
+        }
+        for (auto x = 0; x < map_cache.cache_x; ++x) {
+            for (auto y = 0; y < map_cache.cache_y; ++y) {
+                const auto idx = map_cache.idx(x, y);
+                if (overridden[idx]) { continue; }
+                const auto sunlight = direct_sunlight_state_at(point_bub_ms(x, y), zlev);
+                if (sunlight == direct_sunlight_state::direct) {
+                    seeds[idx] = natural_light;
+                } else if (sunlight == direct_sunlight_state::shadow) {
+                    seeds[idx] = std::max(
+                        LIGHT_AMBIENT_LOW,
+                        std::min(
+                            g->natural_light_level(0),
+                            static_cast<float>(default_daylight_level()) * SOLAR_SHADOW_SCATTER));
+                }
+            }
+        }
+
+        auto source = seeds;
+        auto target = std::vector<float>(size, 0.0f);
+        const auto air_decay = std::exp(-LIGHT_TRANSPARENCY_OPEN_AIR);
+        for (auto pass = 0; pass < 16; ++pass) {
+            const auto distance = static_cast<float>(pass + 1);
+            const auto decay = pass == 0 ? air_decay : air_decay * (distance - 1.0f) / distance;
+            auto changed = false;
+            for (auto x = 0; x < map_cache.cache_x; ++x) {
+                for (auto y = 0; y < map_cache.cache_y; ++y) {
+                    const auto idx = map_cache.idx(x, y);
+                    if (overridden[idx]) {
+                        target[idx] = 0.0f;
+                    } else if (seeds[idx] > 0.0f) {
+                        target[idx] = seeds[idx];
+                    } else if (map_cache.transparency_cache[idx] <= LIGHT_TRANSPARENCY_SOLID) {
+                        target[idx] = 0.0f;
+                    } else {
+                        auto best = source[idx];
+                        for (auto i = 0; i < 4; ++i) {
+                            const auto nx = x + dir_x[i];
+                            const auto ny = y + dir_y[i];
+                            if (nx < 0 || ny < 0 || nx >= map_cache.cache_x
+                                || ny >= map_cache.cache_y) {
+                                continue;
+                            }
+                            const auto neighbour = map_cache.idx(nx, ny);
+                            if (map_cache.transparency_cache[neighbour] > LIGHT_TRANSPARENCY_SOLID
+                                && source[neighbour] > LIGHT_AMBIENT_LOW) {
+                                best = std::max(best, source[neighbour] * decay);
+                            }
+                        }
+                        target[idx] = best;
+                        changed |= best > source[idx];
+                        lm[idx] = std::max(lm[idx], best);
+                    }
+                }
+            }
+            source.swap(target);
+            if (!changed) { break; }
+        }
+    }
+
     /* Now that we have position and intensity of all bulk light sources, apply_ them
       This may seem like extra work, but take a 12x12 raging inferno:
         unbuffered: (12^2)*(160*4) = apply_light_ray x 92160
@@ -1958,12 +2024,15 @@ auto map::apparent_light_helper(
                 continue;
             }
             if (is_opaque(neighbour)) { continue; }
-            if (map_cache.seen_cache[map_cache.idx(neighbour.x(), neighbour.y())] == 0
-                && map_cache.camera_cache[map_cache.idx(neighbour.x(), neighbour.y())] == 0) {
+            const auto idx = map_cache.idx(neighbour.x(), neighbour.y());
+            const auto player_offset = get_player_character().bub_pos().xy() - p.xy();
+            const auto faces_player =
+                offset.x * player_offset.x() + offset.y * player_offset.y() > 0;
+            if ((!faces_player || map_cache.seen_cache[idx] == 0)
+                && map_cache.camera_cache[idx] == 0) {
                 continue;
             }
-            visible_surface_light = std::max(
-                visible_surface_light, map_cache.lm[map_cache.idx(neighbour.x(), neighbour.y())]);
+            visible_surface_light = std::max(visible_surface_light, map_cache.lm[idx]);
         }
         apparent_light = scaled_vis * visible_surface_light;
     } else {
