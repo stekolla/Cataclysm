@@ -1,8 +1,6 @@
 :::caution
 
-This guide is quite old and requires manual dependency management.
-
-For modern alternative, see [CMake Visual Studio build with vcpkg](./vs_cmake.md)
+Build the game with the browser WebAssembly target.
 
 :::
 

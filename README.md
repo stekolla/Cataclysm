@@ -68,8 +68,6 @@ Bright Nights uses a [mod registry](https://mods.cataclysmbn.org/) for easier di
 Please read the official docs for details:
 
 - [building with cmake](docs/en/dev/guides/building/cmake.md)
-- [building with MSYS2](docs/en/dev/guides/building/msys.md)
-- [building with vcpkg](docs/en/dev/guides/building/vs_vcpkg.md)
 
 ## Contributing
 

@@ -1,18 +1,24 @@
 # Testing Cataclysm
 
-When you `make` Cataclysm from source, an executable `tests/cata_test` is built from test cases
-found in the `tests/` directory. These tests are written in the
-[Catch2 framework](https://github.com/catchorg/Catch2).
+The test cases in `tests/` use the [Catch2 framework](https://github.com/catchorg/Catch2). Run both
+test routes through the repository's Docker environment:
 
-Run `tests/cata_test --help` to see the available command-line options, and/or consult the
-[Catch2 tutorial](https://github.com/catchorg/Catch2/blob/devel/docs/tutorial.md) for a more
-thorough introduction.
+```sh
+just docker-test-fast
+just docker-test-wasm
+```
 
-## Playtesting pull requests
+The fast route builds the curses test executable without building a native game. Tests that require
+video or GPU initialization must have the `[wasm]` tag and run through the browser route:
 
-Use [`just playtest [--os OS] <PR URL>`](../reference/tooling.md#playtesting-pull-requests) to download and launch
-an existing PR build without compiling locally. The tooling guide covers prerequisites, supported
-platforms, artifact selection, and save locations.
+```sh
+bash build-scripts/run-docker.sh bash -lc 'cmake --preset linux-tests && cmake --build --preset linux-tests --parallel 2 && ctest --test-dir out/build/linux-tests --output-on-failure'
+bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tests && cmake --build --preset wasm-tests --parallel 2 && ctest --test-dir out/build/wasm-tests --output-on-failure'
+```
+
+The browser runner uses a fixed random seed and CPU compute. Run
+`ctest --test-dir out/build/wasm-tests --show-only` inside the container to list its tests. See the
+[browser build guide](building/cmake.md) for the container setup.
 
 ## Guidelines
 

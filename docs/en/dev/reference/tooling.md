@@ -1,54 +1,11 @@
 # Developer Tooling
 
-## Playtesting pull requests
-
-From the repository root, download and launch a PR's tiles build without compiling locally:
-
-```sh
-gh auth login
-just playtest 10443
-just playtest https://github.com/cataclysmbn/Cataclysm-BN/pull/10443
-just playtest --os linux https://github.com/cataclysmbn/Cataclysm-BN/pull/10443
-just playtest "Exact PR title"
-just playtest branch-name
-```
-
-The first argument accepts a PR number, URL, branch, or exact title. Titles must match exactly one PR;
-quote titles containing spaces. The optional `--os` is `linux`, `windows`, `macos`, or `android`, and defaults
-to the host OS. Desktop builds must run on their matching OS. Linux builds require x86_64; macOS selects
-Intel or ARM according to the host architecture.
-
-Install [just](https://just.systems/), [Deno](https://deno.com/), and the
-[GitHub CLI](https://cli.github.com/). The repository's justfile also requires Bash, including on Windows.
-Linux extraction requires GNU tar; macOS uses the built-in `hdiutil`, `ditto`, and `open` tools.
-The downloaded game still needs its platform's runtime libraries.
-
-For Android, connect an ARM64 device with USB debugging enabled and ensure `adb devices` shows one
-authorized target, then run `just playtest --os android https://github.com/cataclysmbn/Cataclysm-BN/pull/10443`. This installs or updates the experimental app
-with `adb install -r` and launches it. An existing app signed with a different key cannot be updated
-this way.
-
-> [!WARNING]
-> Only playtest PRs you trust: their artifacts execute code on your computer or Android device.
-
-The command selects the newest unexpired artifact matching the PR's current head SHA. If none exists,
-check the PR's `matrix` workflow: the build may be pending, skipped, failed, or expired. Older commits
-are not used as a fallback.
-
-Desktop downloads are cached under
-`/tmp/cataclysm-bn/artifacts/PR-<number>-<SHA>/<os>/build-<artifact-id>/`.
-On Windows, the root is `%TEMP%\cataclysm-bn\artifacts` (the repository directory is used if `TEMP` is unset).
-Repeated launches reuse the same artifact directory and preserve its saves and configuration;
-a new SHA or artifact ID gets a separate directory. Temporary-directory cleanup can remove these files,
-so copy any saves you want to keep elsewhere. Android saves remain on the device.
-
 ## Code style (C++)
 
 C++ formatting uses [Artistic Style](http://astyle.sourceforge.net/) only for top-level
 `src/*.cpp` and `src/*.h`. Most other C++ files use
-[clang-format](https://clang.llvm.org/docs/ClangFormat.html). Formatter-sensitive fixtures such as
-`tools/clang-tidy-plugin/test/` are left unchanged. Use the repository helpers so each file goes
-through the right formatter.
+[clang-format](https://clang.llvm.org/docs/ClangFormat.html). Formatter fixtures are left unchanged.
+Use the repository helpers so each file goes through the right formatter.
 
 ### Invoking C++ formatting
 
@@ -73,69 +30,6 @@ Install the optional hook with:
 ```sh
 just hooks-setup
 ```
-
-### Astyle extensions for Visual Studio
-
-Use these only for top-level `src/*.cpp` and `src/*.h`; use `just fmt-cpp` for repository style.
-There are astyle extensions in the Visual Studio Marketplace, but none of them have been confirmed
-(yet) to correctly work for our purposes on VS2019 or VS2022.
-
-#### Visual Studio 2022
-
-Head over to <https://github.com/olanti-p/BN_Astyle> and follow instructions in the
-[README.md](https://github.com/olanti-p/BN_Astyle/blob/master/README.md). You may compile and
-install the extension from source, or take advantage of the pre-built version in
-[releases section](https://github.com/olanti-p/BN_Astyle/releases).
-
-#### Visual Studio 2019
-
-Extensions's source code lives over at https://github.com/lukamicoder/astyle-extension. To install
-and compile it:
-
-1. Add the `Visual Studio extension development` workload through Visual Studio installer to your
-   VS2019
-2. Download and extract the source code, or clone the repository (a simple
-   `git clone --depth 1 https://github.com/lukamicoder/astyle-extension.git` should do).
-3. From the root folder, open `astyle-extension/AStyleExtension2017.sln`
-4. Select `Release` build configuration (most likely VS will select `Debug` configuration by
-   default)
-5. Build the solution
-6. If the build succeeded, you'll see the compiled extension in `AStyleExtension\bin\Release`.
-   Double click it to install.
-7. Configure the extension according to
-   [Configuration instructions (Visual Studio 2019 or older)](#configuration-instructions-visual-studio-2019-or-older)
-   section.
-
-#### Visual Studio 2017 or earlier
-
-You may follow the steps for VS2019 to compile from source, but there are pre-built versions
-[available](https://marketplace.visualstudio.com/items?itemName=Lukamicoder.AStyleExtension2017) on
-Visual Studio Marketplace, you should be able to install the extension through VS's extension
-manager and then configure it the same way.
-
-#### Configuration instructions (Visual Studio 2019 or older):
-
-1. Go to `Tools` - `Options` - `AStyle Formatter` - `General`.
-
-2. Import
-   `https://github.com/cataclysmbn/Cataclysm-BN/blob/main/msvc-full-features/AStyleExtension-Cataclysm-BN.cfg`
-   on `Export/Import` tab using `Import` button:
-
-![image](./img/VS_Astyle_Step_1.png)
-
-3. After import is successful you can see imported rules on `C/C++` tab:
-
-![image](./img/VS_Astyle_Step_2.png)
-
-4. Close `Options` menu, open file to be astyled and use `Format Document (Astyle)` or
-   `Format Selection (Astyle)` commands from `Edit` - `Advanced` menu.
-
-![image](./img/VS_Astyle_Step_3.png)
-
-_Note:_ You can also configure keybindings for aforementioned commands in `Tools` - `Options` -
-`Environment` - `Keybindings` menu:
-
-![image](./img/VS_Astyle_Step_4.png)
 
 ## JSON style
 
@@ -175,52 +69,6 @@ grep '"file": "' build/compile_commands.json | \
 
 To focus on a subset of files add their names into the `egrep` regex in the middle of the
 command-line.
-
-## Custom clang-tidy plugin
-
-We have written our own clang-tidy checks in a custom plugin. refer to
-[clang-tidy.yml](https://github.com/cataclysmbn/Cataclysm-BN/blob/main/.github/workflows/clang-tidy.yml)
-for the exact steps to build the plugin on ubuntu 24.04.
-
-### Build plugin on Ubuntu 24.04
-
-Follow exact steps in [cmake guide](../../dev/guides/building/cmake.md) with following changes:
-
-Also install these additional dependencies:
-
-```sh
-sudo apt-get install \
-  clang-22 libclang-22-dev llvm-22 llvm-22-dev clang-tidy-22
-```
-
-add `CATA_CLANG_TIDY_PLUGIN=ON` to cmake flags when configuring the build.
-
-### Build plugin on Fedora 40
-
-Follow exact steps in [atomic cmake guide](../../dev/guides/building/atomic_cmake.md) with following
-changes:
-
-Also install these additional dependencies:
-
-```sh
-sudo dnf install clang-devel llvm-devel clang-tools-extra-devel
-```
-
-add `CATA_CLANG_TIDY_PLUGIN=ON` to cmake flags when configuring the build.
-
-### Using the plugin
-
-To run the plugin on a single file, run following command on project root:
-
-```sh
-$ ./build-scripts/clang-tidy-wrapper.sh -fix src/event/achievement.cpp
-```
-
-To run the plugin on multiple files, use [GNU parallel](https://www.gnu.org/software/parallel/):
-
-```sh
-$ parallel ./build-scripts/clang-tidy-wrapper.sh -fix ::: src/*.cpp
-```
 
 ## include-what-you-use
 

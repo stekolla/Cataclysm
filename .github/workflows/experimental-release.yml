@@ -2,6 +2,9 @@ name: "Experimental Release"
 
 concurrency: experimental-release
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -17,4 +20,5 @@ jobs:
     with:
       version-label: experimental
       upload-to-release: true
+      release-tag: experimental
     secrets: inherit

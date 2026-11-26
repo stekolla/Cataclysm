@@ -62,33 +62,13 @@ or entries.
 The formatting tool can be invoked through the CMake `style-json` target, directly as
 `tools/format/json_formatter.cgi`, or via cgi at http://dev.narc.ro/cataclysm/format.html
 
-If you're using the Visual Studio solution, you can configure Visual Studio with commands to format
-all of the JSON in the project.
-
-1. Build the JsonFormatter project by either building the entire solution or just that project. This
-   will create a `tools/format/json_formatter.exe` binary.
-2. Add a new external tool entry ( `Tools` > `External Tools..` > `Add` ) and configure it as
-   follows:
-   - Title: `Lint All JSON`
-   - Command: `C:\windows\system32\windowspowershell\v1.0\powershell.exe`
-   - Arguments: `-file $(SolutionDir)\style-json.ps1`
-   - Initial Directory: `$(SolutionDir)`
-   - Use Output window: _checked_
-
-At this point, you can use the menu ( `Tools` > `Lint All JSON` ) to invoke the command and can look
-in the Output Window for the output of running it. Additionally, you can configure a keybinding for
-this command by navigating to `Tools` > `Options` > `Environment` > `Keyboard`, searching for
-commands containing `Tools.ExternalCommand` and pick the one that corresponds to the position of
-your command in the list (e.g. `Tools.ExternalCommand1` if it's the top item in the list) and then
-assign shortcut keys to it.
-
 ### For Single file
 
-To style one JSON file you can run `json_formatter.exe path/to/file.json`. This will style that one
-file. If it prints "needs linting", the file wasn't styled, but now should be. You can use
-drag&drop: drag the json file onto the `json_formatter` icon, then wait a few seconds.
+To style one JSON file, run `json_formatter path/to/file.json`. This styles that file. If it prints
+"needs linting", the file was not styled and should be reviewed. You can also drag a JSON file onto
+the `json_formatter` icon.
 
 ### On *nix
 
-Run `just fmt-json` in the main repo directory. If `just` is unavailable, run
+Run `just fmt-json` in the repository root. If `just` is unavailable, run
 `build-scripts/format-json.sh` instead.

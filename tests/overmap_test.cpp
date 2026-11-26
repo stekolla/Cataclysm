@@ -586,7 +586,7 @@ auto zoom_scale_widths() -> std::map<float, int> {
 
 } // namespace
 
-TEST_CASE("zoom_bookkeeping_matches_rendered_scale", "[overmap][zoom][tiles]") {
+TEST_CASE("zoom_bookkeeping_matches_rendered_scale", "[overmap][zoom][tiles][wasm]") {
     clear_all_state();
     tile_context_fixture fixture(/*alias_overmap_context=*/true);
     if (!fixture.valid()) {
@@ -660,7 +660,7 @@ TEST_CASE("zoom_bookkeeping_matches_rendered_scale", "[overmap][zoom][tiles]") {
     }
 }
 
-TEST_CASE("separate_overmap_tile_context_keeps_independent_scale", "[overmap][zoom][tiles]") {
+TEST_CASE("separate_overmap_tile_context_keeps_independent_scale", "[overmap][zoom][tiles][wasm]") {
     clear_all_state();
     tile_context_fixture fixture(/*alias_overmap_context=*/false);
     if (!fixture.valid()) {

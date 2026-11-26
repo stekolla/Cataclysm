@@ -2,6 +2,9 @@ name: "Manual release"
 run-name: "Manual Release ${{ inputs.major }}.${{ inputs.minor }}.${{ inputs.patch }}"
 concurrency: release
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:

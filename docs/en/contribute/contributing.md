@@ -380,25 +380,21 @@ xxxx..xxxx  new_feature -> new_feature
 
 ## Unit tests
 
-There is a suite of tests built into the source tree at tests/. You should run the test suite after
-ANY change to the game source. CMake builds the test executable under the selected build preset's
-`tests/` directory. With no arguments it will run the entire test suite. With `--help` it will print
-a number of invocation options you can use to adjust its operation.
+There is a suite of Catch2 tests in `tests/`. Run the fast native test-only suite through Docker for
+non-graphical coverage. It builds a Linux curses test executable without building a native game:
 
 ```sh
-$ cmake --preset linux-slim
-... configuration details ...
-$ cmake --build --preset linux-slim --target cata_test-tiles
-... compilation details ...
-$ ./out/build/linux-slim/tests/cata_test-tiles
-Starting the actual test at Fri Nov  9 04:37:03 2018
-===============================================================================
-All tests passed (1324684 assertions in 94 test cases)
-Ended test at Fri Nov  9 04:37:45 2018
-The test took 41.772 seconds
+$ just docker-test-fast
 ```
 
-I recommend habitually invoking CMake build and test commands for your selected preset.
+Tests that require video or GPU initialization use the `[wasm]` tag and run in the browser suite,
+which uses a fixed random seed and CPU compute:
+
+```sh
+$ just docker-test-wasm
+```
+
+See the [testing guide](../dev/guides/testing.md) for details.
 
 ## In-game testing, test environment and the debug menu
 

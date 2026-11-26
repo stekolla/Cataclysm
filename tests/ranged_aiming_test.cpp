@@ -103,7 +103,7 @@ TEST_CASE("Aiming at a clearly visible target", "[ranged][aiming]") {
 
 TEST_CASE(
     "Projectile damage message visibility survives dirty target-ui cache",
-    "[ranged][aiming][issue-9669]") {
+    "[ranged][aiming][issue-9669][wasm]") {
 #if defined(CATA_SDL)
     clear_all_state();
     set_up_player_vision();

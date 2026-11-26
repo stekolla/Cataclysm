@@ -59,20 +59,23 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 
 1. Issue link: fetch it with `gh`, then `git gtr new <type>/<issue-id>/<slug>` (`feat`, `fix`, `refactor`, `chore`, `build`, `ci`).
 2. Format touched files before building or testing (`just fmt-cpp <files>`, `just fmt-json <files>`, `deno fmt`, `deno task dprint fmt`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
-3. Build the game together with tests:
+3. Build the browser game and the test routes in the host-architecture Docker environment. The
+   native runner is for non-graphical tests on Linux; it does not build the game. Tests that need
+   video or GPU initialization use the `[wasm]` tag and run through the browser route.
    ```sh
-   cmake --preset linux-full
-   cmake --build --preset linux-full --target cataclysm-bn-tiles cata_test-tiles
+   just docker-test-fast
+   just docker-test-wasm
+   just docker-build-wasm
    ```
    For Emscripten, match the setjmp/longjmp implementation of C dependencies to the game's C++ exception mode.
    With native Wasm exceptions, select FreeType's `freetype-legacysjlj` port archive.
    Use JSPI for browser waits with native Wasm exceptions. Asyncify's Wasm rewriting cannot reliably combine the two.
    Keep unsaved moves available for a manual retry after failed autosaves, and rate-limit automatic retries.
-4. Add/update Catch2 tests in `tests/` and run checks:
+4. Add/update Catch2 tests in `tests/` and run native, browser, and data checks:
    ```sh
-   ./out/build/linux-full/tests/cata_test-tiles "[optional-filter]"
+   just docker-test-fast
+   just docker-test-wasm
    ./build-scripts/lint-json.sh
-   ./out/build/linux-full/cataclysm-bn-tiles --check-mods
    deno task docs:gen  # when lua_annotations.lua or docs/en/mod/lua/reference/lua.md conflict
    ```
    UI regression tests follow the production refresh path; do not prepare layout or paging manually.

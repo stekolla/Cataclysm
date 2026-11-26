@@ -17,7 +17,7 @@
 // overmap context, as OVERMAP_TILES does. Moving one tile east must still move the
 // iso context's screen position right by half and up by a quarter tile width,
 // and the global tile_iso must still follow the map context.
-TEST_CASE("iso_tile_context_keeps_iso_after_ortho_context_loads", "[tiles][iso]") {
+TEST_CASE("iso_tile_context_keeps_iso_after_ortho_context_loads", "[tiles][iso][wasm]") {
     tile_context_fixture fixture(/*alias_overmap_context=*/true);
     if (!fixture.valid()) {
         WARN("skipped: this environment cannot set up a headless tile context");

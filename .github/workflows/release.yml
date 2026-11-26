@@ -12,7 +12,9 @@ on:
 
 env:
   VCPKG_BINARY_SOURCES: "default"
-  EXPECTED_NIGHTLY_ASSET_COUNT: 15
+permissions:
+  actions: read
+  contents: write
 
 jobs:
   mods:
@@ -139,11 +141,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          asset_count=$(gh release view "${{ needs.metadata.outputs.tag_name }}" --json assets --jq '.assets | length' 2>/dev/null || echo 0)
-          echo "asset_count=$asset_count" >> "$GITHUB_STEP_SUMMARY"
-          echo "asset_count=$asset_count" >> "$GITHUB_OUTPUT"
+          asset_name="cataclysm-bn-web-${{ needs.metadata.outputs.tag_name }}.zip"
+          has_wasm_asset=$(gh release view "${{ needs.metadata.outputs.tag_name }}" --json assets | jq --arg name "$asset_name" '.assets | any(.name == $name)' 2>/dev/null || echo false)
+          echo "browser archive present: $has_wasm_asset" >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$asset_count" -lt "$EXPECTED_NIGHTLY_ASSET_COUNT" ]; then
+          if [ "$has_wasm_asset" != "true" ]; then
             echo "upload_assets=true" >> "$GITHUB_OUTPUT"
           else
             echo "upload_assets=false" >> "$GITHUB_OUTPUT"

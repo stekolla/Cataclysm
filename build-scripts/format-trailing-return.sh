@@ -19,10 +19,10 @@ for tool in clang-tidy clang-apply-replacements; do
     fi
 done
 
-build_path="${BUILD_PATH:-out/build/linux-full}"
+build_path="${BUILD_PATH:-out/build/wasm-tests}"
 if [[ ! -f "$build_path/compile_commands.json" ]]; then
     echo "error: compilation database not found at $build_path/compile_commands.json" >&2
-    echo "hint: configure it with 'cmake --preset linux-full' or set BUILD_PATH" >&2
+    echo "hint: configure it with 'cmake --preset wasm-tests' or set BUILD_PATH" >&2
     exit 1
 fi
 

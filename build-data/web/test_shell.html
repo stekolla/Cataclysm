@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cataclysm: Bright Nights tests</title>
+</head>
+<body>
+    <canvas id="canvas" tabindex="0"></canvas>
+    <pre id="output"></pre>
+    <script>
+        const output = document.querySelector("#output");
+        var Module = {
+            canvas: document.querySelector("#canvas"),
+            arguments: ["--rng-seed", "1", "--gpu-backend=cpu", "[wasm]"],
+            print(message) {
+                output.textContent += `${message}\n`;
+            },
+            printErr(message) {
+                output.textContent += `${message}\n`;
+            },
+            onExit(status) {
+                document.body.dataset.testExitCode = String(status);
+            },
+            onAbort(reason) {
+                output.textContent += `WASM test runner aborted: ${reason}\n`;
+                document.body.dataset.testExitCode = "1";
+            }
+        };
+    </script>
+    {{{ SCRIPT }}}
+</body>
+</html>

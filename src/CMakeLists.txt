@@ -100,12 +100,6 @@ function(setup_common_target_properties target_name)
         target_link_libraries(${target_name} PUBLIC backtrace)
     endif ()
 
-    # Tracy profiling support
-    if (USE_TRACY)
-        target_link_libraries(${target_name} PUBLIC TracyClient)
-        target_include_directories(${target_name} SYSTEM PUBLIC ${tracy_SOURCE_DIR}/public)
-        target_compile_definitions(${target_name} PUBLIC USE_TRACY)
-    endif ()
 endfunction()
 
 function(link_sdl_core target_name)
@@ -215,15 +209,17 @@ if (CURSES)
             ${CATACLYSM_BN_HEADERS})
     target_include_directories(cataclysm-bn-common INTERFACE ${CMAKE_SOURCE_DIR}/src)
 
-    if (WIN32)
-        add_executable(cataclysm-bn
-                ${MAIN_CPP}
-                ${MESSAGES_CPP}
-                ${RESOURCE_RC})
-    else ()
-        add_executable(cataclysm-bn
-                ${MAIN_CPP}
-                ${MESSAGES_CPP})
+    if (NOT CATA_TESTS_ONLY)
+        if (WIN32)
+            add_executable(cataclysm-bn
+                    ${MAIN_CPP}
+                    ${MESSAGES_CPP}
+                    ${RESOURCE_RC})
+        else ()
+            add_executable(cataclysm-bn
+                    ${MAIN_CPP}
+                    ${MESSAGES_CPP})
+        endif ()
     endif ()
 
     setup_common_target_properties(cataclysm-bn-common)
@@ -237,16 +233,20 @@ if (CURSES)
     if (SOUND)
         link_sdl_mixer(cataclysm-bn-common)
     endif()
-    target_link_libraries(cataclysm-bn PRIVATE cataclysm-bn-common)
+    if (NOT CATA_TESTS_ONLY)
+        target_link_libraries(cataclysm-bn PRIVATE cataclysm-bn-common)
+    endif ()
 
     if (CATA_SHADERS)
         add_dependencies(cataclysm-bn-common cata_shaders)
     endif ()
 
-    if (RELEASE)
-        install(TARGETS cataclysm-bn RUNTIME)
+    if (NOT CATA_TESTS_ONLY)
+        if (RELEASE)
+            install(TARGETS cataclysm-bn RUNTIME)
+        endif ()
+        if (COMMAND cata_copy_windows_lavapipe_runtime)
+            cata_copy_windows_lavapipe_runtime(cataclysm-bn)
+        endif()
     endif ()
-    if (COMMAND cata_copy_windows_lavapipe_runtime)
-        cata_copy_windows_lavapipe_runtime(cataclysm-bn)
-    endif()
 endif ()

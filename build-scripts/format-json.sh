@@ -36,6 +36,7 @@ cmake_args=(
     -B "$build_dir"
     -DCMAKE_BUILD_TYPE=Release
     -DJSON_FORMAT=ON
+    -DCATA_TOOLING_ONLY=ON
     -DCATA_FORMAT_TARGETS=OFF
     -DTESTS=OFF
     -DTILES=OFF

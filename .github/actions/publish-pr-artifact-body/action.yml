@@ -93,10 +93,7 @@ runs:
           timestamp=$(date -u "+%F %T")
 
           artifact_label="pr-${PR_NUMBER}"
-          linux_url=$(artifact_url "linux-tiles-x64-${artifact_label}")
-          windows_url=$(artifact_url "windows-tiles-x64-msvc-${artifact_label}")
-          macos_url=$(artifact_url "osx-tiles-x64-${artifact_label}")
-          android_url=$(artifact_url "android-x64-${artifact_label}")
+          wasm_url=$(artifact_url "wasm-web-${artifact_label}")
 
           content=$(
             {
@@ -104,10 +101,7 @@ runs:
               echo
               echo "PR build for commit [${sha_short}](https://github.com/${REPOSITORY}/commit/${HEAD_SHA}) (${commit_subject}) on ${timestamp}"
               echo
-              artifact_line 'Linux tiles' "$linux_url"
-              artifact_line 'Windows tiles' "$windows_url"
-              artifact_line 'macOS tiles' "$macos_url"
-              artifact_line 'Android tiles' "$android_url"
+              artifact_line 'Browser build (WebAssembly)' "$wasm_url"
             }
           )
 

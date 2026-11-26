@@ -16,11 +16,20 @@ add_compile_options(
 
 function(cata_configure_web_target target)
     set(web_dir "${CMAKE_BINARY_DIR}/web")
-    set(shell "${CMAKE_SOURCE_DIR}/build-data/web/shell.html")
+    get_target_property(is_test_runner ${target} CATA_WASM_TEST_RUNNER)
+    if (is_test_runner)
+        set(shell "${CMAKE_SOURCE_DIR}/build-data/web/test_shell.html")
+    else()
+        set(shell "${CMAKE_SOURCE_DIR}/build-data/web/shell.html")
+    endif()
     set(storage "${CMAKE_SOURCE_DIR}/build-data/web/storage.js")
     set(data "${CMAKE_SOURCE_DIR}/data")
     set(tiles "${CMAKE_SOURCE_DIR}/gfx/RetroDaysTileset")
     file(GLOB_RECURSE assets CONFIGURE_DEPENDS "${data}/*" "${tiles}/*")
+    set(test_exit_runtime)
+    if (is_test_runner)
+        set(test_exit_runtime -sEXIT_RUNTIME=1)
+    endif()
 
     set_target_properties(${target} PROPERTIES
         SUFFIX ".html"
@@ -36,6 +45,7 @@ function(cata_configure_web_target target)
         -sSTACK_SIZE=2097152
         -sALLOW_MEMORY_GROWTH=1
         -sENVIRONMENT=web
+        ${test_exit_runtime}
         -lidbfs.js
         "SHELL:--pre-js '${storage}'"
         "SHELL:--shell-file '${shell}'"

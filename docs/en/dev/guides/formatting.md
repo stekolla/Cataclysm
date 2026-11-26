@@ -28,7 +28,7 @@ style violations, a commit will be pushed to fix them.
 
 ## C++ Formatting
 
-Top-level `src/*.cpp` and `src/*.h` files use [astyle](http://astyle.sourceforge.net/). Most other C++ files use [clang-format](https://clang.llvm.org/docs/ClangFormat.html). Formatter-sensitive fixtures such as `tools/clang-tidy-plugin/test/` are left unchanged.
+Top-level `src/*.cpp` and `src/*.h` files use [astyle](http://astyle.sourceforge.net/). Most other C++ files use [clang-format](https://clang.llvm.org/docs/ClangFormat.html). Formatter fixtures are left unchanged.
 
 ```sh
 # Install formatters (Ubuntu/Debian)
@@ -159,33 +159,6 @@ Use the repository helper for C++ and the Deno extension for Markdown/TypeScript
 
 - **C++**: run `just fmt-cpp`
 - **Deno**: [Deno](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno)
-
-### Visual Studio
-
-Install the formatters once from PowerShell. LLVM provides `clang-format` and `clang-tidy`.
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
-scoop install llvm astyle
-clang-format --version
-clang-tidy --version
-astyle --version
-```
-
-If Scoop is already installed, run only `scoop install llvm astyle`. If any version command is not
-found, close and reopen PowerShell and Visual Studio so they reload `PATH`.
-
-After installing the tools:
-
-1. Open the repository folder in Visual Studio as a CMake project.
-2. Configure CMake. If Visual Studio already configured the project before installing the formatters,
-   reconfigure the CMake cache.
-3. Open **View > Other Windows > CMake Targets View**.
-4. Build the `format` target before committing.
-
-Visual Studio's normal **Format Document** command does not run repository style. Run `just fmt-cpp`
-in a terminal; the CMake `format` target is a wrapper for environments with `bash` available.
 
 ### Vim/Neovim
 

@@ -51,37 +51,50 @@ option(DYNAMIC_LINKING
         "Use dynamic linking. Or use static to remove MinGW dependency instead." "ON")
 option(USE_UNITY_BUILD "Use unity build." "OFF")
 option(JSON_FORMAT "Build JSON formatter" "OFF")
+option(CATA_TOOLING_ONLY "Build standalone repository tools without the game" "OFF")
+option(CATA_TESTS_ONLY "Build the Linux curses test executable without the game" "OFF")
+option(CATA_CLANG_TIDY_PLUGIN "Build Cata's custom clang-tidy plugin" "OFF")
 option(CATA_CCACHE "Try to find and build with ccache" "ON")
 option(TESTS "Compile Cata's tests" "ON")
 find_program(DENO_BINARY deno)
+if (EMSCRIPTEN AND TESTS AND NOT DENO_BINARY)
+    message(FATAL_ERROR "Deno is required to launch browser-based Wasm tests.")
+endif()
 if(DENO_BINARY)
     set(LUA_DOCS_DEFAULT ON)
 else()
     set(LUA_DOCS_DEFAULT OFF)
 endif()
 option(LUA_DOCS_ON_BUILD "Generate Lua reference/annotations after building cataclysm-bn-tiles (requires deno)." ${LUA_DOCS_DEFAULT})
-option(CATA_CLANG_TIDY_PLUGIN "Build Cata's custom clang-tidy plugin" "OFF")
-option(USE_TRACY "Use Tracy profiler" "OFF")
-set(TRACY_VERSION "" CACHE STRING "Tracy version to fetch when source fallback is used")
-option(TRACY_ON_DEMAND "Enable Tracy on-demand profiler connection" "ON")
-option(TRACY_ONLY_IPV4 "Use IPv4 only for Tracy profiler connections" "OFF")
 set(CATA_CLANG_TIDY_INCLUDE_DIR "" CACHE STRING
         "Path to internal clang-tidy headers required for plugin (e.g. ClangTidy.h)")
 set(CATA_CHECK_CLANG_TIDY "" CACHE STRING "Path to check_clang_tidy.py for plugin tests")
 set(GIT_BINARY "" CACHE STRING "Git binary name or path.")
 set(LINKER "" CACHE STRING "Custom Linker to use")
 option(BUILD_SDL3 "Force builds SDL3 and its modules from source, instead of using system packages" "OFF")
-option(BUILD_SHADERCROSS "Build SDL_shadercross from source when shadercross is not on PATH" "ON")
-if(WIN32)
-    set(SHADER_TARGETS "dxil;spirv;msl" CACHE STRING "Shaders to build (dxil/spirv/msl)")
-else()
-    set(SHADER_TARGETS "spirv;msl" CACHE STRING "Shaders to build (dxil/spirv/msl)")
-endif()
-#Enforce lowercase
-list(TRANSFORM SHADER_TARGETS TOLOWER OUTPUT_VARIABLE SHADER_TARGETS)
 option(CATA_SDL "Link SDL3 core for GPU platform services used by existing game targets." "OFF")
 option(CATA_GPU_VERIFY "Enable GPU output verification against CPU reference via readback (development only, requires CATA_SDL)." "OFF")
 set(CATA_SHADERS OFF)
+
+if (NOT EMSCRIPTEN AND CATA_TOOLING_ONLY)
+    if (JSON_FORMAT)
+        add_subdirectory(tools/format)
+    endif()
+    if (CATA_CLANG_TIDY_PLUGIN)
+        add_subdirectory(tools/clang-tidy-plugin)
+    endif()
+    if (JSON_FORMAT OR CATA_CLANG_TIDY_PLUGIN)
+        return()
+    endif()
+endif()
+
+if (CATA_TESTS_ONLY)
+    if (EMSCRIPTEN OR NOT TESTS OR NOT CURSES OR TILES OR SOUND OR CATA_SDL OR NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(FATAL_ERROR "The test-only native configuration is supported on Linux with curses tests only.")
+    endif()
+elseif (NOT EMSCRIPTEN OR NOT TILES OR CURSES OR SOUND)
+    message(FATAL_ERROR "The supported game target is browser tiles with curses and sound disabled. Use the wasm-tiles or wasm-tests preset.")
+endif()
 
 if (TESTS)
 include(CTest)
@@ -202,7 +215,7 @@ if (TILES)
     set(CURSES OFF)
 endif ()
 
-if (TILES OR CURSES OR SOUND)
+if ((TILES OR SOUND) AND NOT CATA_TESTS_ONLY)
     set(CATA_SDL ON CACHE BOOL
         "Link SDL3 core for GPU platform services used by existing game targets." FORCE)
 endif ()
@@ -260,7 +273,6 @@ message(STATUS "CURSES                        : ${CURSES}")
 message(STATUS "SOUND                         : ${SOUND}")
 message(STATUS "BACKTRACE                     : ${BACKTRACE}")
 message(STATUS "LIBBACKTRACE                  : ${LIBBACKTRACE}")
-message(STATUS "USE_TRACY                     : ${USE_TRACY}")
 message(STATUS "USE_XDG_DIR                   : ${USE_XDG_DIR}")
 message(STATUS "USE_HOME_DIR                  : ${USE_HOME_DIR}")
 message(STATUS "UNITY_BUILD                   : ${USE_UNITY_BUILD}")
@@ -268,8 +280,6 @@ if (LINKER)
     message(STATUS "LINKER                        : ${LINKER}")
 endif ()
 message(STATUS "BUILD_SDL3                    : ${BUILD_SDL3}")
-message(STATUS "BUILD_SHADERCROSS             : ${BUILD_SHADERCROSS}")
-message(STATUS "SHADER_TARGETS                : ${SHADER_TARGETS}")
 message(STATUS "CATA_SDL                      : ${CATA_SDL}")
 message(STATUS "CATA_GPU_VERIFY               : ${CATA_GPU_VERIFY}")
 
@@ -333,60 +343,6 @@ endif ()
 set(CMAKE_THREAD_PREFER_PTHREAD True)
 find_package(Threads REQUIRED)
 
-if (USE_TRACY)
-
-    find_package(Tracy CONFIG QUIET)
-
-    if (TARGET Tracy::TracyClient AND NOT TARGET TracyClient)
-        add_library(TracyClient INTERFACE IMPORTED)
-        target_link_libraries(TracyClient INTERFACE Tracy::TracyClient)
-        get_target_property(CATA_TRACY_INCLUDE_DIRS Tracy::TracyClient INTERFACE_INCLUDE_DIRECTORIES)
-        foreach (CATA_TRACY_INCLUDE_DIR ${CATA_TRACY_INCLUDE_DIRS})
-            if (EXISTS "${CATA_TRACY_INCLUDE_DIR}/tracy/tracy/Tracy.hpp")
-                target_include_directories(TracyClient INTERFACE "${CATA_TRACY_INCLUDE_DIR}/tracy")
-            endif ()
-        endforeach ()
-        unset(CATA_TRACY_INCLUDE_DIRS)
-        unset(CATA_TRACY_INCLUDE_DIR)
-        target_compile_definitions(TracyClient INTERFACE TRACY_ENABLE)
-        if (TRACY_ON_DEMAND)
-            target_compile_definitions(TracyClient INTERFACE TRACY_ON_DEMAND)
-        endif ()
-        if (TRACY_ONLY_IPV4)
-            target_compile_definitions(TracyClient INTERFACE TRACY_ONLY_IPV4)
-        endif ()
-        message(STATUS "Using installed Tracy")
-    endif ()
-
-    if (NOT TARGET TracyClient)
-        if (NOT TRACY_VERSION)
-            if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-                set(TRACY_VERSION 6d1deb5640ed11da01995fb1791115cfebe54dbf)
-            else()
-                set(TRACY_VERSION v0.10)
-            endif()
-            message(STATUS "Using tracy version: ${TRACY_VERSION}")
-        endif()
-
-        message(STATUS "Installing Tracy from Source")
-        FetchContent_Declare(
-            tracy
-            GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-            GIT_TAG "${TRACY_VERSION}"
-            GIT_PROGRESS TRUE)
-
-        FetchContent_MakeAvailable(tracy)
-        set_target_properties(TracyClient PROPERTIES TRACY_ENABLE ON TRACY_ON_DEMAND ${TRACY_ON_DEMAND})
-
-        if(NOT MSVC)
-            target_compile_options(TracyClient PRIVATE "-Wno-everything")
-        endif()
-        if (NOT DYNAMIC_LINKING)
-            set_target_properties(TracyClient PROPERTIES TRACY_STATIC ON)
-        endif ()
-    endif ()
-endif ()
-
 # Check for build types and libraries
 if (CATA_SDL)
     message(STATUS "Searching for SDL3 library --")
@@ -438,112 +394,6 @@ if (CATA_SDL)
         add_definitions(-DCATA_GPU_VERIFY)
     endif ()
 endif ()
-
-if (CATA_SDL AND NOT EMSCRIPTEN)
-    # --- SDL_shadercross: HLSL shader compiler (build-time tool only, library not linked) ---
-    message(STATUS "Searching for shadercross (HLSL compiler) --")
-
-    find_program(SHADERCROSS_EXE
-        NAMES shadercross
-        HINTS "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/tools/sdl3-shadercross")
-
-    if (APPLE AND SHADERCROSS_EXE)
-        message(STATUS "shadercross found on macOS; using precompiled MSL shaders instead")
-        set(SHADERCROSS_EXE "")
-    endif ()
-
-    if (NOT SHADERCROSS_EXE AND BUILD_SHADERCROSS AND NOT APPLE)
-        message(STATUS "Installing SDL_shadercross from Source")
-        include(build-scripts/Shadercross.cmake)
-    endif ()
-
-    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/data/shaders")
-
-    file(GLOB_RECURSE CATA_HLSL_SOURCES CONFIGURE_DEPENDS
-         "${CMAKE_SOURCE_DIR}/src/shaders/*.hlsl")
-
-    if (SHADERCROSS_EXE)
-        set(CATA_SHADERS ON)
-        message(STATUS "shadercross: ${SHADERCROSS_EXE}")
-        set(CATA_SHADER_OUTPUTS "")
-
-        foreach (HLSL_SRC ${CATA_HLSL_SOURCES})
-            get_filename_component(SHADER_NAME ${HLSL_SRC} NAME_WE)
-
-            if (SHADER_NAME MATCHES "_vertex$")
-                set(STAGE vertex)
-            elseif (SHADER_NAME MATCHES "_fragment$")
-                set(STAGE fragment)
-            else ()
-                set(STAGE compute)
-            endif ()
-
-            foreach(SHADER ${SHADER_TARGETS})
-
-                # All Shader extensions besides spv match the -d value passed to shadercross
-                if (SHADER STREQUAL "spirv")
-                    set(SHADER_EXTENSION "spv")
-                else ()
-                    set(SHADER_EXTENSION "${SHADER}")
-                endif()
-
-                set(SHADER_OUT  "${CMAKE_SOURCE_DIR}/data/shaders/${SHADER_NAME}.${SHADER_EXTENSION}")
-                add_custom_command(
-                    OUTPUT "${SHADER_OUT}"
-                    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_SOURCE_DIR}/data/shaders"
-                    COMMAND "${SHADERCROSS_EXE}" "${HLSL_SRC}" -s hlsl -d ${SHADER} -t ${STAGE} -o "${SHADER_OUT}"
-                    DEPENDS "${HLSL_SRC}" ${SHADERCROSS_TARGET}
-                    COMMENT "Compiling ${SHADER_NAME}.hlsl -> ${SHADER}"
-                    VERBATIM)
-                list(APPEND CATA_SHADER_OUTPUTS "${SHADER_OUT}")
-            endforeach()
-
-        endforeach ()
-
-        add_custom_target(cata_shaders ALL DEPENDS ${CATA_SHADER_OUTPUTS})
-        if (SHADERCROSS_TARGET)
-            add_dependencies(cata_shaders ${SHADERCROSS_TARGET})
-        endif ()
-    else ()
-
-        list(TRANSFORM SHADER_TARGETS REPLACE "spirv" "spv" OUTPUT_VARIABLE SHADER_TARGETS)
-
-        set(CATA_PRECOMPILED_SHADER_OUTPUTS "")
-        foreach (HLSL_SRC ${CATA_HLSL_SOURCES})
-
-            get_filename_component(SHADER_NAME ${HLSL_SRC} NAME_WE)
-
-            foreach(SHADER_EXTENSION ${SHADER_TARGETS})
-                list(APPEND CATA_PRECOMPILED_SHADER_OUTPUTS
-                     "${CMAKE_SOURCE_DIR}/data/shaders/${SHADER_NAME}.${SHADER_EXTENSION}")
-            endforeach()
-        endforeach ()
-
-        set(CATA_MISSING_PRECOMPILED_SHADERS "")
-        foreach (SHADER_OUT ${CATA_PRECOMPILED_SHADER_OUTPUTS})
-            if (NOT EXISTS "${SHADER_OUT}")
-                get_filename_component(SHADER_NAME ${SHADER_OUT} NAME)
-                list(APPEND CATA_MISSING_PRECOMPILED_SHADERS "${SHADER_NAME}")
-            endif ()
-        endforeach ()
-
-        if (CATA_MISSING_PRECOMPILED_SHADERS)
-            message(FATAL_ERROR
-                "BUILD_SHADERCROSS disabled and precompiled platform shaders are missing: "
-                "${CATA_MISSING_PRECOMPILED_SHADERS}. "
-                "Run a shader generation job or place shaders in ${CMAKE_SOURCE_DIR}/data/shaders.")
-        endif ()
-
-        set(CATA_SHADERS ON)
-        message(STATUS "BUILD_SHADERCROSS disabled; using precompiled shaders from data/shaders")
-        add_custom_target(cata_shaders DEPENDS ${CATA_PRECOMPILED_SHADER_OUTPUTS})
-    endif ()
-endif ()
-
-if (WIN32 AND CATA_SDL)
-    include(${CMAKE_SOURCE_DIR}/build-scripts/WindowsLavapipe.cmake)
-    cata_setup_windows_lavapipe_runtime()
-endif()
 
 if (TILES)
     # Find SDL3_ttf & SDL3_image for tile rendering
@@ -814,10 +664,6 @@ endif()
 if (JSON_FORMAT)
     add_subdirectory(tools/format)
 endif()
-if (CATA_CLANG_TIDY_PLUGIN)
-    add_subdirectory(tools/clang-tidy-plugin)
-endif()
-
 if (RELEASE)
     if (USE_PREFIX_DATA_DIR)
         install(FILES
@@ -852,124 +698,6 @@ if (RELEASE)
         install(DIRECTORY ${CMAKE_SOURCE_DIR}/mods
             DESTINATION .)
     endif()
-endif()
-
-if (WIN32 AND CATA_SDL AND TARGET cata_windows_lavapipe_runtime)
-    install(DIRECTORY "${CATA_WINDOWS_LAVAPIPE_RUNTIME_DIR}/"
-        DESTINATION "mesa/x64")
-endif()
-
-if (APPLE AND RELEASE AND (TILES OR CURSES))
-    if (TILES)
-        set(CATA_OSX_GAME_TARGET cataclysm-bn-tiles)
-    else()
-        set(CATA_OSX_GAME_TARGET cataclysm-bn)
-    endif()
-
-    set(CATA_OSX_APP_DIR "${CMAKE_SOURCE_DIR}/Cataclysm.app")
-    set(CATA_OSX_CONTENTS_DIR "${CATA_OSX_APP_DIR}/Contents")
-    set(CATA_OSX_RESOURCES_DIR "${CATA_OSX_CONTENTS_DIR}/Resources")
-    set(CATA_OSX_DATA_DIR "${CATA_OSX_RESOURCES_DIR}/data")
-    set(CATA_OSX_FRAMEWORKS_DIR "" CACHE PATH "Directory containing macOS SDL3 frameworks for app packaging.")
-    if (NOT CATA_OSX_FRAMEWORKS_DIR)
-        if (EXISTS "$ENV{HOME}/Library/Frameworks/SDL3.framework")
-            set(CATA_OSX_FRAMEWORKS_DIR "$ENV{HOME}/Library/Frameworks")
-        elseif (EXISTS "/Library/Frameworks/SDL3.framework")
-            set(CATA_OSX_FRAMEWORKS_DIR "/Library/Frameworks")
-        endif()
-    endif()
-
-    set(CATA_OSX_COPY_RESOURCE_COMMANDS)
-    if (TILES)
-        list(APPEND CATA_OSX_COPY_RESOURCE_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/gfx" "${CATA_OSX_RESOURCES_DIR}/gfx")
-    endif()
-    if (CATA_SDL)
-        list(APPEND CATA_OSX_COPY_RESOURCE_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/shaders" "${CATA_OSX_DATA_DIR}/shaders")
-    endif()
-    if (SOUND)
-        list(APPEND CATA_OSX_COPY_RESOURCE_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/sound" "${CATA_OSX_DATA_DIR}/sound")
-    endif()
-    if (CURSES)
-        find_library(CATA_OSX_NCURSESW_LIBRARY NAMES ncursesw REQUIRED)
-        find_library(CATA_OSX_FORMW_LIBRARY NAMES formw REQUIRED)
-        file(REAL_PATH "${CATA_OSX_NCURSESW_LIBRARY}" CATA_OSX_NCURSESW_LIBRARY)
-        file(REAL_PATH "${CATA_OSX_FORMW_LIBRARY}" CATA_OSX_FORMW_LIBRARY)
-        get_filename_component(CATA_OSX_NCURSESW_LIBRARY_NAME "${CATA_OSX_NCURSESW_LIBRARY}" NAME)
-        get_filename_component(CATA_OSX_FORMW_LIBRARY_NAME "${CATA_OSX_FORMW_LIBRARY}" NAME)
-        list(APPEND CATA_OSX_COPY_RESOURCE_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CATA_OSX_NCURSESW_LIBRARY}" "${CATA_OSX_RESOURCES_DIR}/${CATA_OSX_NCURSESW_LIBRARY_NAME}"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CATA_OSX_FORMW_LIBRARY}" "${CATA_OSX_RESOURCES_DIR}/${CATA_OSX_FORMW_LIBRARY_NAME}")
-    endif()
-
-    set(CATA_OSX_COPY_FRAMEWORK_COMMANDS)
-    if (CATA_SDL AND CATA_OSX_FRAMEWORKS_DIR)
-        set(CATA_OSX_FRAMEWORK_NAMES SDL3)
-        if (TILES)
-            list(APPEND CATA_OSX_FRAMEWORK_NAMES SDL3_image SDL3_ttf)
-        endif()
-        if (SOUND)
-            list(APPEND CATA_OSX_FRAMEWORK_NAMES SDL3_mixer)
-        endif()
-        foreach (CATA_OSX_FRAMEWORK_NAME ${CATA_OSX_FRAMEWORK_NAMES})
-            list(APPEND CATA_OSX_COPY_FRAMEWORK_COMMANDS
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    "${CATA_OSX_FRAMEWORKS_DIR}/${CATA_OSX_FRAMEWORK_NAME}.framework"
-                    "${CATA_OSX_RESOURCES_DIR}/${CATA_OSX_FRAMEWORK_NAME}.framework")
-        endforeach()
-    endif()
-
-    if (DYNAMIC_LINKING)
-        find_program(CATA_OSX_DYLIBBUNDLER dylibbundler REQUIRED)
-        set(CATA_OSX_BUNDLE_RUNTIME_COMMANDS
-            COMMAND "${CATA_OSX_DYLIBBUNDLER}" -od -b
-                -x "${CATA_OSX_RESOURCES_DIR}/$<TARGET_FILE_NAME:${CATA_OSX_GAME_TARGET}>"
-                -d "${CATA_OSX_RESOURCES_DIR}/lib"
-                -p "@executable_path/lib/")
-    endif()
-
-    add_custom_target(osx-app
-        COMMAND ${CMAKE_COMMAND} -E rm -rf "${CATA_OSX_APP_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CATA_OSX_CONTENTS_DIR}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CATA_OSX_RESOURCES_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CATA_OSX_DATA_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build-data/osx/Info.plist" "${CATA_OSX_CONTENTS_DIR}/Info.plist"
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build-data/osx/Cataclysm.sh" "${CATA_OSX_CONTENTS_DIR}/MacOS/Cataclysm.sh"
-        COMMAND chmod +x "${CATA_OSX_CONTENTS_DIR}/MacOS/Cataclysm.sh"
-        COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${CATA_OSX_GAME_TARGET}>" "${CATA_OSX_RESOURCES_DIR}/$<TARGET_FILE_NAME:${CATA_OSX_GAME_TARGET}>"
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build-data/osx/AppIcon.icns" "${CATA_OSX_RESOURCES_DIR}/AppIcon.icns"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/font" "${CATA_OSX_DATA_DIR}/font"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/json" "${CATA_OSX_DATA_DIR}/json"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/mods" "${CATA_OSX_DATA_DIR}/mods"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/names" "${CATA_OSX_DATA_DIR}/names"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/raw" "${CATA_OSX_DATA_DIR}/raw"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/motd" "${CATA_OSX_DATA_DIR}/motd"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/credits" "${CATA_OSX_DATA_DIR}/credits"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/title" "${CATA_OSX_DATA_DIR}/title"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/help" "${CATA_OSX_DATA_DIR}/help"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/data/lua" "${CATA_OSX_DATA_DIR}/lua"
-        ${CATA_OSX_COPY_RESOURCE_COMMANDS}
-        ${CATA_OSX_COPY_FRAMEWORK_COMMANDS}
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        DEPENDS ${CATA_OSX_GAME_TARGET})
-
-    add_custom_target(osx-bundle-runtime
-        ${CATA_OSX_BUNDLE_RUNTIME_COMMANDS}
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        DEPENDS osx-app)
-
-    if (GIT_VERSION)
-        set(CATA_OSX_DMG_VERSION "${GIT_VERSION}")
-    else()
-        set(CATA_OSX_DMG_VERSION unknown)
-    endif()
-    add_custom_target(dmgdist
-        COMMAND plutil -convert binary1 "${CATA_OSX_APP_DIR}/Contents/Info.plist"
-        COMMAND dmgbuild -s build-data/osx/dmgsettings.py "Cataclysm BN" "CataclysmBN-${CATA_OSX_DMG_VERSION}.dmg"
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        DEPENDS osx-bundle-runtime)
 endif()
 
 configure_file(

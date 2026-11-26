@@ -25,6 +25,7 @@ cmake \
   -DLLVM_DIR=$(llvm-config --cmakedir) \
   -DCMAKE_PREFIX_PATH=$(llvm-config --prefix) \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DCATA_TOOLING_ONLY=ON \
   -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
   -DTILES="$TILES" \
   -DSOUND="$SOUND" \

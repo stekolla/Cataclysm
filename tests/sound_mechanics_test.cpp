@@ -97,7 +97,7 @@ TEST_CASE("queued_sounds_outside_resized_map_are_discarded", "[sound][resize]") 
     CHECK(instances.size() == 2);
 }
 
-TEST_CASE("sounds_keep_absolute_positions_when_reality_bubble_resizes", "[sound][resize]") {
+TEST_CASE("sounds_keep_absolute_positions_when_reality_bubble_resizes", "[sound][resize][wasm]") {
 #if defined(TILES)
     const auto tiles = tile_context_fixture(true);
     REQUIRE(tiles.valid());

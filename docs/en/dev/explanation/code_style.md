@@ -1,6 +1,6 @@
 # C++ Code Style Guide
 
-All C++ code in the project is styled. Run `just fmt` before pushing, or `just fmt-cpp` for C++-only changes. The helper uses astyle only for top-level `src/*.cpp` and `src/*.h`; most other C++ files use clang-format. Formatter-sensitive fixtures such as `tools/clang-tidy-plugin/test/` are left unchanged.
+All C++ code in the project is styled. Run `just fmt` before pushing, or `just fmt-cpp` for C++-only changes. The helper uses astyle only for top-level `src/*.cpp` and `src/*.h`; most other C++ files use clang-format. Formatter fixtures are left unchanged.
 
 Where astyle is still used, use version 3.1. Version 3.0.1 will disagree in only a few places, while Version 3.6.6 will disagree in nearly every file.
 
@@ -10,8 +10,7 @@ Blocks of code can be passed through astyle to ensure that their formatting is c
 astyle --style=1tbs --attach-inlines --indent=spaces=4 --align-pointer=name --max-code-length=100 --break-after-logical --indent-classes --indent-switches --indent-preproc-define --indent-col1-comments --min-conditional-indent=0 --pad-oper --add-braces --convet-tabs --unpad-paren --pad-paren-in --keep-one-line-blocks
 ```
 
-These options are mirrored in `.astylerc`, `doc/CODE_STYLE.txt` and
-`msvc-full-features/AStyleExtension-Cataclysm-BN.cfg`
+These options are mirrored in `.astylerc` and `doc/CODE_STYLE.txt`.
 
 For example, from `vi`, set marks a and b around the block, then:
 
