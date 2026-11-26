@@ -666,8 +666,7 @@ int main( int argc, char *argv[] )
         std::string msg = string_format(
                               "Can't find data directory \"%s\"\n"
                               "Current path: \"%s\"\n"
-                              "Please ensure the current working directory is correct.\n"
-                              "Perhaps you meant to start \"cataclysm-launcher\"?\n",
+                              "Please ensure the current working directory is correct.\n",
                               PATH_INFO::datadir(),
                               current_path
                           );

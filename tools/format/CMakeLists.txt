@@ -6,14 +6,6 @@ add_definitions(-DCATA_IN_TOOL)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-if (RELEASE)
-    if (USE_PREFIX_DATA_DIR)
-        install(TARGETS json_formatter RUNTIME)
-    else()
-        install(TARGETS json_formatter RUNTIME DESTINATION .)
-    endif()
-endif()
-
 # Custom targets for JSON formatting.
 # Note: These targets only work on Unix-like systems with find, grep, xargs
 

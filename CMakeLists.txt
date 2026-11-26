@@ -230,14 +230,12 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # in the source directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} CACHE PATH
             "Single Directory for all Executables.")
-    set(CMAKE_INSTALL_BINDIR .)
 else ()
     set(RELEASE 1)
     add_definitions(-DRELEASE)
     # Use CMAKE_INSTALL_PREFIX as storage of data,gfx, etc.. Useful only on *nix OS.
     if(USE_PREFIX_DATA_DIR)
         if ("${CMAKE_SYSTEM_NAME}" MATCHES "(Linux|FreeBSD|Darwin)")
-            set(CMAKE_INSTALL_DATAROOTDIR "${CMAKE_INSTALL_PREFIX}/share/cataclysm-bn")
             add_definitions(-DPREFIX=${CMAKE_INSTALL_PREFIX})
             configure_file(
                 "${CMAKE_SOURCE_DIR}/src/prefix.h.in"
@@ -245,17 +243,7 @@ else ()
                 @ONLY)
             add_definitions(-DDATA_DIR_PREFIX)
         endif ()
-    else()
-        set(CMAKE_INSTALL_DATADIR   data)
-        set(CMAKE_INSTALL_DOCDIR    .   )
-        set(CMAKE_INSTALL_BINDIR    .   )
     endif ()
-    message(STATUS "CMAKE_INSTALL_PREFIX          : ${CMAKE_INSTALL_PREFIX}")
-    message(STATUS "CMAKE_INSTALL_BINDIR          : ${CMAKE_INSTALL_BINDIR}")
-    message(STATUS "DESKTOP_ENTRY_PATH            : ${DESKTOP_ENTRY_PATH}")
-    message(STATUS "PIXMAPS_ENTRY_PATH            : ${PIXMAPS_ENTRY_PATH}")
-    message(STATUS "PIXMAPS_UNITY_ENTRY_PATH      : ${PIXMAPS_UNITY_ENTRY_PATH}")
-    message(STATUS "MANPAGE_ENTRY_PATH            : ${MANPAGE_ENTRY_PATH}")
 endif ()
 
 message(STATUS "GIT_BINARY                    : ${GIT_EXECUTABLE}")
@@ -369,9 +357,6 @@ if (CATA_SDL)
                 target_compile_options(SDL3-shared PRIVATE
                         "$<$<COMPILE_LANG_AND_ID:C,Clang,AppleClang>:SHELL:-Xclang -fno-pch-timestamp>")
             endif ()
-            if (DYNAMIC_LINKING)
-                install(TARGETS SDL3-shared DESTINATION lib)
-            endif ()
         else()
             message("Using system SDL3")
         endif()
@@ -408,9 +393,6 @@ if (TILES)
                     EXCLUDE_FROM_ALL
             )
             FetchContent_MakeAvailable(SDL3_TTF)
-            if (DYNAMIC_LINKING)
-                install(TARGETS SDL3_ttf-shared DESTINATION lib)
-            endif ()
         else()
             message("Using system SDL3_ttf")
         endif()
@@ -450,9 +432,6 @@ if (TILES)
                     EXCLUDE_FROM_ALL
             )
             FetchContent_MakeAvailable(SDL3_IMAGE)
-            if (DYNAMIC_LINKING)
-                install(TARGETS SDL3_image-shared DESTINATION lib)
-            endif ()
         else()
             message("Using system SDL3_image")
         endif()
@@ -510,9 +489,6 @@ if (SOUND)
                     EXCLUDE_FROM_ALL
             )
             FetchContent_MakeAvailable(SDL3_MIXER )
-            if (DYNAMIC_LINKING)
-                install(TARGETS SDL3_mixer-shared DESTINATION lib)
-            endif ()
         else()
             message("Using system SDL3_mixer")
         endif()
@@ -638,17 +614,6 @@ if (CCACHE_FOUND AND CATA_CCACHE)
 endif ()
 
 add_subdirectory(src)
-add_subdirectory(data)
-
-if (UNIX AND DYNAMIC_LINKING)
-    set(CATA_INSTALL_RPATH "$<IF:$<BOOL:${APPLE}>,@executable_path/lib:@executable_path/lib64,\$ORIGIN/lib:\$ORIGIN/lib64>")
-    if (TARGET cataclysm-bn-tiles)
-        set_target_properties(cataclysm-bn-tiles PROPERTIES INSTALL_RPATH "${CATA_INSTALL_RPATH}")
-    endif()
-    if (TARGET cataclysm-bn)
-        set_target_properties(cataclysm-bn PROPERTIES INSTALL_RPATH "${CATA_INSTALL_RPATH}")
-    endif()
-endif()
 
 if(TESTS)
     add_subdirectory(tests)
@@ -657,51 +622,6 @@ endif()
 if (JSON_FORMAT)
     add_subdirectory(tools/format)
 endif()
-if (RELEASE)
-    if (USE_PREFIX_DATA_DIR)
-        install(FILES
-            ${CMAKE_SOURCE_DIR}/README.md
-            ${CMAKE_SOURCE_DIR}/LICENSE.txt
-            ${CMAKE_SOURCE_DIR}/LICENSE-OFL-Terminus-Font.txt
-            ${CMAKE_SOURCE_DIR}/VERSION.txt
-            TYPE DOC)
-    else()
-        install(FILES
-            ${CMAKE_SOURCE_DIR}/README.md
-            ${CMAKE_SOURCE_DIR}/LICENSE.txt
-            ${CMAKE_SOURCE_DIR}/LICENSE-OFL-Terminus-Font.txt
-            ${CMAKE_SOURCE_DIR}/VERSION.txt
-            DESTINATION .)
-    endif()
-    if (TILES)
-        if (USE_PREFIX_DATA_DIR)
-            install(DIRECTORY ${CMAKE_SOURCE_DIR}/gfx
-                TYPE DATA)
-        else()
-            install(DIRECTORY ${CMAKE_SOURCE_DIR}/gfx
-                DESTINATION .)
-        endif()
-    endif()
-    # Install cataclysm-launcher for portable Linux builds
-    if (NOT USE_PREFIX_DATA_DIR AND UNIX AND NOT APPLE)
-        install(PROGRAMS ${CMAKE_SOURCE_DIR}/cataclysm-launcher
-            DESTINATION .)
-    endif()
-    if ( NOT USE_XDG_DIR AND NOT USE_HOME_DIR )
-        install(DIRECTORY ${CMAKE_SOURCE_DIR}/mods
-            DESTINATION .)
-    endif()
-endif()
-
-configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-        IMMEDIATE @ONLY)
-
-add_custom_target(uninstall
-        "${CMAKE_COMMAND}"
-        -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-
 if (USE_UNITY_BUILD)
     set_property(GLOBAL PROPERTY UNITY_BUILD ON)
 endif ()
