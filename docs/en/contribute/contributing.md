@@ -380,15 +380,18 @@ xxxx..xxxx  new_feature -> new_feature
 
 ## Unit tests
 
-There is a suite of Catch2 tests in `tests/`. Run the fast native test-only suite through Docker for
-non-graphical coverage. It builds a Linux curses test executable without building a native game:
+There is a suite of Catch2 tests in `tests/`. Run the Linux test-only route through Docker for
+non-graphical coverage. It builds a Linux curses test executable without building a native game and
+runs the selection excluding `[slow]` and `[wasm]` tests. The tests run in one process, so this
+route can still take a while:
 
 ```sh
 $ just docker-test-fast
 ```
 
-Tests that require video or GPU initialization use the `[wasm]` tag and run in the browser suite,
-which uses a fixed random seed and CPU compute:
+Tests that require video or GPU initialization use the `[wasm]` tag and run in the browser suite.
+Docker builds the Emscripten target and runs it in headless Chromium with a fixed random seed and CPU
+compute:
 
 ```sh
 $ just docker-test-wasm

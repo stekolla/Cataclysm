@@ -1,69 +1,73 @@
-# Build for the Browser
+# Build and Run the Browser Game
 
-Cataclysm: Bright Nights builds with the Emscripten SDK for desktop browsers. Native game builds
-are not supported.
+Cataclysm: Bright Nights is built for desktop browsers with Emscripten and WebAssembly. Native game
+builds are not supported. The repository's Docker environment provides the pinned Emscripten SDK,
+Linux test toolchain, Deno, and headless Chromium.
 
-## Containerized build environment
+## Requirements
 
-Use the repository Docker environment to build and test from Linux on macOS, Windows, or Linux. It
-includes the Emscripten SDK, native test compiler and libraries, Deno, and headless Chromium. Docker
-uses the host architecture automatically: Apple Silicon uses `linux/arm64`, and x86-64 systems use
-`linux/amd64`. Do not add a `--platform` override.
+- Docker Desktop or Docker Engine
+- [just](https://just.systems/) to run the repository's build recipes
 
-Install Docker Desktop or Docker Engine, then build the image and run the desired task:
+Run commands from the repository root. Docker uses the host architecture automatically: Apple
+Silicon uses `linux/arm64`, and x86-64 systems use `linux/amd64`. Do not force a platform or use
+emulation.
+
+Each `docker-*` recipe builds the Docker image automatically if it is missing. To build it ahead
+of time, run `just docker-image`.
+
+## Build and Run
+
+Build the browser game, then serve it locally:
 
 ```sh
-just docker-image
-just docker-test-fast
-just docker-test-wasm
 just docker-build-wasm
 just docker-serve-wasm
 ```
 
-The fast route builds and runs non-graphical tests in the Linux curses test-only configuration. The
-browser route runs `[wasm]` tests in headless Chromium. Neither route builds a native game.
+Open <http://127.0.0.1:8000/cataclysm-bn-tiles.html> in a desktop browser with WebAssembly JavaScript
+Promise Integration (JSPI). The build output is in `out/build/wasm-tiles/web`.
 
-## Build and run the game
+The browser build uses the RetroDays tileset and CPU compute. It runs in English with sound disabled.
+Use **Save and Quit** (`S`) before reloading. Saves stay in that browser profile for the same site
+address and port. Use one Bright Nights tab per site to keep saves consistent.
 
-The `docker-build-wasm` recipe configures and builds the browser target. To run the commands inside
-the container directly:
+To configure and build without the `just` recipes, run these commands inside the Docker environment:
 
 ```sh
 bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tiles && cmake --build --preset wasm-tiles --parallel 2'
+CATA_DOCKER_PUBLISH=1 bash build-scripts/run-docker.sh python3 -m http.server 8000 --bind 0.0.0.0 --directory out/build/wasm-tiles/web
 ```
 
-`docker-serve-wasm` serves the generated files on port 8000 from inside the container.
+The `docker-serve-wasm` recipe publishes port 8000 from the container to the host.
 
-Open <http://127.0.0.1:8000/cataclysm-bn-tiles.html> in a desktop browser with WebAssembly JavaScript
-Promise Integration (JSPI). Use **Save and Quit** (`S`) before reloading. Saves remain in that browser
-profile for the same site address and port. Use one Bright Nights tab per site to keep saves consistent.
+## Build and Run Tests
 
-The browser build uses the RetroDays tileset and CPU compute. It runs in English with sound disabled.
+Run both test routes through Docker:
 
-## Build and run tests
+```sh
+just docker-test-fast
+just docker-test-wasm
+```
 
-Use the native test-only preset inside the container for fast non-graphical tests. It builds the C++
-sources and Catch2 runner with curses enabled, but does not create a native game executable:
+`docker-test-fast` builds and runs the Linux curses test-only configuration. It does not build a
+native game. It runs the Catch2 selection excluding `[slow]` and `[wasm]` tests in one process, so
+the suite can still take a while.
+
+`docker-test-wasm` builds the browser game and Wasm test runner, then runs the tests in headless
+Chromium. Mark tests that need video or GPU initialization with the `[wasm]` Catch2 tag. The browser
+runner uses a fixed random seed and CPU compute.
+
+For direct CMake commands inside Docker:
 
 ```sh
 bash build-scripts/run-docker.sh bash -lc 'cmake --preset linux-tests && cmake --build --preset linux-tests --parallel 2 && ctest --test-dir out/build/linux-tests --output-on-failure'
-```
-
-The container runs this test-only configuration as Linux. It omits tiles and SDL, so tests that need
-video or GPU initialization run only in the browser test route. Those tests use the `[wasm]` Catch2
-tag. Configure and build the WebAssembly test runner, then run it through headless Chromium:
-
-```sh
 bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tests && cmake --build --preset wasm-tests --parallel 2 && ctest --test-dir out/build/wasm-tests --output-on-failure'
 ```
 
-The browser runner uses a fixed random seed and the CPU compute backend. `CHROME_BIN` points to the
-Chromium binary in the container.
+## Standalone JSON Formatter
 
-## Standalone JSON formatter
-
-The JSON formatter is a repository tool, separate from the game build. It can be built without
-Emscripten by running:
+The JSON formatter is repository tooling separate from the game build. Run it with:
 
 ```sh
 just fmt-json

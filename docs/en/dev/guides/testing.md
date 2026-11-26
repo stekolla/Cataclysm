@@ -1,15 +1,18 @@
 # Testing Cataclysm
 
-The test cases in `tests/` use the [Catch2 framework](https://github.com/catchorg/Catch2). Run both
-test routes through the repository's Docker environment:
+The test cases in `tests/` use the [Catch2 framework](https://github.com/catchorg/Catch2). Run the
+Linux test-only route and browser route through the repository's Docker environment:
 
 ```sh
 just docker-test-fast
 just docker-test-wasm
 ```
 
-The fast route builds the curses test executable without building a native game. Tests that require
-video or GPU initialization must have the `[wasm]` tag and run through the browser route:
+The Linux route builds the curses test executable without building a native game. It runs the
+Catch2 selection that excludes `[slow]` and `[wasm]` tests in one process, so it can still take a
+while despite the `docker-test-fast` recipe name. Tests that require video or GPU initialization
+must have the `[wasm]` tag and run through the browser route. The browser route builds the Wasm game
+and test runner, then runs the tests in headless Chromium:
 
 ```sh
 bash build-scripts/run-docker.sh bash -lc 'cmake --preset linux-tests && cmake --build --preset linux-tests --parallel 2 && ctest --test-dir out/build/linux-tests --output-on-failure'
