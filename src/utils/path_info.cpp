@@ -216,11 +216,6 @@ auto PATH_INFO::soundpack_conf() -> std::string { return "soundpack.txt"; }
 auto PATH_INFO::gfxdir() -> std::string { return gfxdir_value; }
 auto PATH_INFO::data_sound() -> std::string { return datadir_value + "sound"; }
 
-auto PATH_INFO::credits() -> std::string {
-    return find_translated_file(
-        datadir_value + "credits/", ".credits", datadir_value + "credits/" + "en.credits");
-}
-
 auto PATH_INFO::title(const holiday) -> std::string { return title_screen::resolve_path(); }
 
 auto PATH_INFO::names() -> std::string {

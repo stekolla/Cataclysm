@@ -41,14 +41,6 @@ Please read the [contributor guide](docs/en/contribute/contributing.md) for deta
 Gameplay and development documentation is available as Markdown in the
 [docs directory](docs/README.md).
 
-## Community
-
-[![Documentation](https://img.shields.io/badge/Docs-Markdown-lightgrey?style=for-the-badge)][docs]
-[![Discussions](https://img.shields.io/badge/Discussions-black?style=for-the-badge&logo=github)][discussion]
-
-[discussion]: https://github.com/stekolla/Cataclysm/discussions
-[docs]: docs/README.md "Project documentation"
-
 ## Frequently Asked Questions
 
 #### Is there a tutorial?

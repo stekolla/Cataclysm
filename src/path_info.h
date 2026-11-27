@@ -57,7 +57,6 @@ std::string mods_dev_default();
 std::string mods_user_default();
 std::string soundpack_conf();
 
-std::string credits();
 std::string title( holiday current_holiday );
 std::string names();
 
