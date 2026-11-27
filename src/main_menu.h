@@ -22,8 +22,6 @@ class main_menu
     private:
         // ASCII art that says "Cataclysm Dark Days Ahead"
         std::vector<std::string> mmenu_title;
-        std::string mmenu_credits;
-        int mmenu_credits_len;
         std::vector<std::string> vMenuItems;
         std::vector<std::string> vWorldSubItems;
         std::vector<std::string> vNewGameSubItems;
@@ -97,11 +95,9 @@ class main_menu
          * @param iSel which index in vMenuItems is selected
          * @param offset Menu location in window
          */
-        void print_menu( const catacurses::window &w_open, int iSel, const point &offset, int sel_line );
+        void print_menu( const catacurses::window &w_open, int iSel, const point &offset );
 
-        void display_text( const std::string &text, const std::string &title, int &selected );
-
-        void display_sub_menu( int sel, const point &bottom_left, int sel_line );
+        void display_sub_menu( int sel, const point &bottom_left );
 
         void init_windows();
 

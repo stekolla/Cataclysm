@@ -58,7 +58,6 @@ enum class main_menu_opts : int {
     WORLD,
     SETTINGS,
     HELP,
-    CREDITS,
     QUIT
 };
 static constexpr auto max_menu_opts = static_cast<int>( main_menu_opts::QUIT );
@@ -181,16 +180,13 @@ std::vector<int> main_menu::print_menu_items( const catacurses::window &w_in,
     return ret;
 }
 
-void main_menu::display_sub_menu( int sel, const point &bottom_left, int sel_line )
+void main_menu::display_sub_menu( int sel, const point &bottom_left )
 {
     main_menu_sub_button_map.clear();
     std::vector<std::string> sub_opts;
     int xlen = 0;
     main_menu_opts sel_o = static_cast<main_menu_opts>( sel );
     switch( sel_o ) {
-        case main_menu_opts::CREDITS:
-            display_text( mmenu_credits, _( "Credits" ), sel_line );
-            return;
         case main_menu_opts::SETTINGS:
             for( int i = 0; static_cast<size_t>( i ) < vSettingsSubItems.size(); ++i ) {
                 nc_color clr = i == sel2 ? hilite( c_yellow ) : c_yellow;
@@ -286,8 +282,7 @@ void main_menu::display_sub_menu( int sel, const point &bottom_left, int sel_lin
     wnoutrefresh( w_sub );
 }
 
-void main_menu::print_menu( const catacurses::window &w_open, int iSel, const point &offset,
-                            int sel_line )
+void main_menu::print_menu( const catacurses::window &w_open, int iSel, const point &offset )
 {
     main_menu_button_map.clear();
 
@@ -393,7 +388,7 @@ void main_menu::print_menu( const catacurses::window &w_open, int iSel, const po
 
     const point p_offset( catacurses::getbegx( w_open ), catacurses::getbegy( w_open ) );
 
-    display_sub_menu( iSel, p_offset + point( offsets[iSel], offset.y - 3 ), sel_line );
+    display_sub_menu( iSel, p_offset + point( offsets[iSel], offset.y - 3 ) );
 }
 
 std::vector<std::string> main_menu::load_file( const std::string &path,
@@ -450,22 +445,6 @@ void main_menu::init_strings()
     // ASCII Art
     mmenu_title = load_file( PATH_INFO::title( current_holiday ), _( "Cataclysm: Fault Lines" ) );
 
-    // Credits
-    mmenu_credits.clear();
-    read_from_file( PATH_INFO::credits(), [&]( std::istream & stream ) {
-        std::string line;
-        while( std::getline( stream, line ) ) {
-            if( line[0] != '#' ) {
-                mmenu_credits += ( line.empty() ? " " : line ) + "\n";
-            }
-        }
-    }, true );
-
-    if( mmenu_credits.empty() ) {
-        mmenu_credits = _( "No credits information found." );
-    }
-    mmenu_credits_len = foldstring( mmenu_credits, FULL_SCREEN_WIDTH - 2 ).size();
-
     // fill menu with translated menu items
     vMenuItems.clear();
     vMenuItems.emplace_back( pgettext( "Main Menu", "<N|n>ew Game" ) );
@@ -473,7 +452,6 @@ void main_menu::init_strings()
     vMenuItems.emplace_back( pgettext( "Main Menu", "<W|w>orld" ) );
     vMenuItems.emplace_back( pgettext( "Main Menu", "Se<t|T>tings" ) );
     vMenuItems.emplace_back( pgettext( "Main Menu", "H<e|E|?>lp" ) );
-    vMenuItems.emplace_back( pgettext( "Main Menu", "<C|c>redits" ) );
     vMenuItems.emplace_back( pgettext( "Main Menu", "<Q|q>uit" ) );
 
     // new game menu items
@@ -543,32 +521,6 @@ void main_menu::init_strings()
     }
 
     vdaytip = get_random_tip_of_the_day();
-}
-
-void main_menu::display_text( const std::string &text, const std::string &title, int &selected )
-{
-    const int w_open_height = getmaxy( w_open );
-    const int b_height = FULL_SCREEN_HEIGHT - clamp( ( FULL_SCREEN_HEIGHT - w_open_height ) + 4, 0, 4 );
-    const int vert_off = clamp( ( w_open_height - FULL_SCREEN_HEIGHT ) / 2, getbegy( w_open ), TERMY );
-
-    catacurses::window w_border = catacurses::newwin( b_height, FULL_SCREEN_WIDTH,
-                                  point( clamp( ( TERMX - FULL_SCREEN_WIDTH ) / 2, 0, TERMX ), vert_off ) );
-
-    catacurses::window w_text = catacurses::newwin( b_height - 2, FULL_SCREEN_WIDTH - 2,
-                                point( 1 + clamp( ( TERMX - FULL_SCREEN_WIDTH ) / 2, 0, TERMX ), 1 + vert_off ) );
-
-    draw_border( w_border, BORDER_COLOR, title );
-
-    int width = FULL_SCREEN_WIDTH - 2;
-    int height = b_height - 2;
-    const auto vFolded = foldstring( text, width );
-    int iLines = vFolded.size();
-
-    fold_and_print_from( w_text, point_zero, width, selected, c_light_gray, text );
-
-    draw_scrollbar( w_border, selected, height, iLines, point_south, BORDER_COLOR, true );
-    wnoutrefresh( w_border );
-    wnoutrefresh( w_text );
 }
 
 void main_menu::load_char_templates()
@@ -666,8 +618,6 @@ bool main_menu::opening_screen()
     avatar &player_character = get_avatar();
     player_character = avatar();
 
-    int sel_line = 0;
-
     // Make [Load Game] the default cursor position if there's game save available
     if( !world_generator->all_worldnames().empty() ) {
         sel1 = getopt( main_menu_opts::LOADCHAR );
@@ -678,7 +628,7 @@ bool main_menu::opening_screen()
 
     ui_adaptor ui;
     ui.on_redraw( [&]( const ui_adaptor & ) {
-        print_menu( w_open, sel1, menu_offset, sel_line );
+        print_menu( w_open, sel1, menu_offset );
     } );
     ui.on_screen_resize( [this]( ui_adaptor & ui ) {
         init_windows();
@@ -701,7 +651,6 @@ bool main_menu::opening_screen()
                 if( sInput.text == hotkey && sel1 != i ) {
                     sel1 = i;
                     sel2 = i == getopt( main_menu_opts::LOADCHAR ) ? last_world_pos : 0;
-                    sel_line = 0;
                     if( i == getopt( main_menu_opts::HELP ) ) {
                         action = "CONFIRM";
                     } else if( i == getopt( main_menu_opts::QUIT ) ) {
@@ -738,7 +687,6 @@ bool main_menu::opening_screen()
                 return false;
             }
         } else if( action == "LEFT" || action == "PREV_TAB" ) {
-            sel_line = 0;
             if( sel1 > 0 ) {
                 sel1--;
             } else {
@@ -747,7 +695,6 @@ bool main_menu::opening_screen()
             sel2 = sel1 == getopt( main_menu_opts::LOADCHAR ) ? last_world_pos : 0;
             on_move();
         } else if( action == "RIGHT" || action == "NEXT_TAB" ) {
-            sel_line = 0;
             if( sel1 < max_menu_opts ) {
                 sel1++;
             } else {
@@ -762,18 +709,6 @@ bool main_menu::opening_screen()
             int min_item_val = 0;
             main_menu_opts opt = static_cast<main_menu_opts>( sel1 );
             switch( opt ) {
-                case main_menu_opts::CREDITS:
-                    if( action == "UP" || action == "PAGE_UP" || action == "SCROLL_UP" ) {
-                        if( sel_line > 0 ) {
-                            sel_line--;
-                        }
-                    } else if( action == "DOWN" || action == "PAGE_DOWN" || action == "SCROLL_DOWN" ) {
-                        int effective_height = sel_line + FULL_SCREEN_HEIGHT - 2;
-                        if( effective_height < mmenu_credits_len ) {
-                            sel_line++;
-                        }
-                    }
-                    break;
                 case main_menu_opts::LOADCHAR:
                     max_item_count = world_generator->all_worldnames().size();
                     break;
@@ -848,7 +783,6 @@ bool main_menu::opening_screen()
                         start_new = true;
                     }
                     break;
-                case main_menu_opts::CREDITS:
                 default:
                     break;
             }
