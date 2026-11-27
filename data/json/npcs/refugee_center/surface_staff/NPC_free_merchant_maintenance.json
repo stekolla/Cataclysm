@@ -2,7 +2,9 @@
   {
     "type": "npc",
     "id": "evac_maintenance_lead",
+    "name_unique": "Mara Velez",
     "name_suffix": "Maintenance Lead",
+    "gender": "female",
     "class": "NC_PROF_NEIGHBORHOOD_MECHANIC",
     "attitude": 0,
     "mission": 7,
@@ -13,7 +15,7 @@
   {
     "type": "talk_topic",
     "id": "TALK_EVAC_MAINTENANCE_LEAD",
-    "dynamic_line": "I keep the lights and water running around here.  What can I do for you?",
+    "dynamic_line": "Mara Velez.  I keep the lights and water running around here.  What can I do for you?",
     "responses": [
       {
         "text": "Do you need a hand with maintenance?",
@@ -25,8 +27,22 @@
         "topic": "TALK_MISSION_LIST_ASSIGNED",
         "condition": "has_assigned_mission"
       },
+      { "text": "How did you get into maintenance?", "topic": "TALK_EVAC_MAINTENANCE_BACKGROUND" },
+      { "text": "What's the hardest thing to keep running?", "topic": "TALK_EVAC_MAINTENANCE_REPAIRS" },
       { "text": "I'll leave you to it.", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_MAINTENANCE_BACKGROUND",
+    "dynamic_line": "I did maintenance for the school district.  The oldest building still had hand-lettered tags on the pipes, and half of them were wrong.  I got used to tracing things myself.  My first week here I spent more time finding shutoff valves than sleeping.",
+    "responses": [ { "text": "Can I ask you something else?", "topic": "TALK_EVAC_MAINTENANCE_LEAD" } ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_MAINTENANCE_REPAIRS",
+    "dynamic_line": "The plumbing.  A blown light can wait.  A leak in a washroom turns into a line down the hall by breakfast.  If you see water where it doesn't belong, I'd rather hear about it early.",
+    "responses": [ { "text": "I'll keep an eye out.", "topic": "TALK_EVAC_MAINTENANCE_LEAD" } ]
   },
   {
     "id": "MISSION_FREE_MERCHANTS_EVAC_4",

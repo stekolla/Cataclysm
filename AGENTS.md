@@ -86,6 +86,9 @@ If a mistake is found during a task, update AGENTS.md or the skill and fix the c
 
 ## Data and Review
 
+- Keep named quest givers and their mission definitions in dedicated NPC files. Use shared dialogue
+  topics for responses shared with generic NPCs.
+
 - Keep unsaved moves available for manual retry after failed autosaves, and rate-limit automatic retries.
 
 - Digital files keep at least 1 ml volume; zero-volume items are rejected, including scanned books.

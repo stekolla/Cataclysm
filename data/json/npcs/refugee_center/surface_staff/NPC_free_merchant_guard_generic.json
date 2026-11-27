@@ -11,19 +11,6 @@
     "faction": "free_merchants"
   },
   {
-    "type": "npc",
-    "id": "evac_security_chief",
-    "name_unique": "Milton Lang",
-    "name_suffix": "Security Chief",
-    "gender": "male",
-    "class": "NC_BOUNTY_HUNTER",
-    "attitude": 0,
-    "mission": 8,
-    "chat": "TALK_EVAC_SECURITY_CHIEF",
-    "faction": "free_merchants",
-    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_1"
-  },
-  {
     "type": "talk_topic",
     "id": [ "TALK_GUARD", "TALK_EVAC_SECURITY_CHIEF" ],
     "responses": [
@@ -56,9 +43,16 @@
       }
     ],
     "responses": [
+      { "text": "Who should I talk to if I'm looking for work?", "topic": "TALK_GUARD_FM_STAFF" },
       { "text": "How did you get saddled with guard duty?", "topic": "TALK_GUARD_FM_BACKGROUND" },
       { "text": "Don't mind me…", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_GUARD_FM_STAFF",
+    "dynamic_line": "For trade work, ask Owen Mercer at the front.  Ruth Calder handles food and supplies in the back.  Milton Lang runs security by the back bay, and Mara Velez handles maintenance from the big office with the long table.",
+    "responses": [ { "text": "Thanks for the directions.", "topic": "TALK_GUARD" } ]
   },
   {
     "type": "talk_topic",
@@ -84,55 +78,5 @@
     ],
     "speaker_effect": { "effect": { "npc_add_var": "cleanup_asked", "type": "mission", "context": "Boris_mission_1", "value": "yes" } },
     "responses": [ { "text": "Well, thanks anyway.", "topic": "TALK_DONE" } ]
-  },
-  {
-    "type": "talk_topic",
-    "id": "TALK_EVAC_SECURITY_CHIEF",
-    "dynamic_line": "Milton Lang.  I run security for the center.  Keep civil and stay out of the sealed bay unless we have business there.",
-    "responses": [
-      { "text": "Do you need help with security?", "topic": "TALK_MISSION_LIST", "condition": "has_available_mission" },
-      { "text": "About the back bay…", "topic": "TALK_MISSION_LIST_ASSIGNED", "condition": "has_assigned_mission" },
-      { "text": "I'll let you get back to it.", "topic": "TALK_DONE" }
-    ]
-  },
-  {
-    "id": "MISSION_FREE_MERCHANTS_EVAC_1",
-    "type": "mission_definition",
-    "name": { "str": "Clear Back Bay" },
-    "description": "Clear out the barricaded back area in the refugee center and lay the former leader of the Free Merchants to rest, in exchange for the local currency: Free Merchant certified notes.",
-    "goal": "MGOAL_KILL_MONSTERS",
-    "difficulty": 2,
-    "value": 50000,
-    "start": {
-      "assign_mission_target": { "om_terrain": "evac_center_9", "reveal_radius": 1 },
-      "update_mapgen": {
-        "om_terrain": "evac_center_9",
-        "place_monster": [ { "group": "GROUP_REFUGEE_BOSS_ZOMBIE", "x": [ 10, 10 ], "y": [ 10, 10 ], "target": true } ],
-        "place_monsters": [ { "monster": "GROUP_REFUGEE_CENTER_BACK_ROOM", "x": [ 2, 15 ], "y": [ 4, 20 ], "density": 0.6, "target": true } ]
-      }
-    },
-    "end": {
-      "effect": [
-        { "u_buy_item": "FMCNote", "count": 25 },
-        { "u_add_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" },
-        { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 3 }
-      ],
-      "update_mapgen": {
-        "om_terrain": "evac_center_9",
-        "set": [ { "square": "terrain", "id": "t_floor", "x": 0, "y": 23, "x2": 1, "y2": 23 } ]
-      }
-    },
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "I need someone to clear out the dead in the back bay.  Fearful of going outside during the first days of the Cataclysm we ended up throwing our dead and the zombies we managed to kill in the sealed back bay.  Our promising leader at the time even fell… he turned into something different.  Kill all of them and make sure they won't bother us again.  We can't pay much, besides some of our own internal money which isn't good for that much yet, but it would help us to reclaim the bay.",
-      "accepted": "Please be careful, we don't need any more deaths.",
-      "rejected": "Come back if you change your mind.  We need that bay secured.",
-      "advice": "If you can, get a friend or two to help you.",
-      "inquire": "Will they be bothering us any longer?",
-      "success": "Thank you, having that big of a threat close to home was nerve wracking.  Here's some of our local certified notes, we've been paying these to our workers in exchange for supplies.  They're getting some value in the center as a trade item, I'm afraid they're all we have to spare at the moment.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    }
   }
 ]

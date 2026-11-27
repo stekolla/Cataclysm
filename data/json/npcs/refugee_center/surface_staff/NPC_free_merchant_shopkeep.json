@@ -3,7 +3,9 @@
     "type": "npc",
     "id": "evac_merchant",
     "//": "Appears in the refugee center as shopkeeper with missions.  Faction critical.",
+    "name_unique": "Owen Mercer",
     "name_suffix": "Merchant",
+    "gender": "male",
     "class": "NC_EVAC_SHOPKEEP",
     "attitude": 0,
     "mission": 3,
@@ -298,7 +300,7 @@
   {
     "id": "TALK_EVAC_MERCHANT_STAFF",
     "type": "talk_topic",
-    "dynamic_line": "I handle trade and deals with people outside the center.  Talk to Milton Lang, our security chief, by the back bay.  The quartermaster in the back handles food and supplies.  Ask the maintenance lead about repairs and power.  You'll find them in the big office with the long table.",
+    "dynamic_line": "I handle trade and deals with people outside the center.  Talk to Milton Lang, our security chief, by the back bay.  Ruth Calder, the quartermaster in the back, handles food and supplies.  Ask Mara Velez about repairs and power.  You'll find her in the big office with the long table.",
     "responses": [ { "text": "Thanks.  Can I ask you something else?", "topic": "TALK_EVAC_MERCHANT" } ]
   },
   {

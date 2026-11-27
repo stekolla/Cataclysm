@@ -122,26 +122,33 @@ TEST_CASE("npc_talk_describe_mission", "[npc_talk]") {
     CHECK(d_line == "I'm looking for wounded to help.");
 }
 
-/// Open each staff member's work menu on a fresh NPC to check independent offers and follow-ups.
+/// Spawn each staff member to verify their fixed name and the mission chain in their work menu.
 TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     struct staff_missions {
         const char* npc_id;
+        const char* name;
         const char* first_offer;
         mission_type_id follow_up = mission_type_id::NULL_ID();
     };
     const auto expected = GENERATE(
         staff_missions{
             .npc_id = "evac_merchant",
+            .name = "Owen Mercer, Merchant",
             .first_offer = "MISSION_FREE_MERCHANTS_EVAC_2",
             .follow_up = mission_type_id("MISSION_FREE_MERCHANTS_EVAC_3")},
         staff_missions{
             .npc_id = "evac_broker",
+            .name = "Ruth Calder, Quartermaster",
             .first_offer = "MISSION_FREE_MERCHANTS_EVAC_5",
             .follow_up = mission_type_id("MISSION_BROKER_1")},
         staff_missions{
-            .npc_id = "evac_security_chief", .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1"},
+            .npc_id = "evac_security_chief",
+            .name = "Milton Lang, Security Chief",
+            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1"},
         staff_missions{
-            .npc_id = "evac_maintenance_lead", .first_offer = "MISSION_FREE_MERCHANTS_EVAC_4"});
+            .npc_id = "evac_maintenance_lead",
+            .name = "Mara Velez, Maintenance Lead",
+            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_4"});
     CAPTURE(expected.npc_id);
     g->faction_manager_ptr->create_if_needed();
     auto staff = npc();
@@ -153,6 +160,7 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     });
 
     auto d = dialogue();
+    CHECK(staff.name == expected.name);
     d.alpha = &get_avatar();
     d.beta = &staff;
     d.gen_responses(talk_topic(staff.chatbin.first_topic));
@@ -168,6 +176,32 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     CHECK(offered.get_npc_id() == staff.getID());
     CHECK(offered.get_type().id == mission_type_id(expected.first_offer));
     CHECK(offered.get_follow_up() == expected.follow_up);
+}
+
+/// Ask a generic guard for work to check that their referral names all four staff members.
+TEST_CASE("refugee_center_guards_direct_players_to_staff", "[npc_talk]") {
+    g->faction_manager_ptr->create_if_needed();
+    auto guard = npc();
+    guard.load_npc_template(string_id<npc_template>("guard"));
+    const auto remove_guard = on_out_of_scope([&guard] {
+        if (auto* guard_faction = guard.get_faction()) {
+            guard_faction->remove_member(guard.getID());
+        }
+    });
+
+    auto d = dialogue();
+    d.alpha = &get_avatar();
+    d.beta = &guard;
+    const auto referral = talk_topic("TALK_GUARD_FM_STAFF");
+    d.gen_responses(talk_topic(guard.chatbin.first_topic));
+    REQUIRE(std::ranges::any_of(d.responses, [&referral](const auto& response) {
+        return response.success.next_topic.id == referral.id;
+    }));
+    const auto directions = d.dynamic_line(referral);
+    CHECK(directions.contains("Owen Mercer"));
+    CHECK(directions.contains("Ruth Calder"));
+    CHECK(directions.contains("Milton Lang"));
+    CHECK(directions.contains("Mara Velez"));
 }
 
 TEST_CASE("npc_talk_stats", "[npc_talk]") {
