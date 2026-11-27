@@ -92,5 +92,8 @@ If a mistake is found during a task, update AGENTS.md or the skill and fix the c
 - Keep unsaved moves available for manual retry after failed autosaves, and rate-limit automatic retries.
 
 - Digital files keep at least 1 ml volume; zero-volume items are rejected, including scanned books.
+- For standalone item groups, use `[ "item_id", weight ]` entries in `items`. When a mission
+  needs multiple physical tools, verify that its goal counts the tools themselves. Item goals and
+  dialogue inventory conditions can accept tool charges as quantities.
 - When generated or pulled files stop being tracked, verify ignore rules (`git status --ignored` or run the generator) and that every CI and release consumer still gets them.
 - References: [Code Style](./docs/en/dev/explanation/code_style.md), [Building](./docs/en/dev/guides/building/cmake.md), [Formatting](./docs/en/dev/guides/formatting.md), [Dev Index](./docs/en/dev/), [LLM Review Guide](./.github/llm_review_guide.md). Use `_( "text" )` for user-facing strings.

@@ -10,15 +10,52 @@
     "mission": 8,
     "chat": "TALK_EVAC_SECURITY_CHIEF",
     "faction": "free_merchants",
-    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_1"
+    "mission_offered": [ "MISSION_FREE_MERCHANTS_EVAC_1", "MISSION_EVAC_SECURITY_INCIDENT_REPORTS" ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_EVAC_SECURITY_CHIEF",
-    "dynamic_line": "Milton Lang.  I run security for the center.  Keep civil and stay out of the sealed bay unless we have business there.",
+    "dynamic_line": {
+      "u_has_var": "evac_security_approach",
+      "type": "mission",
+      "context": "flag",
+      "value": "yes",
+      "yes": "The approach is safer now.  Traders can get to our doors without passing that pack.  For bigger threats farther out, talk to the Old Guard representative.",
+      "no": {
+        "u_has_var": "FMShopkeep_Mission1",
+        "type": "mission",
+        "context": "flag",
+        "value": "yes",
+        "yes": "Milton Lang.  I run security for the center.  We've got the back bay under control.  What do you need?",
+        "no": "Milton Lang.  I run security for the center.  Keep civil and stay out of the sealed bay unless we have business there."
+      }
+    },
     "responses": [
-      { "text": "Do you need help with security?", "topic": "TALK_MISSION_LIST", "condition": "has_available_mission" },
-      { "text": "About the back bay…", "topic": "TALK_MISSION_LIST_ASSIGNED", "condition": "has_assigned_mission" },
+      {
+        "text": "Do you need help with security?",
+        "topic": "TALK_MISSION_LIST",
+        "condition": { "not": "has_no_available_mission" }
+      },
+      {
+        "text": "About the work you gave me…",
+        "topic": "TALK_MISSION_LIST_ASSIGNED",
+        "condition": { "or": [ "has_assigned_mission", "has_many_assigned_missions" ] }
+      },
+      {
+        "text": "I have equipment for the guards.",
+        "topic": "TALK_EVAC_SECURITY_RADIO_CHECK_DELIVERY",
+        "condition": {
+          "and": [
+            { "u_has_mission": "MISSION_EVAC_SECURITY_RADIO_CHECK" },
+            {
+              "or": [
+                { "not": { "u_compare_var": "evac_security_radios", "op": ">=", "value": 2 } },
+                { "not": { "u_compare_var": "evac_security_flashlights", "op": ">=", "value": 2 } }
+              ]
+            }
+          ]
+        }
+      },
       { "text": "How did you end up running security?", "topic": "TALK_EVAC_SECURITY_CHIEF_BACKGROUND" },
       { "text": "What should I know while I'm here?", "topic": "TALK_EVAC_SECURITY_CHIEF_RULES" },
       { "text": "I'll let you get back to it.", "topic": "TALK_DONE" }
@@ -44,6 +81,8 @@
     "goal": "MGOAL_KILL_MONSTERS",
     "difficulty": 2,
     "value": 50000,
+    "has_generic_rewards": false,
+    "followup": "MISSION_EVAC_SECURITY_RADIO_CHECK",
     "start": {
       "assign_mission_target": { "om_terrain": "evac_center_9", "reveal_radius": 1 },
       "update_mapgen": {
@@ -75,5 +114,128 @@
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     }
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_SECURITY_RADIO_CHECK_DELIVERY",
+    "dynamic_line": "I'll log each piece as it comes in.  Two radios and two lights, one of each for each post.",
+    "responses": [
+      {
+        "text": "Here's a two-way radio.",
+        "topic": "TALK_EVAC_SECURITY_RADIO_CHECK_DELIVERY",
+        "condition": {
+          "and": [ { "u_has_item": "two_way_radio" }, { "not": { "u_compare_var": "evac_security_radios", "op": ">=", "value": 2 } } ]
+        },
+        "effect": [ { "u_sell_item": "two_way_radio" }, { "u_adjust_var": "evac_security_radios", "adjustment": 1 } ]
+      },
+      {
+        "text": "Here's a flashlight.",
+        "topic": "TALK_EVAC_SECURITY_RADIO_CHECK_DELIVERY",
+        "condition": {
+          "and": [ { "u_has_item": "flashlight" }, { "not": { "u_compare_var": "evac_security_flashlights", "op": ">=", "value": 2 } } ]
+        },
+        "effect": [ { "u_sell_item": "flashlight" }, { "u_adjust_var": "evac_security_flashlights", "adjustment": 1 } ]
+      },
+      { "text": "That's all for now.", "topic": "TALK_EVAC_SECURITY_CHIEF" }
+    ]
+  },
+  {
+    "id": "MISSION_EVAC_SECURITY_RADIO_CHECK",
+    "type": "mission_definition",
+    "name": { "str": "Radio Check" },
+    "description": "Bring Milton Lang two two-way radios and two flashlights for the Refugee Center guards.",
+    "goal": "MGOAL_CONDITION",
+    "goal_condition": {
+      "and": [
+        { "u_compare_var": "evac_security_radios", "op": ">=", "value": 2 },
+        { "u_compare_var": "evac_security_flashlights", "op": ">=", "value": 2 }
+      ]
+    },
+    "difficulty": 1,
+    "value": 0,
+    "has_generic_rewards": false,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_EVAC_SECURITY_APPROACH",
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 10 } },
+    "dialogue": {
+      "describe": "I need equipment for the guards.",
+      "offer": "Now that the bay's clear, I can split the night watch between the doors.  I need two working two-way radios so the guards can talk, and two flashlights so they can see what they're talking about.  Ten Certified Notes for the lot.",
+      "accepted": "One radio and one light for each post.  Bring them to me as you find them.",
+      "rejected": "We'll keep sending someone down the hall with messages.",
+      "advice": "Try electronics stores for the radios.  Check hardware stores or houses for the flashlights.",
+      "inquire": "Did you find both radios and both flashlights?",
+      "success": "That's enough for both posts.  I'll run a radio check at shift change.",
+      "success_lie": "I need enough to equip both posts.",
+      "failure": "I'll keep a runner on the roster."
+    }
+  },
+  {
+    "id": "MISSION_EVAC_SECURITY_APPROACH",
+    "type": "mission_definition",
+    "name": { "str": "Secure the Approach" },
+    "description": "Eliminate the zombies in the marked field near the Refugee Center so scavengers and traders can reach it safely.",
+    "goal": "MGOAL_KILL_MONSTERS",
+    "difficulty": 2,
+    "value": 0,
+    "has_generic_rewards": false,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "start": {
+      "assign_mission_target": { "om_terrain": "refctr_field", "origin_npc": true, "z": 0, "min_distance": 3, "search_range": 4, "reveal_radius": 1 },
+      "update_mapgen": {
+        "place_monster": [
+          { "monster": "mon_zombie", "x": 4, "y": 4, "target": true },
+          { "monster": "mon_zombie", "x": 8, "y": 4, "target": true },
+          { "monster": "mon_zombie", "x": 4, "y": 8, "target": true },
+          { "monster": "mon_zombie", "x": 8, "y": 8, "target": true }
+        ]
+      }
+    },
+    "end": {
+      "effect": [
+        { "u_buy_item": "FMCNote", "count": 30 },
+        { "u_add_var": "evac_security_approach", "type": "mission", "context": "flag", "value": "yes" }
+      ]
+    },
+    "dialogue": {
+      "describe": "The watch spotted a few dead out in the field.",
+      "offer": "One of the guards called in a small pack in a field near the center.  They're close enough to catch a trader coming in with a load.  Clear the pack and I'll pay you thirty Certified Notes.",
+      "accepted": "I've marked the field on your map.  I'll keep the guards on the doors.",
+      "rejected": "I'll tell the watch to warn anyone headed that way.",
+      "advice": "There's room to move in the field.  Use it to draw them apart.",
+      "inquire": "Is the field clear?",
+      "success": "Good.  The scavengers and traders have a safer way in now.  If you're looking to deal with threats farther out, ask the Old Guard representative.",
+      "success_lie": "I need the whole pack cleared.",
+      "failure": "I'll warn people to give that field a wide berth."
+    }
+  },
+  {
+    "id": "MISSION_EVAC_SECURITY_INCIDENT_REPORTS",
+    "type": "mission_definition",
+    "name": { "str": "Incident Reports" },
+    "description": "Bring Milton Lang four pens so the guards can write their incident reports.",
+    "goal": "MGOAL_FIND_ITEM_GROUP",
+    "item_group": "evac_security_incident_report_pens",
+    "count": 4,
+    "difficulty": 1,
+    "value": 0,
+    "has_generic_rewards": false,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } },
+    "dialogue": {
+      "describe": "I've got a paperwork problem.",
+      "offer": "Every time I ask for an incident report, somebody's lost a pen.  Bring me four pens.  Two Certified Notes if it gets me through a shift without hearing that excuse.",
+      "accepted": "I'll put the forms out.  They've never managed to lose those.",
+      "rejected": "I'll see if anyone remembers how to borrow one.",
+      "advice": "Check desks.  That's where ours are supposed to be.",
+      "inquire": "Did you find four pens?",
+      "success": "Four pens.  I'll see how long it takes them to run out of paper.",
+      "success_lie": "Four pens.  I can count them myself.",
+      "failure": "I'll keep taking the reports out loud."
+    }
+  },
+  {
+    "type": "item_group",
+    "id": "evac_security_incident_report_pens",
+    "items": [ [ "pen", 100 ] ]
   }
 ]

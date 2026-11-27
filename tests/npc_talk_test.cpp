@@ -130,6 +130,7 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         const char* first_offer;
         mission_type_id follow_up = mission_type_id::NULL_ID();
         const char* side_offer = nullptr;
+        mission_type_id final_offer = mission_type_id::NULL_ID();
     };
     const auto expected = GENERATE(
         staff_missions{
@@ -145,13 +146,17 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         staff_missions{
             .npc_id = "evac_security_chief",
             .name = "Milton Lang, Security Chief",
-            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1"},
+            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1",
+            .follow_up = mission_type_id("MISSION_EVAC_SECURITY_RADIO_CHECK"),
+            .side_offer = "MISSION_EVAC_SECURITY_INCIDENT_REPORTS",
+            .final_offer = mission_type_id("MISSION_EVAC_SECURITY_APPROACH")},
         staff_missions{
             .npc_id = "evac_maintenance_lead",
             .name = "Mara Velez, Maintenance Lead",
             .first_offer = "MISSION_EVAC_MAINTENANCE_SUPPLIES",
             .follow_up = mission_type_id("MISSION_EVAC_MAINTENANCE_PUMP"),
-            .side_offer = "MISSION_EVAC_MAINTENANCE_KETTLE"});
+            .side_offer = "MISSION_EVAC_MAINTENANCE_KETTLE",
+            .final_offer = mission_type_id("MISSION_FREE_MERCHANTS_EVAC_4")});
     CAPTURE(expected.npc_id);
     g->faction_manager_ptr->create_if_needed();
     auto staff = npc();
@@ -187,7 +192,9 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     if (expected.side_offer != nullptr) {
         check_offer(mission_type_id(expected.side_offer), mission_type_id::NULL_ID());
         REQUIRE(expected.follow_up.is_valid());
-        CHECK(expected.follow_up->follow_up == mission_type_id("MISSION_FREE_MERCHANTS_EVAC_4"));
+        REQUIRE(expected.final_offer.is_valid());
+        CHECK(expected.follow_up->follow_up == expected.final_offer);
+        CHECK(expected.final_offer->follow_up.is_null());
     }
 }
 
