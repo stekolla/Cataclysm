@@ -66,6 +66,30 @@ auto quote_for(const auto& quotes, const char* type, int quantity = 1) -> int {
 
 } // namespace
 
+/// Check that the scrapper buys salvage and restocks basic goods without selling the quest reward.
+TEST_CASE("scrap_trader_salvage_stock", "[npc][trade][pricing][merchant]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto fixture = merchant_test("NPC_scrap_trader");
+    auto& [trader, player] = fixture;
+    calendar::turn += 1_days;
+    give(player, item::spawn("scrap"));
+    const auto check_stock = [&] {
+        const auto state = fixture.quotes();
+        CHECK(quote_for(state.theirs, "scrap", 60) > 0);
+        CHECK(quote_for(state.theirs, "motor_small") > 0);
+        CHECK(quote_for(state.theirs, "circuit") > 0);
+        CHECK(quote_for(state.theirs, "wrench") > 0);
+        CHECK(quote_for(state.yours, "scrap") < quote_for(state.theirs, "scrap"));
+        CHECK(line_for(state.theirs, "rebar_railgun") == state.theirs.end());
+    };
+    check_stock();
+    trader.shop_restock();
+    trader.inv_clear();
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    trader.shop_restock();
+    check_stock();
+}
+
 /// Check that a new manager can supply Tacoma's full lumber order, and that normal restocking
 /// replenishes the shop only after the cooldown.
 TEST_CASE("lumbermill_bulk_stock_and_restock", "[npc][trade][pricing][merchant]") {

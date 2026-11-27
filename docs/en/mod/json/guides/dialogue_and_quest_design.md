@@ -78,6 +78,10 @@ improve the crew's quarters, machinery, and perimeter, not the player's access t
 Tacoma's foreman can mark the mill as an optional lead; the player can still bring planks from
 any source.
 
+The Scrap Yard uses the same separation: its salvage trade is open from the start. The
+trader's two retrieval jobs place their items only at the selected warehouse and military
+helipad. The repaired rifle is a one-time quest reward, not part of the trader's stock.
+
 ## Match the reward to the job
 
 Consider the difficulty, risk, and usefulness of the work. For cash or faction currency, use the

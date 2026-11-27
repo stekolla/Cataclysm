@@ -35,6 +35,80 @@
 #include <utility>
 #include <vector>
 
+/// Accept both scrapper jobs at fixed, existing terrain types and turn in the items they place.
+TEST_CASE("scrap_trader_recovers_railgun_once", "[npc][mission][dialogue]") {
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto& trader = spawn_npc(player.bub_pos() + point(5, 0), "NPC_scrap_trader");
+    auto* faction = trader.get_faction();
+    REQUIRE(faction != nullptr);
+    const auto restore_likes = restore_on_out_of_scope(faction->likes_u);
+    const auto restore_respect = restore_on_out_of_scope(faction->respects_u);
+    const auto restore_power = restore_on_out_of_scope(faction->power);
+    auto& overmap = ACTIVE_OVERMAP_BUFFER;
+    const auto target = player.abs_omt_pos();
+    const auto previous_terrain = overmap.ter(target);
+    auto visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
+    for (auto y = -1; y <= 1; ++y) {
+        for (auto x = -1; x <= 1; ++x) {
+            const auto tile = target + point_rel_omt(x, y);
+            visibility.emplace_back(tile, overmap.seen(tile));
+        }
+    }
+    const auto restore_terrain = on_out_of_scope([&] {
+        overmap.ter_set(target, previous_terrain);
+        for (const auto& [tile, seen] : visibility) { overmap.set_seen(tile, seen); }
+    });
+
+    const auto recover =
+        [&](const char* mission_id, const char* terrain, const char* item_id, const point& offset) {
+            CAPTURE(mission_id);
+            overmap.ter_set(target, oter_id(terrain));
+            REQUIRE(trader.chatbin.missions.size() == 1);
+            auto* job = trader.chatbin.missions.front();
+            REQUIRE(job->get_type().id == mission_type_id(mission_id));
+            trader.chatbin.mission_selected = job;
+            talk_function::assign_mission(trader);
+            REQUIRE(job->get_target() == target);
+            const auto spot = abs_to_bub(project_to<coords::ms>(target)) + offset;
+            auto stack = get_map().i_at(spot);
+            const auto found = std::ranges::find_if(stack, [&](const auto* it) {
+                return it->typeId() == itype_id(item_id);
+            });
+            REQUIRE(found != stack.end());
+            player.i_add(get_map().i_rem(spot, *found), false);
+            player.invalidate_crafting_inventory();
+            REQUIRE(job->is_complete(trader.getID()));
+            talk_function::mission_success(trader);
+            CHECK_FALSE(job->in_progress());
+            talk_function::mission_success(trader);
+            talk_function::clear_mission(trader);
+        };
+
+    const auto rifle = itype_id("rebar_railgun");
+    recover("MISSION_SCRAP_TRADER_SHIPMENT", "industrial_center_warehouse_north",
+            "scrap_trader_shipping_manifest", point(16, 3));
+    CHECK_FALSE(player.has_amount(rifle, 1));
+    recover("MISSION_SCRAP_TRADER_CONTROLLER", "helipad_nw_north", "scrap_trader_power_controller",
+            point(22, 13));
+    CHECK(player.amount_of(rifle) == 1);
+    CHECK(player.charges_of(itype_id("rebar_rail")) == 12);
+    CHECK(player.charges_of(itype_id("steel_rail")) == 4);
+    CHECK(player.amount_of(itype_id("UPS_off")) == 1);
+    const auto batteries = player.items_with([](const auto& it) {
+        return it.typeId() == itype_id("heavy_battery_cell");
+    });
+    REQUIRE(batteries.size() == 1);
+    CHECK(batteries.front()->ammo_remaining() == 400);
+    CHECK(trader.chatbin.missions.empty());
+}
+
 /// Check the manager's three linked jobs and the exact turn-in thresholds for their materials.
 TEST_CASE("lumbermill_mission_progression", "[npc][mission][dialogue]") {
     clear_all_state();

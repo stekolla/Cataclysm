@@ -7,6 +7,8 @@
 - Format touched files before building or testing. Do not retain unrelated formatter changes.
 - For dialogue and mission JSON, run a test that loads game data. JSON syntax checks do not
   catch definitions accidentally nested inside a response array.
+- For scripted item rewards, verify actual delivered quantities. Bare `u_buy_item` adds
+  `count - 1` to an item's default charges; a container reward uses the specified quantity.
 - Choose the smallest relevant validation route. Run one build at a time; rebuild only when
   inputs change or a failure requires it. Reuse the browser game built by the Wasm test suite
   for manual checks. If the user objects to waiting, ask before starting another long build
