@@ -28,6 +28,7 @@
 #include "map_iterator.h"
 #include "morale.h"
 #include "mutation.h"
+#include "npctrade.h"
 #include "overmap/overmapbuffer.h"
 #include "player.h"
 #include "player_activity.h"
@@ -141,7 +142,10 @@ void Character::recalc_speed_bonus()
         if( !has_trait( trait_DEBUG_STORAGE ) ) {
             // these are nontrivial calculations, store in variables so they aren't calculated multiple times.
             auto carried = cached_weight_carried();
-            auto capacity = weight_capacity();
+            const auto capacity = weight_capacity();
+            if( carried > capacity ) {
+                carried -= npc_trading::shelf_stock_weight( *this );
+            }
             if( carried > capacity ) {
                 mod_speed_bonus( -25 * ( carried - capacity ) / capacity );
             }

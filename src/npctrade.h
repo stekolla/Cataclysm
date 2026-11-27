@@ -48,6 +48,7 @@ struct trade_state {
 };
 
 auto setup_trade_state( trade_state &state, int cost, npc &np ) -> void;
+auto shelf_stock_weight( const Character &who ) -> units::mass;
 auto npc_will_accept_trade( const trade_state &state, const npc &np ) -> bool;
 auto calc_npc_owes_you( const trade_state &state, const npc &np ) -> int;
 auto update_npc_owed( const trade_state &state, npc &np ) -> void;

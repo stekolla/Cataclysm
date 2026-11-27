@@ -83,6 +83,8 @@ prices change. Owen instead uses a curated collection rolled once per restock: i
 roll. His base restock interval and the calculation for faction currency stock were unchanged.
 Check the trade list after normal inventory cleanup, especially for bulky stock. Also check that
 earlier player sales and old stock do not bypass the sale restrictions.
+For non-allied curated merchants, owned goods in the shop's catalog do not count toward
+the overburden speed penalty. Worn gear, wielded items, and non-stock inventory still count.
 
 ## Use quest rewards as purchasing-power benchmarks
 

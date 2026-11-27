@@ -66,6 +66,25 @@ auto quote_for(const auto& quotes, const char* type, int quantity = 1) -> int {
 
 } // namespace
 
+/// Bulk shelf stock should not slow the manager down, but heavy personal gear still should.
+TEST_CASE("curated_stock_does_not_slow_shopkeepers", "[npc][trade][merchant]") {
+    auto fixture = merchant_test("NPC_lumbermill_merchant");
+    auto& manager = fixture.merchant;
+    REQUIRE(manager.weight_carried() > manager.weight_capacity());
+    manager.reset_stats();
+    const auto stocked_speed = manager.get_speed();
+
+    manager.inv_clear();
+    manager.reset_stats();
+    CHECK(manager.get_speed() == stocked_speed);
+
+    while (manager.weight_carried() < manager.weight_capacity() * 2) {
+        give(manager, item::spawn("anvil"));
+    }
+    manager.reset_stats();
+    CHECK(manager.get_speed() < stocked_speed);
+}
+
 /// Check that the scrapper buys salvage and restocks basic goods without selling the quest reward.
 TEST_CASE("scrap_trader_salvage_stock", "[npc][trade][pricing][merchant]") {
     const auto restore_turn = restore_on_out_of_scope(calendar::turn);

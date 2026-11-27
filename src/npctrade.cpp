@@ -94,6 +94,27 @@ auto commercial_quote( const merchant_pricing &profile, const std::set<const ity
 
 } // namespace
 
+auto npc_trading::shelf_stock_weight( const Character &who ) -> units::mass
+{
+    const auto *trader = who.as_npc();
+    if( !trader || trader->is_player_ally() || !trader->myclass->has_curated_stock() ) {
+        return 0_gram;
+    }
+
+    const auto stock = item_group::every_possible_item_from( trader->myclass->get_shopkeeper_items() );
+    const auto *fac = trader->get_faction();
+    auto weight = 0_gram;
+    for( const auto *stack : trader->inv_const_slice() ) {
+        for( const auto *it : *stack ) {
+            if( it->is_owned_by( *trader ) &&
+                ( ( fac && it->typeId() == fac->currency ) || stock_allows( stock, *it ) ) ) {
+                weight += it->weight();
+            }
+        }
+    }
+    return weight;
+}
+
 void npc_trading::transfer_items( std::vector<item_pricing> &stuff, Character &,
                                   Character &receiver, bool npc_gives )
 {
