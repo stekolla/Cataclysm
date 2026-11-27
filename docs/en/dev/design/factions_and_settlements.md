@@ -155,6 +155,24 @@ Resolve these during faction-specific reviews rather than answering them specula
 - What commercial advantages should accrue at the Refugee Center versus at the originating specialist?
 - What, if anything, should represent wider regional cooperation in the late game beyond authored changes to individual locations?
 
+## Faction follow-ups
+
+These are priorities for future design reviews, not implementation commitments or a required
+order for players.
+
+| Faction | Potential direction | Priority |
+| --- | --- | --- |
+| **Great Library** | Preserve knowledge and put it to work rebuilding civilization. Explore quests to recover and share records, research or reference services, and relationships with communities that can use what the Library saves. | High |
+| **Isolated Artisans** | Keep them small-scale specialists in crafting, modification, and equipment. Connect their stories to other factions through shared material needs and services that complement, rather than replace, local workshops. | High |
+| **Grey Moose Militia** | Explore community-led defense and local autonomy as an alternative to the Old Guard's vision of military authority. Develop stronger ties with the Isherwood Family and show where their interests align or conflict. | Medium |
+| **Marloss Evangelists** | Explore an optional progression path centered on the occult, transformation, and otherworldly aspects of the Cataclysm, distinct from conventional military or high-technology endgame paths. | Future exploration |
+
+For each review, identify what the faction offers that others do not, who it has reason to
+cooperate or disagree with, and what those relationships let the player choose. Favor distinctive
+services, rewards, and storylines over isolated quest hubs. Reuse existing mechanics where
+practical, and keep cooperation and progression possible without requiring allegiance to a single
+faction.
+
 ## Related design guidance
 
 - [Faction and settlement design guide](../../mod/json/guides/faction_and_settlement_design.md)
