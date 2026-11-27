@@ -15,6 +15,7 @@ output directory will be created if it does not already exist.
 
 import argparse
 import json
+from io import BytesIO
 import logging
 import os
 import subprocess
@@ -24,18 +25,7 @@ from logging.config import dictConfig
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
-try:
-    vips_path = os.getenv("LIBVIPS_PATH")
-    if vips_path is not None and vips_path != "":
-        os.environ["PATH"] += f";{os.path.join(vips_path, 'bin')}"
-    import pyvips  # type: ignore
-
-    Vips = pyvips
-except ImportError:
-    import gi
-
-    gi.require_version("Vips", "8.0")  # NoQA
-    from gi.repository import Vips
+from PIL import Image, ImageCms
 
 
 # variable for silent script run (no output to terminal)
@@ -130,12 +120,6 @@ LOGGING_CONFIG = {
 }
 
 PROPERTIES_FILENAME = "tileset.txt"
-
-PNGSAVE_ARGS = {
-    "compression": 9,
-    "strip": True,
-    "filter": 8,
-}
 
 FALLBACK = {
     "file": "fallback.png",
@@ -592,7 +576,7 @@ class Tilesheet:
         self.output = tileset.output_dir.joinpath(self.name)
 
         self.tile_entries = []
-        self.null_image = Vips.Image.grey(self.sprite_width, self.sprite_height)
+        self.null_image = Image.new("RGBA", (self.sprite_width, self.sprite_height))
         self.sprites = []
 
         self.first_index = self.tileset.pngnum + 1
@@ -683,35 +667,22 @@ class Tilesheet:
             "filler" if self.is_filler else "main"
         ].append(filepath.stem)
 
-    def load_image(
-        self,
-        png_path: Union[str, Path],
-    ) -> pyvips.Image:
-        """
-        Load and verify an image using pyvips
-        """
+    def load_image(self, png_path: Union[str, Path]) -> Image.Image:
+        """Load a PNG and normalize it to sRGB with alpha."""
         try:
-            image = Vips.Image.pngload(str(png_path))
-        except pyvips.error.Error as pyvips_error:
-            raise ComposingException(
-                f"Cannot load {png_path}: {pyvips_error.message}"
-            ) from None
-        except UnicodeDecodeError:
-            raise ComposingException(
-                f"Cannot load {png_path} with UnicodeDecodeError, "
-                "please report your setup at "
-                "https://github.com/libvips/pyvips/issues/80"
-            ) from None
-        if image.interpretation != "srgb":
-            image = image.colourspace("srgb")
-
-        try:
-            if not image.hasalpha():
-                image = image.addalpha()
-            if image.get_typeof("icc-profile-data") != 0:
-                image = image.icc_transform("srgb")
-        except Vips.Error as vips_error:
-            log.error("%s: %s", png_path, vips_error)
+            with Image.open(png_path, formats=["PNG"]) as source:
+                image = source.convert("RGBA")
+                profile = source.info.get("icc_profile")
+                if profile:
+                    color = source if source.mode in {"L", "LA", "RGB", "RGBA"} else image
+                    converted = ImageCms.profileToProfile(
+                        color, BytesIO(profile), ImageCms.createProfile("sRGB"),
+                        outputMode="RGB",
+                    )
+                    converted.putalpha(image.getchannel("A"))
+                    image = converted
+        except (OSError, ImageCms.PyCMSError) as error:
+            raise ComposingException(f"Cannot load {png_path}: {error}") from error
 
         if (
             image.width != self.sprite_width
@@ -763,19 +734,20 @@ class Tilesheet:
         if self.tileset.only_json:
             return True
 
-        sheet_image = Vips.Image.arrayjoin(
-            self.sprites, across=self.sprites_across
+        rows = (len(self.sprites) + self.sprites_across - 1) // self.sprites_across
+        sheet_image = Image.new(
+            "RGBA", (self.sprites_across * self.sprite_width, rows * self.sprite_height)
         )
-
-        pngsave_args = PNGSAVE_ARGS.copy()
+        for index, sprite in enumerate(self.sprites):
+            row, column = divmod(index, self.sprites_across)
+            sheet_image.alpha_composite(sprite, (column * self.sprite_width, row * self.sprite_height))
 
         if self.tileset.palette:
-            pngsave_args["palette"] = True
-
-        sheet_image.pngsave(str(self.output), **pngsave_args)
+            sheet_image = sheet_image.quantize()
+        sheet_image.save(self.output, compress_level=9)
 
         if self.tileset.palette_copies and not self.tileset.palette:
-            sheet_image.pngsave(f"{self.output}8", palette=True, **pngsave_args)
+            sheet_image.quantize().save(f"{self.output}8", format="PNG", compress_level=9)
 
         return True
 

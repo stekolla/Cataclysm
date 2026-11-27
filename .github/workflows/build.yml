@@ -54,7 +54,7 @@ jobs:
           ref: ${{ inputs.checkout-ref }}
 
       - name: Build shared Linux build and test image
-        run: docker build --tag cataclysm-bn-build-env:emsdk-6.0.8 --file docker/Dockerfile docker/
+        run: docker build --tag cataclysm-bn-build-env:emsdk-6.0.8-python --file docker/Dockerfile docker/
 
       - name: Check build directory isolation
         run: bash build-scripts/test-run-docker.sh

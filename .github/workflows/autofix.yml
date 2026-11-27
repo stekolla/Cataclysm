@@ -10,7 +10,11 @@ on:
         "**.h",
         "**.c",
         "**.md",
-        "**.ts",
+        "**.py",
+        "scripts/requirements.txt",
+        "build-scripts/fmt.sh",
+        ".pre-commit-config.yaml",
+        ".github/workflows/autofix.yml",
         "**.lua",
       ]
   pull_request_target:
@@ -20,7 +24,7 @@ permissions:
   contents: read
 
 env:
-  DENO_DIR: /home/runner/.cache/deno
+  DPRINT_VERSION: "0.47.5"
   CLANG_FORMAT_VERSION: "22.1.8"
 
 jobs:
@@ -44,23 +48,23 @@ jobs:
       - name: Show clang-format version
         run: clang-format --version
 
-      - uses: denoland/setup-deno@v2
-        with: { cache: true }
-
-      - name: cache deno dependencies
-        uses: actions/cache@v5
+      - uses: actions/setup-python@v5
         with:
-          path: ${{ env.DENO_DIR }}
-          key: deno-${{ hashFiles('deno.lock') }}
+          python-version: "3.12"
+
+      - name: Install script and formatter dependencies
+        run: |
+          python -m pip install -r scripts/requirements.txt
+          npm install --global dprint@"$DPRINT_VERSION"
 
       - name: format C++ files
         run: build-scripts/format-cpp.sh
 
-      - name: format Markdown and TypeScript files
-        run: deno fmt
+      - name: format Markdown files
+        run: build-scripts/fmt.sh docs
 
       - name: format Lua files
-        run: deno task dprint fmt
+        run: build-scripts/fmt.sh lua
 
       - name: format JSON
         run: build-scripts/format-json.sh
@@ -94,16 +98,12 @@ jobs:
 
             If you don't do this, your following commits will be based on the old commit, and cause **MERGE CONFLICT**.
 
-      - name: lint and test typescript files
-        run: |
-          # deno lint
-          test_tmp="$(mktemp -d)"
-          trap 'rm -rf "$test_tmp"' EXIT
-          TMPDIR="$test_tmp" deno test --allow-read --allow-write="$test_tmp" --allow-run --allow-env=npm_package_config_libvips,TILESET_PYTHON --allow-ffi
+      - name: Test Python scripts
+        run: python -m unittest discover -s scripts
 
-      - name: check generated semantic PR config
+      - name: Check generated semantic PR config
         run: |
-          deno run --allow-read --allow-write scripts/semantic.ts
+          python scripts/semantic.py
           git diff --exit-code -- .github/semantic.yml
 
   lint:

@@ -58,7 +58,7 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 ## Workflow
 
 1. Issue link: fetch it with `gh`, then `git gtr new <type>/<issue-id>/<slug>` (`feat`, `fix`, `refactor`, `chore`, `build`, `ci`).
-2. Format touched files before building or testing (`build-scripts/fmt.sh cpp <files>`, `build-scripts/fmt.sh json <files>`, `deno fmt`, `deno task dprint fmt`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
+2. Format touched files before building or testing (`build-scripts/fmt.sh cpp <files>`, `build-scripts/fmt.sh json <files>`, `build-scripts/fmt.sh docs`, `build-scripts/fmt.sh lua`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
 3. Before building, finish and format related changes, then choose the smallest relevant validation
    route. Run one build at a time; do not start another build for the same change while one is
    running. Rebuild only when subsequent changes affect build inputs or a failure requires it.
@@ -74,7 +74,9 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    With native Wasm exceptions, select FreeType's `freetype-legacysjlj` port archive.
    Use JSPI for browser waits with native Wasm exceptions. Asyncify's Wasm rewriting cannot reliably combine the two.
    Keep unsaved moves available for a manual retry after failed autosaves, and rate-limit automatic retries.
-4. Add/update focused Catch2 tests in `tests/` for changed behavior. Run the relevant test route and
+4. Check migrated scripts against the original CLI output and fixtures before switching their callers.
+   Exercise staged formatting with the system Bash on macOS when changing the formatter wrapper.
+   Add/update focused Catch2 tests in `tests/` for changed behavior. Run the relevant test route and
    `./build-scripts/lint-json.sh` when JSON changes require it; do not run unrelated suites by default.
    UI regression tests follow the production refresh path; do not prepare layout or paging manually.
    For browser canvas changes, verify the running game's CSS size, backing pixels, and terminal size

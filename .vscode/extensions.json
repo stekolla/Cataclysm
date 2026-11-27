@@ -4,7 +4,6 @@
         "llvm-vs-code-extensions.vscode-clangd",
         "vadimcn.vscode-lldb",
         "tangzx.emmylua",
-        "denoland.vscode-deno",
         // Formatters
         "dprint.dprint",
         "cdda-toys.cdda-json-formatter",

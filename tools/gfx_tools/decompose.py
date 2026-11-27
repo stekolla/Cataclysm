@@ -10,13 +10,8 @@ import math
 import os
 import subprocess
 
-try:
-    import pyvips
-    Vips = pyvips
-except ImportError:
-    import gi
-    gi.require_version('Vips', '8.0')
-    from gi.repository import Vips
+from PIL import Image
+
 
 # stupid stinking Python 2 versus Python 3 syntax
 def write_to_json(pathname, data, prettify=False):
@@ -62,7 +57,8 @@ class TileSheetData(object):
         self.write_dim |= self.sprite_offset_y_retracted != self.sprite_offset_y
         self.write_dim |= self.pixelscale != 1.0
         self.ts_pathname = refs.tileset_pathname + "/" + self.ts_filename
-        self.ts_image = Vips.Image.pngload(self.ts_pathname)
+        with Image.open(self.ts_pathname, formats=["PNG"]) as image:
+            self.ts_image = image.convert("RGBA")
         self.ts_width = self.ts_image.width
         self.ts_tiles_per_row = int(math.floor(self.ts_width / self.sprite_width))
         self.ts_height = self.ts_image.height
@@ -281,11 +277,12 @@ class ExtractionData(object):
         x_index = file_index - y_index * tile_data.ts_tiles_per_row
         tile_off_x = max(0, tile_data.sprite_width * x_index)
         tile_off_y = max(0, tile_data.sprite_height * y_index)
-        tile_image = tile_data.ts_image.extract_area(tile_off_x, tile_off_y,
-                                                     tile_data.sprite_width,
-                                                     tile_data.sprite_height)
+        tile_image = tile_data.ts_image.crop((
+            tile_off_x, tile_off_y,
+            tile_off_x + tile_data.sprite_width, tile_off_y + tile_data.sprite_height,
+        ))
         tile_png_pathname = f"{self.subdir_pathname}/{pngname}.png"
-        tile_image.pngsave(tile_png_pathname)
+        tile_image.save(tile_png_pathname)
         refs.extracted_pngnums[png_index] = True
 
     def write_images(self, refs):
@@ -411,7 +408,7 @@ class PngRefs(object):
 args = argparse.ArgumentParser(description="Split a tileset's tile_config.json into a directory per tile containing the tile data and png.")
 args.add_argument("tileset_dir", action="store",
                   help="local name of the tileset directory")
-args.add_argument("--delete_file", dest="del_path", action="store",
+args.add_argument("--delete-file", "--delete_file", dest="del_path", action="store",
                   help="local name of file containing lists of ranges of indices to delete")
 argsDict = vars(args.parse_args())
 

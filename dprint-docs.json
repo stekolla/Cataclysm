@@ -1,0 +1,19 @@
+{
+  "includes": [
+    "*.md",
+    "scripts/**/*.md",
+    "build-scripts/**/*.md",
+    ".agents/**/*.md",
+    "docs/**/*.md",
+    ".github/**/*.md"
+  ],
+  "lineWidth": 100,
+  "markdown": {
+    "textWrap": "maintain",
+    "emphasisKind": "underscores",
+    "strongKind": "asterisks"
+  },
+  "plugins": [
+    "https://plugins.dprint.dev/markdown-0.29.0.wasm"
+  ]
+}

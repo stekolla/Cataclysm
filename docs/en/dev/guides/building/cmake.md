@@ -2,7 +2,7 @@
 
 Cataclysm is built for desktop browsers with Emscripten and WebAssembly. Native game
 builds are not supported. The repository's Docker environment provides the pinned Emscripten SDK,
-Linux test toolchain, Deno, and headless Chromium.
+Linux test toolchain, Python, and headless Chromium.
 
 ## Requirements
 

@@ -50,28 +50,18 @@ if [[ "$mode" == json ]]; then
 fi
 
 if [[ "$mode" == docs ]]; then
-    deno fmt
+    dprint fmt --config dprint-docs.json
     exit 0
 fi
 
 if [[ "$mode" == lua ]]; then
-    deno task dprint fmt
+    dprint fmt
     exit 0
 fi
 
 cpp_files=()
 json_files=()
 stage_files=()
-
-append_stage_file() {
-    local file="$1"
-    for staged in "${stage_files[@]}"; do
-        if [[ "$staged" == "$file" ]]; then
-            return
-        fi
-    done
-    stage_files+=( "$file" )
-}
 
 if [[ "$mode" == staged ]]; then
     while IFS= read -r -d '' file; do
@@ -83,35 +73,35 @@ if [[ "$mode" == staged ]]; then
         case "$file" in
             *.cpp|*.h|*.hpp)
                 cpp_files+=( "$file" )
-                append_stage_file "$file"
+                stage_files+=( "$file" )
                 ;;
             *.json)
                 if [[ "$file" != data/names/* ]]; then
                     json_files+=( "$file" )
-                    append_stage_file "$file"
+                    stage_files+=( "$file" )
                 fi
                 ;;
-            *.md|*.ts|*.lua)
-                append_stage_file "$file"
+            *.md|*.lua)
+                stage_files+=( "$file" )
                 ;;
         esac
     done < <(git diff --cached --name-only --diff-filter=ACMR -z)
 fi
 
-deno fmt
-deno task dprint fmt
+dprint fmt --config dprint-docs.json
+dprint fmt
 
 if [[ "$mode" == all ]]; then
     build-scripts/format-cpp.sh
     build-scripts/format-json.sh
 else
-    if (( ${#cpp_files[@]} > 0 )); then
+    if [[ ${cpp_files[0]+set} ]]; then
         build-scripts/format-cpp.sh "${cpp_files[@]}"
     fi
-    if (( ${#json_files[@]} > 0 )); then
+    if [[ ${json_files[0]+set} ]]; then
         build-scripts/format-json.sh "${json_files[@]}"
     fi
-    if (( ${#stage_files[@]} > 0 )); then
+    if [[ ${stage_files[0]+set} ]]; then
         git add -f -- "${stage_files[@]}"
     fi
 fi

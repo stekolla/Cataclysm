@@ -56,9 +56,8 @@ option(CATA_TESTS_ONLY "Build the Linux curses test executable without the game"
 option(CATA_CLANG_TIDY_PLUGIN "Build Cata's custom clang-tidy plugin" "OFF")
 option(CATA_CCACHE "Try to find and build with ccache" "ON")
 option(TESTS "Compile Cata's tests" "ON")
-find_program(DENO_BINARY deno)
-if (EMSCRIPTEN AND TESTS AND NOT DENO_BINARY)
-    message(FATAL_ERROR "Deno is required to launch browser-based Wasm tests.")
+if (EMSCRIPTEN AND TESTS)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
 endif()
 set(CATA_CLANG_TIDY_INCLUDE_DIR "" CACHE STRING
         "Path to internal clang-tidy headers required for plugin (e.g. ClangTidy.h)")

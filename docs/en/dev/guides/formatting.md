@@ -10,8 +10,8 @@ This guide explains how to format and lint code in Cataclysm.
 | All files       | all formatters      | `build-scripts/fmt.sh --all` |
 | C++ (`.cpp/.h`) | astyle/clang-format | `build-scripts/fmt.sh cpp`   |
 | JSON            | json_formatter      | `build-scripts/fmt.sh json`  |
-| Markdown/TS     | deno fmt            | `deno fmt`                   |
-| Lua             | dprint              | `deno task dprint fmt`       |
+| Markdown        | dprint              | `build-scripts/fmt.sh docs`  |
+| Lua             | dprint              | `build-scripts/fmt.sh lua`   |
 
 ## Automated Formatting
 
@@ -79,25 +79,14 @@ build-scripts/lint-json.sh
 
 This runs Python's `json.tool` on all JSON files to catch syntax errors.
 
-## Markdown & TypeScript Formatting
+## Markdown and Lua Formatting
 
-Markdown and TypeScript files are formatted with [Deno](https://deno.land/).
-
-```sh
-# Install Deno
-curl -fsSL https://deno.land/install.sh | sh
-
-# Format Markdown and TypeScript
-deno fmt
-```
-
-## Lua Formatting
-
-Lua files are formatted with [dprint](https://dprint.dev/) via Deno.
+Install the standalone [dprint CLI](https://dprint.dev/) at the version used by CI.
 
 ```sh
-# Format Lua files
-deno task dprint fmt
+npm install --global dprint@0.47.5
+build-scripts/fmt.sh docs
+build-scripts/fmt.sh lua
 ```
 
 ## Dialogue Validation
@@ -116,9 +105,9 @@ Install the optional pre-commit hook with [`prek`](https://github.com/j178/prek)
 prek install
 ```
 
-When you commit, the hook runs `build-scripts/fmt.sh`: Deno and dprint run normally, while C++ and JSON formatters
-run only on staged created/updated files. Formatted staged files are re-added so the commit includes
-the formatted result.
+When you commit, the hook runs `build-scripts/fmt.sh`. dprint formats Markdown and Lua across the
+repository. The C++ and JSON formatters process staged additions and modifications. The hook
+re-stages formatted files so the commit includes the changes.
 
 To run the same formatting manually against staged files:
 
@@ -151,10 +140,7 @@ pushing.
 
 ### VS Code
 
-Use the repository helper for C++ and the Deno extension for Markdown/TypeScript:
-
-- **C++**: run `build-scripts/fmt.sh cpp`
-- **Deno**: [Deno](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno)
+Run `build-scripts/fmt.sh cpp` for C++. The dprint extension uses the repository configuration for Lua.
 
 ### Vim/Neovim
 
@@ -162,7 +148,7 @@ Use the helper instead of calling astyle or clang-format directly:
 
 ```vim
 autocmd BufWritePre *.cpp,*.h !build-scripts/fmt.sh cpp %
-autocmd BufWritePre *.md,*.ts !deno fmt %
+autocmd BufWritePre *.md !dprint fmt --config dprint-docs.json %
 ```
 
 ## Troubleshooting

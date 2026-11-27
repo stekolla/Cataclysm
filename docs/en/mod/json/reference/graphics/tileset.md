@@ -10,27 +10,27 @@ The browser build bundles only RetroDays.
 Prior October 2019, tilesets had to be submitted to the repo with each tilesheet fully composited
 and the sprite indices in `tile_config.json` calculated by hand. Since then, tilesets can be
 submitted as directories of individual sprite files and `tile_entry` JSON files that use sprite file
-names. The TypeScript tileset tool merges those files into tilesheets, converts sprite file names to
+names. The Python tileset tool merges those files into tilesheets, converts sprite file names to
 sprite indices, and writes `tile_config.json`.
 
 For the rest of this document, tilesets that are submitted as fully composited tilesheets are called
 legacy tilesets, and tilesets that are submitted as individual sprite image files are compositing
 tilesets.
 
-### TypeScript tileset tool
+### Python tileset tool
 
-Use `scripts/tileset.ts` for normal compose/decompose work. It replaced the old Python compose
-workflow in [PR #8151](https://github.com/cataclysmbn/Cataclysm-BN/pull/8151).
+Use `scripts/tileset.py` to pack and unpack tilesets. Install Pillow in a virtual environment
+with `python3 -m pip install -r scripts/requirements.txt`.
 
 ```sh
 # Compose individual sprite files and tile entries into tile_config.json and tilesheet PNGs.
-deno run -A scripts/tileset.ts --pack path/to/unpacked-tileset
+python3 scripts/tileset.py --pack path/to/unpacked-tileset
 
 # Write the composed output to another directory.
-deno run -A scripts/tileset.ts --pack path/to/unpacked-tileset /tmp/composed-tileset
+python3 scripts/tileset.py --pack path/to/unpacked-tileset /tmp/composed-tileset
 
 # Decompose a legacy tileset into individual sprite files and tile entries.
-deno run -A scripts/tileset.ts --unpack gfx/ChestHole16Tileset
+python3 scripts/tileset.py --unpack gfx/ChestHole16Tileset
 ```
 
 Useful options:
@@ -197,7 +197,7 @@ offsets, it can have an empty dictionary as the value for the tilesheet name key
 should have a dictionary of the sprite offsets, height, and width.
 
 A special key is `"fallback"` which should be `true` if present. If a tilesheet is designated as
-fallback, it will be treated as a tilesheet of fallback ASCII characters. `scripts/tileset.ts` will
+fallback, it will be treated as a tilesheet of fallback ASCII characters. `scripts/tileset.py` will
 also compose the fallback tilesheet to the end of the tileset, and will add a "fallback.png" to
 `tile_config.json` if there is no `"fallback"` entry in `tile_info.json`.
 

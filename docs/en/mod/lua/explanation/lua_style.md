@@ -10,7 +10,7 @@ with default configuration.
 To format lua files, run:
 
 ```sh
-deno task dprint fmt
+build-scripts/fmt.sh lua
 ```
 
 ### Formatting Lua files in VSCode

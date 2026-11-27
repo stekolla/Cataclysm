@@ -5,6 +5,6 @@ repos:
         name: Format staged files
         entry: build-scripts/fmt.sh
         language: system
-        files: \.(cpp|h|hpp|json|lua|md|ts)$
+        files: \.(cpp|h|hpp|json|lua|md)$
         pass_filenames: false
         stages: [pre-commit]

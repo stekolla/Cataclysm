@@ -26,8 +26,8 @@ elseif (EMSCRIPTEN AND TILES AND NOT CURSES)
 
     add_test(
         NAME test-tiles
-        COMMAND ${DENO_BINARY} run -A
-            ${CMAKE_SOURCE_DIR}/scripts/run-wasm-tests.ts
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_SOURCE_DIR}/scripts/run-wasm-tests.py
             $<TARGET_FILE:cata_test-tiles>
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 else()

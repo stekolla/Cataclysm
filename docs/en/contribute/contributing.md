@@ -61,25 +61,13 @@ JSON files are formatted using custom formatter available in `tools/format`. Vis
 
 ### Markdown
 
-Markdown files such as `doc/` are formatted using [`deno`](https://deno.com)'s built-in formatter.
-Run [`deno fmt`](https://deno.land/manual/tools/formatter) anywhere to format markdown files. On
-VSCode, you can set following configuration to auto-format markdown files on save:
-
-```json
-// .vscode/settings.json
-{
-  "[markdown]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  }
-}
-```
+Run `build-scripts/fmt.sh docs` to format Markdown with dprint. See the
+[formatting guide](../dev/guides/formatting.md) for installation.
 
 ### Lua
 
-Lua files are formatted using [`dprint`](https://dprint.dev)'s built-in formatter. Run
-[`deno task dprint fmt`](https://github.com/RubixDev/dprint-plugin-stylua) anywhere to format Lua files. For details,
-see [Lua Style Guide](../mod/lua/explanation/lua_style.md).
+Run `build-scripts/fmt.sh lua` to format Lua with dprint. See the
+[Lua Style Guide](../mod/lua/explanation/lua_style.md) for editor setup.
 
 ## Documentation
 
