@@ -17,6 +17,42 @@ NPC missions are controlled by a separate but related JSON structure and are doc
 
 NPC classes are defined as `"type": "npc_class"` entries (see `data/json/npcs/classes.json`).
 
+### "trade_pricing"
+
+Optional object for shopkeepers. Without it, trades use the NPC's personal valuation. It does not
+affect personal item valuation, allied item exchange, or scripted dialogue transactions.
+
+For help choosing rates and stock, see the [merchant economy guide](../../guides/postapoc_price_guide.md).
+
+```json
+"trade_pricing": {
+  "retail_percent": 140,
+  "purchase_percent": 40,
+  "curated_stock": true,
+  "categories": {
+    "scrap_metal": { "purchase_percent": 60 },
+    "guns": { "purchase_percent": 0 }
+  },
+  "items": {
+    "solder_wire": { "retail_percent": 500 }
+  }
+}
+```
+
+- Percentages apply to the item's post-apocalyptic price, including its condition, charges, and
+  contents. Defaults are 140% retail and 40% purchase. Item overrides take precedence over
+  category overrides and defaults, separately for each direction. For a single item in its
+  default container, use the contained item ID for an override.
+- Set retail to 100–1000 and purchase to 0–80. A purchase percentage of 0 refuses the item,
+  including inside a container. Loose liquids, bombs, and dangerous items are not merchandise.
+  The normal Barter and Intelligence adjustment is capped at 20% in either direction. The
+  merchant's faction currency always trades at face value.
+- With `curated_stock`, use a `shopkeeper_item_group` collection with explicit quantities.
+  The group is generated once per restock instead of repeatedly sampled from the faction's
+  merchandise budget. Restock timing and faction currency stock are unchanged. Only items in the
+  group (including nested groups) and faction currency can appear for sale. Curated inventory
+  represents shop shelves, so it is not limited by the NPC's personal carrying capacity.
+
 ### "lua_ai"
 
 (string, optional)

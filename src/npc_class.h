@@ -44,6 +44,19 @@ class distribution
         static distribution one_in( float in );
 };
 
+struct merchant_price_rule {
+    std::optional<int> retail_percent;
+    std::optional<int> purchase_percent;
+};
+
+struct merchant_pricing {
+    int retail_percent = 140;
+    int purchase_percent = 40;
+    bool curated_stock = false;
+    std::map<item_category_id, merchant_price_rule> categories;
+    std::map<itype_id, merchant_price_rule> items;
+};
+
 class npc_class
 {
     private:
@@ -70,6 +83,9 @@ class npc_class
         item_group_id worn_override;
         item_group_id carry_override;
         item_group_id weapon_override;
+        std::optional<merchant_pricing> trade_pricing;
+
+        auto has_curated_stock() const -> bool { return trade_pricing && trade_pricing->curated_stock; }
 
         std::map<mutation_category_id, distribution> mutation_rounds;
         trait_group::Trait_group_tag traits = trait_group::Trait_group_tag( "EMPTY_GROUP" );

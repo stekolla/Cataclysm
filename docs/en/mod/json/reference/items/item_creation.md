@@ -6,6 +6,8 @@
 
 ### Generic Items
 
+For guidance on `price_postapoc`, see the [merchant economy guide](../../guides/postapoc_price_guide.md).
+
 ```json
 "type": "GENERIC",                // Defines this as some generic item
 "id": "socks",                    // Unique ID. Must be one continuous word, use underscores if necessary
@@ -34,8 +36,8 @@
 "integral_weight": 0,                        // Weight added to base item when item is integrated into another (eg. a gunmod integrated to a gun). Can be negative to reduce parent weight. Clamped at 1% of parent base weight.
 "rigid": false,                              // For non-rigid items volume (and for worn items encumbrance) increases proportional to contents
 "insulation": 1,                             // (Optional, default = 1) If container or vehicle part, how much insulation should it provide to the contents
-"price": 100,                                // Used when bartering with NPCs. For stackable items (ammo, comestibles) this is the price for stack_size charges. Can use string "cent" "USD" or "kUSD".
-"price_postapoc": "1 USD",                   // Same as price but represent value post cataclysm. Can use string "cent" "USD" or "kUSD".
+"price": 100,                                // Pre-Cataclysm value. For charge-counted items, this is the price for stack_size charges. Can use string "cent" "USD" or "kUSD".
+"price_postapoc": "1 USD",                   // Post-Cataclysm reference value for trade, in the same units as price. Falls back to price when not set or inherited.
 "material": ["COTTON"],                      // Material types, can be as many as you want.  See materials.json for possible options
 "weapon_category": [ "WEAPON_CAT1" ],        // (Optional) Weapon categories this item is in for martial arts.
 "cutting": 0,                                // (Optional, default = 0) Cutting damage caused by using it as a melee weapon.  This value cannot be negative.

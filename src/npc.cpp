@@ -338,6 +338,9 @@ void npc::load_npc_template( const string_id<npc_template> &ident )
         if( from != item_group_id( "EMPTY_GROUP" ) ) {
             inv_clear();
             for( detached_ptr<item> &it : item_group::items_from( from ) ) {
+                if( myclass->has_curated_stock() ) {
+                    it->set_owner( *this );
+                }
                 i_add( std::move( it ) );
             }
         }
@@ -1944,17 +1947,25 @@ void npc::shop_restock()
         }
     }
 
-    int count = 0;
-    bool last_item = false;
-    while( shop_value > 0 && total_space > 0_ml && !last_item ) {
-        detached_ptr<item> tmpit = item_group::item_from( from, calendar::turn );
-        if( !tmpit->is_null() && total_space >= tmpit->volume() ) {
-            tmpit->set_owner( *this );
-            shop_value -= tmpit->price( true );
-            total_space -= tmpit->volume();
-            count += 1;
-            last_item = count > 10 && one_in( 100 );
-            ret.push_back( std::move( tmpit ) );
+    if( myclass->has_curated_stock() ) {
+        // The collection sets its own quantities; repeatedly sampling it would miss staples.
+        for( auto &it : item_group::items_from( from, calendar::turn ) ) {
+            it->set_owner( *this );
+            ret.push_back( std::move( it ) );
+        }
+    } else {
+        auto count = 0;
+        auto last_item = false;
+        while( shop_value > 0 && total_space > 0_ml && !last_item ) {
+            auto tmpit = item_group::item_from( from, calendar::turn );
+            if( !tmpit->is_null() && total_space >= tmpit->volume() ) {
+                tmpit->set_owner( *this );
+                shop_value -= tmpit->price( true );
+                total_space -= tmpit->volume();
+                count += 1;
+                last_item = count > 10 && one_in( 100 );
+                ret.push_back( std::move( tmpit ) );
+            }
         }
     }
 

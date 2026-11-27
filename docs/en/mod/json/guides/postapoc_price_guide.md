@@ -1,119 +1,139 @@
-# How to give items a sensible postapoc_price value
+# Balancing item prices and merchant economies
 
-### Pricing philosophy
+Scavenging should remain rewarding, trading should save time, and quests should earn the player
+something worth spending. Favor predictable prices and curated stock over simulated supply and
+demand, inflation, or logistics. A merchant should provide another way to get supplies, not make
+scavenging or crafting unnecessary.
 
-Prices were based on the philosophy that there is a decent portion of humanity unwilling to
-regularly brave the risks of city scavenging, that are always on the lookout for supplies to stay
-alive. This mean food and medicine are relatively quite valuable compared to the goods you would use
-to acquire them.
+## Set the reference value first
 
-**The standard unit of currency**, the free merchants note, is priced to be the equivalent to **one
-piece of meat jerky (250 cents)**.
+[`price_postapoc`](../reference/items/item_creation.md#generic-items) is a shared reference value,
+not the price a shop charges or the amount it pays for loot. Do not derive it from pre-Cataclysm
+retail prices. The loader falls back to `price` when no `price_postapoc` is set or inherited,
+so give tradable items an explicit post-Cataclysm value when that fallback would misprice them.
+Compare the item to plausible substitutes and ask:
 
-One piece of meat jerky will stay fresh for 24 days, a decent time, and contains 347 calories.
+- **What can it do?** A tool that unlocks repairs or construction can be worth much more than a
+  common weapon or a pile of raw material.
+- **How easy is it to replace?** Look at scavenging locations, recipes, and alternative tools.
+  Scarcity alone does not make an item valuable. Common materials should be inexpensive, but
+  enough to finish a project should be worth buying.
+- **What condition is it in?** Compare a usable item with damaged, incomplete, empty, or partly
+  used versions. For food, compare nutrition and storage life as well as availability. Preserved
+  food is generally more useful than equally nutritious food that spoils quickly, and medicine
+  without a practical substitute can command a premium.
 
-A survivor that bring back 2000 cents worth of goods back to the merchants every day is doing well
-enough to eke out a subsistence living.
+Use the in-game quantity when making comparisons. For charge-counted items, the JSON price is
+for `stack_size` charges, not necessarily the quantity that spawns. For example, bandages are
+priced at 200 cents for nine charges, but a default stack of three has a reference value of about
+67 cents. A bottle or tube can also change what the trade window values or accepts: compare
+packaged liquids with packaged liquids, not with loose contents. Check the actual quote; the
+trade window truncates fractional cents after multiplying by the selected quantity.
 
-A survivor that brings back 4000 cents worth of goods every day is doing quite well for himself.
+Change the shared reference only when the item is out of scale across merchants and other
+systems. In the Free Merchant rebalance, planks, pipes, hammers, hacksaws, and welders warranted
+shared corrections for their practical uses. Owen's prices for items such as repair kits and
+axes were changed locally, so the same loot did not become more valuable to unrelated merchants.
 
-#### Items are priced on a combination of their availability and their utility.
+## Price buying and selling separately
 
-Raw materials tend to either be worthless, or only somewhat worthwhile if you can get them in bulk
-~(0-25)/kg.
+The **ask** is what the player pays the merchant. The **bid** is what the merchant offers the
+player. Use a spread so players pay for the convenience of reliable stock but can still earn
+something from scavenging. Start with the following rates for an opted-in shopkeeper, then
+validate actual trades:
 
-Common items with no utility are worthless.
+| Transaction                              |          Starting point |
+| ---------------------------------------- | ----------------------: |
+| Merchant sells merchandise               |       140% of reference |
+| Merchant buys ordinary merchandise       |        40% of reference |
+| Merchant buys goods in their specialty   | Around 60% of reference |
+| Merchant buys unwanted goods             |       10–20%, or refuse |
+| Merchant trades its own faction currency |              Face value |
 
-Common items with some theoretical utility are worth very little (~10).
+Use an [NPC class pricing profile](../reference/creatures/npcs.md#trade_pricing) for these rules.
+The profile keeps item and category exceptions local to the merchant. Barter and Intelligence
+still affect quotes for goods, but the profile caps the adjustment at 20%. Test both sides at
+the skill extremes: buying and immediately reselling equivalent goods should never earn money.
 
-Common items that are useful tend to be in the ~(250-2000) price range.
+Leave unreviewed merchants on the legacy path. Personal valuation is useful for an ordinary NPC
+deciding whether they need a tool or can use a weapon, but it does not make a good shop price.
+Before Owen had a profile, at matched skills his ask and bid were identical for 26 of the 30
+non-currency samples he agreed to buy. Four had higher bids than asks, partly because he valued
+a tool differently depending on whether he already owned one.
 
-Rare items with no utility have some small value ~(10-50).
+## Give each merchant a specialty
 
-Rare items with some theoretical utility are worth ~(100-500).
+Decide what the merchant sells, what they prefer to buy, and what they refuse. These lists
+can differ: taking an item as salvage need not put it up for sale. A hardware trader can buy
+construction materials and spare parts, stock basic tools, and turn away firearms and food.
+Other merchants can specialize in weapons, medicine, or electronics instead.
 
-Rare items with considerable use tend to have the highest variety in prices ~(1000-15000).
+Use dedicated [item groups](../reference/items/item_spawn.md) with three stock tiers:
 
-**No item should be worth more than 150000.** They might be worth more if the economy was larger but
-that's pretty much the most anyone will be willing to spend on any one thing, no matter how nice it
-is.
+| Tier           | What belongs there                                                                                                                              |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Staples        | Useful quantities of consumables and materials, plus dependable access to basic tools. Size batches against real recipes and construction jobs. |
+| Rotating stock | Tools, spare parts, repair kits, practical clothing, or other goods that make repeat visits worthwhile.                                         |
+| Uncommon stock | A small selection of specialized equipment or machinery. Don't make rare equipment the only attractive purchase at a high budget.               |
 
-#### Currently Implemented faction currencies
+Check what the merchant actually offers after a restock, not just the item group probabilities.
+Merchandise sampled against a faction budget can change in quantity or variety when reference
+prices change. Owen instead uses a curated collection rolled once per restock: it supplies
+12–24 planks and 200–400 nails alongside rotating tools, with at most one uncommon item per
+roll. His base restock interval and the calculation for faction currency stock were unchanged.
+Check the trade list after normal inventory cleanup, especially for bulky stock. Also check that
+earlier player sales and old stock do not bypass the sale restrictions.
 
-    "id": "FMCNote",
-    "description": "The Free Merchant Certified Note, also known by names such as a 'c-note' or 'merch', is a currency based on old American bills.  Fifty dollar bills and larger are printed with a promissory note signed by the treasurer of the Free Merchants, along with a complex design.  The note explains that this can be exchanged for food, water, and other services through the Free Merchants in the Refugee Center.",
-    "name": { "str": "Merch" }, 
-    "price_postapoc": 250
+## Use quest rewards as purchasing-power benchmarks
 
+Keep faction currency denominations stable and trade the merchant's own currency at face
+value. One Free Merchant Certified Note (`FMCNote`) is **1 Merch = 250 internal cents**. A piece
+of jerky also has a 250-cent reference value, but that is a comparison, not a guarantee of
+what a merchant charges or whether they will trade it at all.
 
-    "id": "RobofacCoin",
-    "name": { "str": "Hub 01 Gold Coin" },
-    "description": "This is a small but surprisingly heavy gold coin.  One side is etched with circuitry and the other side reads 'Hub 01 exchange currency'.",
-    "price_postapoc": 5000
+| Currency item                            | Reference value (cents) |
+| ---------------------------------------- | ----------------------: |
+| Free Merchant Certified Note (`FMCNote`) |                     250 |
+| Hub 01 Gold Coin (`RobofacCoin`)         |                   5,000 |
+| Campus Exchange Token (`FlatCoin`)       |                     250 |
+| Signed chit (`signed_chit`)              |                     250 |
+| Church icon (`icon`)                     |                     250 |
 
+Use existing rewards to set useful baskets before considering a mission change. At Owen's
+novice quotes, a small reward of **5 Merch** covers 200 nails and three pipes or ten planks.
+**15 Merch** covers an axe or machete plus five planks. **30 Merch** covers repair equipment
+plus nails; **40–60 Merch** should offer several substantial purchases or specialized
+equipment when available. These are hardware-shop examples, not mandatory prices for other
+merchants.
 
-    "id": "FlatCoin",
-    "name": { "str": "FlatCoin" },
-    "description": "This is a coin that has been flattened in a novelty coin flattening machine.  The machine has been somewhat crudely altered so that the design - which appears to once have been Mickey Mouse - is overlaid with a handwritten emblem of a book.  There is some text that faintly reads 'Campus Exchange Token'.",
-    "price_postapoc": 250
+Compare rewards against what the same merchant pays for common loot, as well as what they
+charge. A few routine sales should not trivialize a dangerous quest. A delivery reward should
+normally exceed what the requested goods would earn through ordinary trade. Flag exceptions
+for separate balancing rather than silently changing missions. Count explicit currency
+payouts separately from mission credit, and don't treat a quoted bid as guaranteed cash or
+retained credit.
 
+## Measure and test the trade players actually get
 
-    "id": "signed_chit",
-    "name": { "str": "chit" },
-    "description": "This is a slip of paper signed by the issuer.",
-    "price_postapoc": 250
-
-
-    "id": "icon",
-    "name": { "str": "icon" },
-    "description": "This is a small picture, about the same size as an ID card, symbolizing a religious figure.  On the back, there is a text that faintly reads 'New England Church Community'.",
-    "price_postapoc": 250
-
-##### Some benchmark prices
-
-```
-{
-  "id": "antibiotics",
-  "name": { "str_sp": "antibiotics" },
-  "description": "A strong antibacterial medication designed to prevent or stop the spread of infection.  It's the safest way to cure any infections you might have.  One dose lasts twelve hours.",
-  "price_postapoc": 40000,
-  "charges": 15,
-  "stack_size": 200,
-  "flags": [ "NPC_SAFE", "IRREPLACEABLE_CONSUMABLE" ]
-},
-{
-  "id": "boltcutters",
-  "type": "TOOL",
-  "name": { "str": "pair of bolt cutters", "str_pl": "pairs of bolt cutters" },
-  "description": "This is a large pair of bolt cutters.  You could use them to cut padlocks or heavy gauge wire.",
-  "price_postapoc": 250,
-},
-{
-  "id": "armor_lightplate",
-  "name": { "str": "plate armor" },
-  "description": "A suit of Gothic plate armor.",
-  "price_postapoc": 12000,
-},
-{
-  "id": "bat_metal",
-  "name": { "str": "aluminum bat" },
-  "description": "An aluminum baseball bat, lighter than a wooden bat and a little easier to swing as a result.",
-  "price_postapoc": 1250,
-},
-```
-
-#### Food pricing
-
-Food is priced mostly for a combination of calories, how preservable they are, and how nutritious
-they are.
-
-Meat jerky is 250.
-
-Food that has more calories, is canned, and is very nutritious might be 500.
-
-Food that has less calories, goes bad quickly, and is junk food, might be 50.
-
-#### Stack size
-
-For items that have a stack size, you need to **divide** the price by stack size find the price per
-unit of the item.
+1. **Capture a baseline before changing data.** For a broad rebalance, sample roughly 30–40
+   items across staples, tools, weapons, food, medicine, and specialized equipment. Record the
+   item ID, condition, quantity, reference value, ask, and bid in a small Markdown or CSV table.
+   Record a refusal separately from a quote that rounds down to zero.
+2. **Compare like with like.** Use the actual trade-window path (`npc_trading::setup_trade_state`),
+   not a calculation from raw JSON. Keep the fixture's skills, Intelligence, inventory, and item
+   condition consistent before and after the change. Measure at matched skill and at least one
+   other Barter level. Test worn or partly used items, packaging, and whole and partial stacks.
+3. **Check budgets and return visits.** Try small, medium, and major quest budgets with actual
+   stock. Deplete staples, revisit before the timer expires, and sample several eligible
+   restocks. Confirm there is something useful to buy even when rare gear does not appear.
+4. **Try the obvious resale loops.** Buy an item and sell it straight back at low and high
+   Barter. Try ordinary loot outside the merchant's specialty, and check for effortless
+   profit from differences between merchants or currencies.
+   Compare the cost of buying recipe inputs with the bid for the output and any byproducts.
+   For example, Owen's matched-skill ask for a plank and six nails is 105 cents, versus a
+   20-cent bid for a nailboard. Profitable crafting is fine when it requires meaningful time,
+   skill, scarce materials, or equipment; trivial repeatable profit is not.
+5. **Check neighboring systems.** Test at least one unprofiled merchant and review faction
+   currencies, scripted exchanges, and quest rewards separately. Add regression tests for
+   the rules the change relies on, use real item and NPC definitions where practical, and
+   validate the modified JSON.

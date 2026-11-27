@@ -70,6 +70,7 @@
 #include "mtype.h"
 #include "mutation.h"
 #include "npc.h"
+#include "npc_class.h"
 #include "options.h"
 #include "output.h"
 #include "overlay_ordering.h"
@@ -3971,6 +3972,12 @@ void Character::drop_invalid_inventory()
 
     if( dropped_liquid ) {
         add_msg_if_player( m_bad, _( "Liquid from your inventory has leaked onto the ground." ) );
+    }
+
+    // Curated stock represents shelves, not the shopkeeper's personal carrying capacity.
+    if( const auto *trader = as_npc(); trader && !trader->is_player_ally() &&
+        trader->myclass->has_curated_stock() ) {
+        return;
     }
 
     if( volume_carried() > volume_capacity() ) {

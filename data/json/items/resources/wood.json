@@ -105,7 +105,7 @@
     "volume": "4400 ml",
     "bashing": 10,
     "price": "10 USD",
-    "price_postapoc": "10 cent",
+    "price_postapoc": "60 cent",
     "flags": [ "FIREWOOD" ],
     "stackable": true
   },

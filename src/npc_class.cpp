@@ -12,6 +12,7 @@
 #include "assign.h"
 #include "debug.h"
 #include "generic_factory.h"
+#include "item_category.h"
 #include "item_group.h"
 #include "mutation.h"
 #include "rng.h"
@@ -143,6 +144,23 @@ void npc_class::check_consistency()
             debugmsg( "Missing weapon override item group %s", cl.weapon_override.c_str() );
         }
 
+        if( cl.trade_pricing ) {
+            for( const auto &[category, rule] : cl.trade_pricing->categories ) {
+                if( !category.is_valid() ) {
+                    debugmsg( "Invalid merchant pricing category %s for %s", category.c_str(), cl.id.c_str() );
+                }
+            }
+            for( const auto &[item_id, rule] : cl.trade_pricing->items ) {
+                if( !item_id.is_valid() ) {
+                    debugmsg( "Invalid merchant pricing item %s for %s", item_id.c_str(), cl.id.c_str() );
+                }
+            }
+            if( cl.has_curated_stock() &&
+                cl.shopkeeper_item_group == item_group_id( "EMPTY_GROUP" ) ) {
+                debugmsg( "Curated merchant %s requires a shopkeeper item group", cl.id.c_str() );
+            }
+        }
+
         for( const auto &pr : cl.skills ) {
             if( !pr.first.is_valid() ) {
                 debugmsg( "Invalid skill %s", pr.first.c_str() );
@@ -222,6 +240,57 @@ static distribution load_distribution( const JsonObject &jo, const std::string &
     return distribution();
 }
 
+namespace
+{
+
+auto load_price_percent( const JsonObject &jo, const std::string &field, int min,
+                         int max ) -> std::optional<int>
+{
+    if( !jo.has_member( field ) ) {
+        return std::nullopt;
+    }
+    const auto value = jo.get_int( field );
+    if( value < min || value > max ) {
+        jo.throw_error( string_format( "%s must be between %d and %d", field, min, max ), field );
+    }
+    return value;
+}
+
+auto load_price_rule( const JsonObject &jo ) -> merchant_price_rule
+{
+    return {
+        .retail_percent = load_price_percent( jo, "retail_percent", 100, 1000 ),
+        .purchase_percent = load_price_percent( jo, "purchase_percent", 0, 80 ),
+    };
+}
+
+auto load_merchant_pricing( const JsonObject &jo ) -> merchant_pricing
+{
+    auto profile = merchant_pricing{};
+    const auto defaults = load_price_rule( jo );
+    if( defaults.retail_percent ) {
+        profile.retail_percent = *defaults.retail_percent;
+    }
+    if( defaults.purchase_percent ) {
+        profile.purchase_percent = *defaults.purchase_percent;
+    }
+    profile.curated_stock = jo.get_bool( "curated_stock", false );
+    if( jo.has_member( "categories" ) ) {
+        for( const auto member : jo.get_object( "categories" ) ) {
+            profile.categories.emplace( item_category_id( member.name() ),
+                                        load_price_rule( member.get_object() ) );
+        }
+    }
+    if( jo.has_member( "items" ) ) {
+        for( const auto member : jo.get_object( "items" ) ) {
+            profile.items.emplace( itype_id( member.name() ), load_price_rule( member.get_object() ) );
+        }
+    }
+    return profile;
+}
+
+} // namespace
+
 void npc_class::load( const JsonObject &jo, const std::string & )
 {
     mandatory( jo, was_loaded, "name", name );
@@ -235,6 +304,9 @@ void npc_class::load( const JsonObject &jo, const std::string & )
 
     optional( jo, was_loaded, "shopkeeper_item_group", shopkeeper_item_group,
               item_group_id( "EMPTY_GROUP" ) );
+    if( jo.has_member( "trade_pricing" ) ) {
+        trade_pricing = load_merchant_pricing( jo.get_object( "trade_pricing" ) );
+    }
     optional( jo, was_loaded, "worn_override", worn_override );
     optional( jo, was_loaded, "carry_override", carry_override );
     optional( jo, was_loaded, "weapon_override", weapon_override );

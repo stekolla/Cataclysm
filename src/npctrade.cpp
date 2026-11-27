@@ -5,8 +5,11 @@
 #include "game.h"
 #include "item.h"
 #include "item_category.h"
+#include "item_group.h"
+#include "itype.h"
 #include "map/map_selector.h"
 #include "npc.h"
+#include "npc_class.h"
 #include "player.h"
 #include "skill.h"
 #include "string_utils.h"
@@ -17,12 +20,79 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <ranges>
+#include <set>
 #include <string>
 #include <vector>
 
 static const skill_id skill_barter( "barter" );
 static const flag_id json_flag_NO_UNWIELD( "NO_UNWIELD" );
+
+namespace
+{
+
+const auto bomb_flag = flag_id( "BOMB" );
+
+auto merchandise_type( const item &it ) -> const item & // *NOPAD*
+{
+    const auto &contents = it.contents.all_items_top();
+    if( it.is_container() && contents.size() == 1 &&
+        contents.front()->type->default_container == it.typeId() ) {
+        return *contents.front();
+    }
+    return it;
+}
+
+auto stock_allows( const std::set<const itype *> &stock, const item &it ) -> bool
+{
+    const auto &merchandise = merchandise_type( it );
+    if( !stock.contains( merchandise.type ) ) {
+        return false;
+    }
+    return !merchandise.is_container() ||
+           std::ranges::all_of( merchandise.contents.all_items_top(), [&]( const auto * inside ) {
+        return stock_allows( stock, *inside );
+    } );
+}
+
+auto merchant_percent( const merchant_pricing &profile, const item &it, bool npc_sells ) -> int
+{
+    const auto field = npc_sells ? &merchant_price_rule::retail_percent :
+                       &merchant_price_rule::purchase_percent;
+    const auto &merchandise = merchandise_type( it );
+    if( const auto found = profile.items.find( merchandise.typeId() );
+        found != profile.items.end() && found->second.*field ) {
+        return *( found->second.*field );
+    }
+    if( const auto found = profile.categories.find( merchandise.get_category().get_id() );
+        found != profile.categories.end() && found->second.*field ) {
+        return *( found->second.*field );
+    }
+    return npc_sells ? profile.retail_percent : profile.purchase_percent;
+}
+
+auto commercial_quote( const merchant_pricing &profile, const std::set<const itype *> &stock,
+                       const item &it, bool npc_sells ) -> std::optional<float>
+{
+    if( it.made_of( LIQUID ) || it.is_dangerous() ||
+        it.has_item_with( []( const auto & candidate ) { return candidate.has_flag( bomb_flag ); } ) ) {
+        return std::nullopt;
+    }
+    if( npc_sells ? profile.curated_stock && !stock_allows( stock, it ) :
+        it.has_item_with( [&]( const auto & candidate ) {
+        return merchant_percent( profile, candidate, false ) == 0;
+    } ) ) {
+        return std::nullopt;
+    }
+    const auto reference = it.price( true );
+    if( reference <= 0 ) {
+        return std::nullopt;
+    }
+    return reference * ( merchant_percent( profile, it, npc_sells ) / 100.0f );
+}
+
+} // namespace
 
 void npc_trading::transfer_items( std::vector<item_pricing> &stuff, Character &,
                                   Character &receiver, bool npc_gives )
@@ -115,9 +185,14 @@ std::vector<item_pricing> npc_trading::init_buying( Character &buyer, Character 
 
     double adjust = net_price_adjustment( buyer, seller );
 
-    const auto check_item = [fac, adjust, is_npc, &np, &result,
-                                  &seller]( const std::vector<item *> &locs,
-    int count = 1 ) {
+    const auto &profile = np.myclass->trade_pricing;
+    const auto commercial = profile && np.is_shopkeeper() && !np.will_exchange_items_freely();
+    const auto stock = commercial && is_npc && np.myclass->has_curated_stock() ?
+                       item_group::every_possible_item_from( np.myclass->get_shopkeeper_items() ) :
+                       std::set<const itype *> {};
+    const auto check_item = [fac, adjust, is_npc, commercial, &profile, &stock, &np, &result,
+                             &seller]( const std::vector<item *> &locs,
+                                       int count = 1 ) {
         item *it_ptr = locs.front();
         if( it_ptr == nullptr || it_ptr->is_null() ) {
             return;
@@ -126,6 +201,16 @@ std::vector<item_pricing> npc_trading::init_buying( Character &buyer, Character 
 
         // Don't sell items we don't own.
         if( !it.is_owned_by( seller ) ) {
+            return;
+        }
+
+        if( commercial ) {
+            if( fac && it.typeId() == fac->currency ) {
+                result.emplace_back( locs, it.price( true ), count );
+            } else if( const auto quote = commercial_quote( *profile, stock, it, is_npc ) ) {
+                result.emplace_back( locs, *quote, count );
+                result.back().adjust_values( std::min( adjust, 1.2 ), fac );
+            }
             return;
         }
 
