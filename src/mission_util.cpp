@@ -557,7 +557,8 @@ bool mission_util::load_funcs( const JsonObject &jo,
     return true;
 }
 
-bool mission_type::parse_funcs( const JsonObject &jo, std::function<void( mission * )> &phase_func )
+auto mission_type::parse_funcs( const JsonObject &jo, std::function<void( mission * )> &phase_func,
+                                bool collect_rewards ) -> bool
 {
     std::vector<std::function<void( mission *miss )>> funcs;
     if( !mission_util::load_funcs( jo, funcs ) ) {
@@ -585,9 +586,10 @@ bool mission_type::parse_funcs( const JsonObject &jo, std::function<void( missio
         }
     };
 
-    for( talk_effect_fun_t &effect : talk_effects.effects ) {
-        auto rewards = effect.get_likely_rewards();
-        if( !rewards.empty() ) {
+    if( collect_rewards ) {
+        likely_rewards.clear();
+        for( const auto &effect : talk_effects.effects ) {
+            const auto &rewards = effect.get_likely_rewards();
             likely_rewards.insert( likely_rewards.end(), rewards.begin(), rewards.end() );
         }
     }

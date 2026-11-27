@@ -117,7 +117,12 @@ void talk_function::mission_success( npc &p )
         return;
     }
 
-    int miss_val = npc_trading::cash_to_favor( p, miss->get_value() );
+    if( !miss->in_progress() || miss->get_assigned_player_id() != g->u.getID() ||
+        !miss->is_complete( p.getID() ) ) {
+        return;
+    }
+
+    const auto miss_val = npc_trading::cash_to_favor( p, miss->get_value() );
     npc_opinion tmp( 0, 0, 1 + miss_val / 5, -1, 0 );
     p.op_of_u += tmp;
     faction *p_fac = p.get_faction();
@@ -167,19 +172,6 @@ void talk_function::clear_mission( npc &p )
             p.chatbin.mission_selected = p.chatbin.missions.front();
         }
     }
-}
-
-void talk_function::mission_reward( npc &p )
-{
-    const mission *miss = p.chatbin.mission_selected;
-    if( miss == nullptr ) {
-        debugmsg( "Called mission_reward with null mission" );
-        return;
-    }
-
-    int mission_value = miss->get_value();
-    p.op_of_u.owed += mission_value;
-    npc_trading::trade( p, 0, _( "Reward" ) );
 }
 
 void talk_function::buy_chicken( npc &p )
@@ -916,11 +908,7 @@ void talk_function::start_training( npc &p )
         return;
     }
 
-    mission *miss = p.chatbin.mission_selected;
-    if( miss != nullptr && miss->get_assigned_player_id() == g->u.getID() &&
-        miss->is_complete( g->u.getID() ) ) {
-        clear_mission( p );
-    } else if( !npc_trading::pay_npc( p, cost ) ) {
+    if( !npc_trading::pay_npc( p, cost ) ) {
         return;
     }
     std::unique_ptr<player_activity> act = std::make_unique<player_activity>( ACT_TRAIN,

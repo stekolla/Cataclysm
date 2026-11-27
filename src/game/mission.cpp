@@ -227,6 +227,7 @@ void mission::fail() {
 }
 
 void mission::set_target_to_mission_giver() {
+    if (has_target() && !objective_destination) { objective_destination = target; }
     const auto giver = g->find_npc(npc_id);
     if (giver != nullptr) {
         target = giver->abs_omt_pos();
@@ -256,12 +257,14 @@ void mission::step_complete(const int _step) {
 }
 
 void mission::wrap_up() {
+    if (!in_progress()) { return; }
     auto& u = g->u;
     if (u.getID() != player_id) {
         // This is called from npctalk.cpp, the npc should only offer the option to wrap up mission
         // that have been assigned to the current player.
         debugmsg("mission::wrap_up called, player %d was assigned, but current player is %d",
                  player_id.get_value(), u.getID().get_value());
+        return;
     }
 
     status = mission_status::success;
@@ -472,6 +475,12 @@ auto mission::get_deadline() const -> time_point { return deadline; }
 auto mission::get_description() const -> std::string { return type->description.translated(); }
 
 auto mission::has_target() const -> bool { return target != overmap::invalid_tripoint; }
+
+auto mission::get_objective_destination() const -> std::optional<tripoint_abs_omt> {
+    if (objective_destination) { return objective_destination; }
+    if (has_target()) { return target; }
+    return std::nullopt;
+}
 
 auto mission::get_target() const -> const tripoint_abs_omt& { return target; }
 

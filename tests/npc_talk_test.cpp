@@ -178,8 +178,20 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         return response.success.next_topic.id == "TALK_MISSION_LIST";
     }));
 
-    d.gen_responses(talk_topic("TALK_MISSION_LIST"));
     REQUIRE(staff.chatbin.missions.size() == (expected.side_offer == nullptr ? 1 : 2));
+    d.add_topic("TALK_MISSION_LIST");
+    if (expected.side_offer == nullptr) {
+        REQUIRE(d.topic_stack.back().id == "TALK_MISSION_OFFER");
+        const auto* offered = staff.chatbin.mission_selected;
+        REQUIRE(offered != nullptr);
+        CHECK(offered->get_type().id == mission_type_id(expected.first_offer));
+        CHECK(offered->get_follow_up() == expected.follow_up);
+        CHECK_FALSE(offered->is_assigned());
+        CHECK(gen_dynamic_line(d) == offered->dialogue_for_topic("TALK_MISSION_OFFER"));
+    } else {
+        REQUIRE(d.topic_stack.back().id == "TALK_MISSION_LIST");
+    }
+    d.gen_responses(d.topic_stack.back());
     const auto check_offer = [&](const auto& id, const auto& follow_up) {
         const auto response = std::ranges::find_if(d.responses, [&](const auto& candidate) {
             return candidate.mission_selected != nullptr
@@ -190,8 +202,8 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         CHECK(offered.get_npc_id() == staff.getID());
         CHECK(offered.get_follow_up() == follow_up);
     };
-    check_offer(mission_type_id(expected.first_offer), expected.follow_up);
     if (expected.side_offer != nullptr) {
+        check_offer(mission_type_id(expected.first_offer), expected.follow_up);
         check_offer(mission_type_id(expected.side_offer), mission_type_id::NULL_ID());
     }
     if (!expected.final_offer.is_null()) {
@@ -249,12 +261,29 @@ TEST_CASE("ruth_calder_completes_supply_missions", "[npc_talk][mission][quarterm
             add_supply(1);
             REQUIRE(job->is_complete(ruth_id));
             const auto before = u.charges_of(merch);
-            job->wrap_up();
+            const auto credit_before = ruth->op_of_u.owed;
+            d.gen_responses(talk_topic("TALK_MISSION_INQUIRE"));
+            const auto report = std::ranges::find_if(d.responses, [](const auto& response) {
+                return response.success.next_topic.id == "TALK_MISSION_SUCCESS";
+            });
+            REQUIRE(report != d.responses.end());
+            CHECK(report->success.apply(d).id == "TALK_MISSION_SUCCESS");
+            talk_function::mission_success(*ruth);
             CHECK(u.charges_of(merch) == before + reward);
+            CHECK(ruth->op_of_u.owed == credit_before);
             CHECK(u.amount_of(supply) == 0);
-            talk_function::clear_mission(*ruth);
+            CHECK_FALSE(job->in_progress());
+            d.gen_responses(talk_topic("TALK_MISSION_SUCCESS"));
+            REQUIRE(d.responses.size() == 1);
+            CHECK(d.responses.front().success.apply(d).id == "TALK_NONE");
+            CHECK(ruth->chatbin.missions_assigned.empty());
         };
 
+    auto* ruth_faction = ruth->get_faction();
+    REQUIRE(ruth_faction != nullptr);
+    const auto restore_likes = restore_on_out_of_scope(ruth_faction->likes_u);
+    const auto restore_respect = restore_on_out_of_scope(ruth_faction->respects_u);
+    const auto restore_power = restore_on_out_of_scope(ruth_faction->power);
     complete("MISSION_BROKER_COFFEE", "coffee_raw", 20, 3);
     REQUIRE(ruth->chatbin.missions.size() == 1);
     complete("MISSION_BROKER_CANNING_POT", "pot_canning", 1, 10);
@@ -267,10 +296,106 @@ TEST_CASE("ruth_calder_completes_supply_missions", "[npc_talk][mission][quarterm
     }));
     complete("MISSION_BROKER_1", "jar_3l_glass", 20, 25);
     CHECK(ruth->chatbin.missions.empty());
+    d.add_topic("TALK_MISSION_LIST");
+    CHECK(d.topic_stack.back().id == "TALK_MISSION_LIST");
+    d.gen_responses(d.topic_stack.back());
+    REQUIRE(d.responses.size() == 1);
+    CHECK(d.responses.front().success.next_topic.id == "TALK_NONE");
     d.gen_responses(talk_topic("TALK_FREE_MERCHANT_STOCKS"));
     CHECK(std::ranges::any_of(d.responses, [](const auto& response) {
         return response.success.next_topic.id == "TALK_FREE_MERCHANT_STOCKS_JARS";
     }));
+}
+
+/// Exercise the shared turn-in choices before and after the objective, including failed jobs.
+TEST_CASE(
+    "mission_turn_in_requires_objective_and_uses_only_explicit_rewards", "[npc_talk][mission]") {
+    const auto suffix = GENERATE("KILL", "ASSASSINATE", "TRAVEL");
+    const auto fail_mission = GENERATE(false, true);
+    CAPTURE(suffix, fail_mission);
+    auto& u = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(u, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(u, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    u.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto giver = npc();
+    auto* giver_faction = giver.get_faction();
+    REQUIRE(giver_faction != nullptr);
+    const auto restore_likes = restore_on_out_of_scope(giver_faction->likes_u);
+    const auto restore_respect = restore_on_out_of_scope(giver_faction->respects_u);
+    const auto restore_power = restore_on_out_of_scope(giver_faction->power);
+    giver.setID(g->assign_npc_id(), true);
+    auto d = dialogue();
+    d.alpha = &u;
+    d.beta = &giver;
+    auto* job = mission::
+        reserve_new(mission_type_id(std::string("MISSION_TEST_TURN_IN_") + suffix), giver.getID());
+    giver.add_new_mission(job);
+    d.add_topic("TALK_MISSION_LIST");
+    REQUIRE(d.topic_stack.back().id == "TALK_MISSION_OFFER");
+    d.gen_responses(d.topic_stack.back());
+    const auto accept = std::ranges::find_if(d.responses, [](const auto& response) {
+        return response.success.next_topic.id == "TALK_MISSION_ACCEPTED";
+    });
+    REQUIRE(accept != d.responses.end());
+    CHECK(accept->success.apply(d).id == "TALK_MISSION_ACCEPTED");
+    REQUIRE(job->in_progress());
+    const auto merch = itype_id("FMCNote");
+    REQUIRE(u.charges_of(merch) == 1);
+    REQUIRE(job->get_likely_rewards().size() == 1);
+    CHECK(job->get_likely_rewards().front().first == 2);
+
+    auto* new_offer = mission::reserve_new(job->get_type().id, giver.getID());
+    giver.add_new_mission(new_offer);
+    d.add_topic("TALK_MISSION_LIST");
+    CHECK(d.topic_stack.back().id == "TALK_MISSION_OFFER");
+    CHECK(giver.chatbin.mission_selected == new_offer);
+    CHECK_FALSE(new_offer->is_assigned());
+    d.add_topic("TALK_MISSION_INQUIRE");
+    CHECK(giver.chatbin.mission_selected == job);
+
+    const auto query = talk_topic("TALK_MISSION_INQUIRE");
+    d.gen_responses(query);
+    CHECK(std::ranges::none_of(d.responses, [](const auto& response) {
+        return response.success.next_topic.id == "TALK_MISSION_SUCCESS";
+    }));
+    talk_function::mission_success(giver);
+    CHECK(job->in_progress());
+
+    if (job->get_type().goal == MGOAL_GO_TO) {
+        job->set_target(u.abs_omt_pos());
+    } else {
+        job->step_complete(1);
+    }
+    if (fail_mission) { job->fail(); }
+    d.gen_responses(query);
+    if (fail_mission) {
+        REQUIRE(d.responses.size() == 1);
+        CHECK(d.responses.front().success.apply(d).id == "TALK_MISSION_FAILURE");
+        d.gen_responses(talk_topic("TALK_MISSION_FAILURE"));
+        REQUIRE(d.responses.size() == 1);
+        CHECK(d.responses.front().success.apply(d).id == "TALK_NONE");
+        CHECK(u.get_failed_missions().size() == 1);
+        CHECK(u.charges_of(merch) == 1);
+    } else {
+        const auto report = std::ranges::find_if(d.responses, [](const auto& response) {
+            return response.success.next_topic.id == "TALK_MISSION_SUCCESS";
+        });
+        REQUIRE(report != d.responses.end());
+        CHECK(report->success.apply(d).id == "TALK_MISSION_SUCCESS");
+        talk_function::mission_success(giver);
+        CHECK(u.get_completed_missions().size() == 1);
+        CHECK(u.charges_of(merch) == 3);
+        d.gen_responses(talk_topic("TALK_MISSION_SUCCESS"));
+        REQUIRE(d.responses.size() == 1);
+        CHECK(d.responses.front().success.apply(d).id == "TALK_NONE");
+    }
+    CHECK(u.get_active_missions().empty());
+    CHECK(giver.chatbin.missions_assigned.empty());
+    CHECK(giver.op_of_u.owed == 0);
 }
 
 /// Use Ruth's delivery and confirmation topics to verify that every food can be sold at its quote.

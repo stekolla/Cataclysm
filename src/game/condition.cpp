@@ -512,7 +512,7 @@ template <class T> void conditional_t<T>::set_mission_complete() {
     condition = [](const T& d) {
         mission* miss = d.beta->chatbin.mission_selected;
         if (!miss) { return false; }
-        return miss->is_complete(d.beta->getID());
+        return !miss->has_failed() && miss->is_complete(d.beta->getID());
     };
 }
 
@@ -520,7 +520,7 @@ template <class T> void conditional_t<T>::set_mission_incomplete() {
     condition = [](const T& d) {
         mission* miss = d.beta->chatbin.mission_selected;
         if (!miss) { return false; }
-        return !miss->is_complete(d.beta->getID());
+        return miss->in_progress() && !miss->is_complete(d.beta->getID());
     };
 }
 
@@ -860,6 +860,11 @@ template <class T> conditional_t<T>::conditional_t(const std::string& type) {
         set_mission_complete();
     } else if (type == "mission_incomplete") {
         set_mission_incomplete();
+    } else if (type == "mission_failed") {
+        condition = [](const T& d) {
+            const auto* job = d.beta->chatbin.mission_selected;
+            return job && job->has_failed();
+        };
     } else if (type == "npc_available") {
         set_npc_available();
     } else if (type == "npc_following") {

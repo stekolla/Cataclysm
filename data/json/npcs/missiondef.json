@@ -282,6 +282,8 @@
     "id": "MISSION_GET_SAFE_BOX",
     "type": "mission_definition",
     "name": { "str": "Retrieve Deposit Box" },
+    "description": "Recover the regional manager’s safe deposit box and bring it back to the quest giver.",
+    "reward_description": "One weapon from the deposit box.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 2,
     "value": 30000,

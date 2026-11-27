@@ -900,5 +900,71 @@
     "mission": 0,
     "chat": "TALK_TEST_START",
     "faction": "tacoma_commune"
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_TEST_TURN_IN_KILL",
+    "name": "Test mission",
+    "goal": "MGOAL_KILL_MONSTER",
+    "difficulty": 1,
+    "value": 500,
+    "has_generic_rewards": true,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "dialogue": {
+      "describe": "I need a hand.",
+      "offer": "Can you help?",
+      "accepted": "Thank you.",
+      "rejected": "Fair enough.",
+      "advice": "Good luck.",
+      "inquire": "How did it go?",
+      "success": "Well done.",
+      "failure": "I see."
+    },
+    "start": { "effect": { "u_buy_item": "FMCNote", "count": 1 } },
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } }
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_TEST_TURN_IN_ASSASSINATE",
+    "name": "Test mission",
+    "goal": "MGOAL_ASSASSINATE",
+    "difficulty": 1,
+    "value": 500,
+    "has_generic_rewards": true,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "dialogue": {
+      "describe": "I need a hand.",
+      "offer": "Can you help?",
+      "accepted": "Thank you.",
+      "rejected": "Fair enough.",
+      "advice": "Good luck.",
+      "inquire": "How did it go?",
+      "success": "Well done.",
+      "failure": "I see."
+    },
+    "start": { "effect": { "u_buy_item": "FMCNote", "count": 1 } },
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } }
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_TEST_TURN_IN_TRAVEL",
+    "name": "Test mission",
+    "goal": "MGOAL_GO_TO",
+    "difficulty": 1,
+    "value": 500,
+    "has_generic_rewards": true,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "dialogue": {
+      "describe": "I need a hand.",
+      "offer": "Can you help?",
+      "accepted": "Thank you.",
+      "rejected": "Fair enough.",
+      "advice": "Good luck.",
+      "inquire": "How did it go?",
+      "success": "Well done.",
+      "failure": "I see."
+    },
+    "start": { "effect": { "u_buy_item": "FMCNote", "count": 1 } },
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } }
   }
 ]

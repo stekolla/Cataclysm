@@ -1225,7 +1225,8 @@ void npc::talk_to_u( bool radio_contact, bool enforce_first_topic )
     // Main dialogue loop
     do {
         if( chatbin.mission_selected != nullptr ) {
-            if( chatbin.mission_selected->get_assigned_player_id() != you.getID() ) {
+            if( chatbin.mission_selected->is_assigned() &&
+                chatbin.mission_selected->get_assigned_player_id() != you.getID() ) {
                 // Don't talk about a mission that is assigned to someone else.
                 chatbin.mission_selected = nullptr;
             }
@@ -1260,11 +1261,13 @@ void npc::talk_to_u( bool radio_contact, bool enforce_first_topic )
             int cat = topic_category( d.topic_stack.back() );
             do {
                 d.topic_stack.pop_back();
-            } while( cat != -1 && topic_category( d.topic_stack.back() ) == cat );
+            } while( !d.topic_stack.empty() && cat != -1 && topic_category( d.topic_stack.back() ) == cat );
         }
         if( next.id == "TALK_DONE" || d.topic_stack.empty() ) {
             d.beta->say( _( "Bye." ) );
             d.done = true;
+        } else if( next.id == d.topic_stack.back().id ) {
+            d.topic_stack.back() = next;
         } else if( next.id != "TALK_NONE" ) {
             d.add_topic( next );
         }
@@ -1658,13 +1661,8 @@ void dialogue::gen_responses( const talk_topic &the_topic )
     }
     avatar &you = get_avatar();
     if( topic == "TALK_MISSION_LIST" ) {
-        if( p->chatbin.missions.size() == 1 ) {
-            add_response( _( "Tell me about it." ), "TALK_MISSION_OFFER",
-                          p->chatbin.missions.front(), true );
-        } else {
-            for( auto &mission : p->chatbin.missions ) {
-                add_response( mission->get_type().tname(), "TALK_MISSION_OFFER", mission, true );
-            }
+        for( auto *miss : p->chatbin.missions ) {
+            add_response( miss->get_type().tname(), "TALK_MISSION_OFFER", miss, true );
         }
     } else if( topic == "TALK_MISSION_LIST_ASSIGNED" ) {
         if( missions_assigned.size() == 1 ) {
@@ -1886,8 +1884,8 @@ int topic_category( const talk_topic &the_topic )
             "TALK_MISSION_START", "TALK_MISSION_DESCRIBE", "TALK_MISSION_OFFER",
             "TALK_MISSION_ACCEPTED", "TALK_MISSION_REJECTED", "TALK_MISSION_ADVICE",
             "TALK_MISSION_INQUIRE", "TALK_MISSION_SUCCESS", "TALK_MISSION_SUCCESS_LIE",
-            "TALK_MISSION_FAILURE", "TALK_MISSION_REWARD", "TALK_MISSION_END",
-            "TALK_MISSION_DESCRIBE_URGENT"
+            "TALK_MISSION_FAILURE", "TALK_MISSION_END",
+            "TALK_MISSION_DESCRIBE_URGENT", "TALK_MISSION_LIST", "TALK_MISSION_LIST_ASSIGNED"
         }
     };
     if( topic_1.contains( topic ) ) {
@@ -2131,12 +2129,20 @@ void parse_tags( std::string &phrase, const Character &u, const Character &me,
 
 void dialogue::add_topic( const std::string &topic_id )
 {
-    topic_stack.emplace_back( topic_id );
+    add_topic( talk_topic( topic_id ) );
 }
 
 void dialogue::add_topic( const talk_topic &topic )
 {
-    topic_stack.push_back( topic );
+    if( topic.id == "TALK_MISSION_LIST" && beta && beta->chatbin.missions.size() == 1 ) {
+        beta->chatbin.mission_selected = beta->chatbin.missions.front();
+        topic_stack.emplace_back( "TALK_MISSION_OFFER" );
+    } else {
+        if( topic.id == "TALK_MISSION_INQUIRE" && beta && missions_assigned.size() == 1 ) {
+            beta->chatbin.mission_selected = missions_assigned.front();
+        }
+        topic_stack.push_back( topic );
+    }
 }
 
 talk_data talk_response::create_option_line( const dialogue &d, const char letter )
@@ -3200,7 +3206,6 @@ void talk_effect_t::parse_string_effect( const std::string &effect_id, const Jso
             WRAP( mission_success ),
             WRAP( mission_failure ),
             WRAP( clear_mission ),
-            WRAP( mission_reward ),
             WRAP( start_trade ),
             WRAP( sort_loot ),
             WRAP( find_mount ),

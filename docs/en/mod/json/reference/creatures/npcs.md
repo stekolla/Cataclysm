@@ -667,7 +667,6 @@ effects should be arranged in a list and are processed in the order listed.
 | `mission_success`                                                | Resolves the current mission successfully.                                                                       |
 | `mission_failure`                                                | Resolves the current mission as a failure.                                                                       |
 | `clear_mission`                                                  | Clears the mission from the your character's assigned missions.                                                  |
-| `mission_reward`                                                 | Gives the player the mission's reward.                                                                           |
 | `assign_mission: mission_type_id string`                         | Will assign mission `mission_type_id` to the player.                                                             |
 | `finish_mission: mission_type_id string`,`success: success_bool` | Will complete mission `mission_type_id` to the player as a success if `success` is true, as a failure otherwise. |
 
@@ -872,7 +871,8 @@ camps.
 | `"has_many_available_missions"` | simple string | `true` if the NPC has several jobs available for the player character.                                                                                                                                                                                                                 |
 | `"mission_goal"`                | string        | `true` if the NPC's current mission has the same goal as `mission_goal`.                                                                                                                                                                                                               |
 | `"mission_complete"`            | simple string | `true` if the player has completed the NPC's current mission.                                                                                                                                                                                                                          |
-| `"mission_incomplete"`          | simple string | `true` if the player hasn't completed the NPC's current mission.                                                                                                                                                                                                                       |
+| `"mission_incomplete"`          | simple string | `true` if the NPC's current mission is in progress and its objective is unfinished.                                                                                                                                                                                                                       |
+| `"mission_failed"`              | simple string | `true` if the NPC's current mission has failed. |
 | `"mission_has_generic_rewards"` | simple string | `true` if the NPC's current mission is flagged as having generic rewards.                                                                                                                                                                                                              |
 | `"npc_service"`                 | simple string | `true` if the NPC does not have the `"currently_busy"` effect. Useful to check if the player character can hire an NPC to perform a task that would take time to complete. Functionally, this is identical to `not": { "npc_has_effect": "currently_busy" }`. Same as `npc_available`. |
 | `"npc_allies"`                  | int           | `true` if the player character has at least `npc_allies` number of NPC allies.                                                                                                                                                                                                         |
@@ -982,48 +982,21 @@ camps.
   }
 },
 {
-    "text": "I killed them.  All of them.",
-    "topic": "TALK_MISSION_SUCCESS",
-    "condition": {
-        "and": [ { "or": [ { "mission_goal": "KILL_MONSTER_SPEC" }, { "mission_goal": "KILL_MONSTER_TYPE" } ] }, "mission_complete" ]
-    },
-    "switch": true
+  "text": "I killed them.  All of them.",
+  "topic": "TALK_MISSION_SUCCESS",
+  "condition": {
+    "and": [
+      { "or": [ { "mission_goal": "MGOAL_KILL_MONSTER_SPEC" }, { "mission_goal": "MGOAL_KILL_MONSTER_TYPE" } ] },
+      "mission_complete"
+    ]
+  },
+  "switch": true,
+  "effect": "mission_success"
 },
 {
-    "text": "Glad to help.  I need no payment.",
-    "topic": "TALK_NONE",
-    "effect": "clear_mission",
-    "mission_opinion": { "trust": 4, "value": 3 },
-    "opinion": { "fear": -1, "anger": -1 }
-},
-{
-    "text": "Maybe you can teach me something as payment?",
-    "topic": "TALK_TRAIN",
-    "condition": { "or": [ "npc_train_skills", "npc_train_styles" ] },
-    "effect": "mission_reward"
-},
-{
-    "truefalsetext": {
-        "true": "I killed him.",
-        "false": "I killed it.",
-        "condition": { "mission_goal": "ASSASSINATE" }
-    },
-    "condition": {
-        "and": [
-            "mission_incomplete",
-            {
-                "or": [
-                    { "mission_goal": "ASSASSINATE" },
-                    { "mission_goal": "KILL_MONSTER" },
-                    { "mission_goal": "KILL_MONSTER_SPEC" },
-                    { "mission_goal": "KILL_MONSTER_TYPE" }
-                ]
-            }
-        ]
-    },
-    "trial": { "type": "LIE", "difficulty": 10, "mod": [ [ "TRUST", 3 ] ] },
-    "success": { "topic": "TALK_NONE" },
-    "failure": { "topic": "TALK_MISSION_FAILURE" }
+  "text": "Thanks.",
+  "topic": "TALK_NONE",
+  "effect": "clear_mission"
 },
 {
   "text": "Didn't you say you knew where the Vault was?",

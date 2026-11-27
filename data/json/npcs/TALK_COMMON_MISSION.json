@@ -37,36 +37,8 @@
   {
     "id": "TALK_MISSION_LIST",
     "type": "talk_topic",
-    "dynamic_line": {
-      "has_no_available_mission": {
-        "has_no_assigned_mission": "I don't have any jobs for you.",
-        "no": { "has_many_assigned_missions": "I don't have any more jobs for you.", "no": "I don't have any more jobs for you." }
-      },
-      "no": {
-        "has_many_available_missions": {
-          "has_no_assigned_mission": "I have other jobs for you.  Want to hear about them?",
-          "no": {
-            "has_many_assigned_missions": "I have more jobs for you.  Want to hear about them?",
-            "no": "I have other jobs for you.  Want to hear about them?"
-          }
-        },
-        "no": {
-          "has_no_assigned_mission": "I have a job for you.  Want to hear about it?",
-          "no": {
-            "has_many_assigned_missions": "I just have one job for you.  Want to hear about it?",
-            "no": "I just have one job for you.  Want to hear about it?"
-          }
-        }
-      }
-    },
-    "responses": [
-      { "text": "Oh, okay.", "topic": "TALK_NONE", "condition": "has_no_available_mission" },
-      {
-        "text": "Never mind, I'm not interested.",
-        "topic": "TALK_NONE",
-        "condition": { "not": "has_no_available_mission" }
-      }
-    ]
+    "dynamic_line": { "has_no_available_mission": "I don't have any work right now.", "no": "Which job did you want to hear about?" },
+    "responses": [ { "text": "Never mind.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_MISSION_LIST_ASSIGNED",
@@ -118,34 +90,7 @@
         "topic": "TALK_MISSION_FAILURE",
         "opinion": { "trust": -1, "value": -1, "anger": 1 }
       },
-      {
-        "text": "Not yet.",
-        "condition": "mission_failed",
-        "trial": { "type": "LIE", "difficulty": 10, "mod": [ [ "TRUST", 3 ] ] },
-        "success": { "topic": "TALK_NONE" },
-        "failure": { "topic": "TALK_MISSION_FAILURE", "opinion": { "trust": -3, "value": -1, "anger": 2 } }
-      },
       { "text": "Not yet.", "condition": "mission_incomplete", "topic": "TALK_NONE" },
-      {
-        "truefalsetext": { "true": "I killed him.", "false": "I killed it.", "condition": { "mission_goal": "MGOAL_ASSASSINATE" } },
-        "condition": {
-          "and": [
-            "mission_incomplete",
-            {
-              "or": [
-                { "mission_goal": "MGOAL_ASSASSINATE" },
-                { "mission_goal": "MGOAL_KILL_MONSTER" },
-                { "mission_goal": "MGOAL_KILL_MONSTER_SPEC" },
-                { "mission_goal": "MGOAL_KILL_MONSTER_TYPE" },
-                { "mission_goal": "MGOAL_KILL_MONSTERS" }
-              ]
-            }
-          ]
-        },
-        "trial": { "type": "LIE", "difficulty": 10, "mod": [ [ "TRUST", 5 ] ] },
-        "success": { "topic": "TALK_MISSION_SUCCESS", "effect": "mission_success" },
-        "failure": { "topic": "TALK_MISSION_SUCCESS_LIE", "opinion": { "trust": -5, "value": -1, "anger": 5 } }
-      },
       { "text": "No.  I'll get back to it, bye!", "condition": "mission_incomplete", "topic": "TALK_DONE" },
       {
         "text": "Yup!  Here it is!",
@@ -270,69 +215,11 @@
   {
     "id": "TALK_MISSION_SUCCESS",
     "type": "talk_topic",
-    "responses": [
-      {
-        "text": "Glad to help.  I need no payment.",
-        "topic": "TALK_NONE",
-        "condition": "mission_has_generic_rewards",
-        "effect": "clear_mission",
-        "mission_opinion": { "trust": 4, "value": 3 },
-        "opinion": { "fear": -1, "anger": -1 }
-      },
-      {
-        "text": "How about some items as payment?",
-        "topic": "TALK_MISSION_REWARD",
-        "condition": { "and": [ "mission_has_generic_rewards", { "not": "npc_friend" } ] },
-        "effect": "mission_reward"
-      },
-      {
-        "text": "Maybe you can teach me something as payment?",
-        "topic": "TALK_TRAIN",
-        "condition": { "and": [ "mission_has_generic_rewards", { "or": [ "npc_train_skills", "npc_train_styles" ] } ] }
-      },
-      {
-        "text": "Glad to help.  I need no payment.  Bye!",
-        "topic": "TALK_DONE",
-        "condition": "mission_has_generic_rewards",
-        "effect": "clear_mission",
-        "mission_opinion": { "trust": 4, "value": 3 },
-        "opinion": { "fear": -1, "anger": -1 }
-      },
-      {
-        "text": "Glad to help.",
-        "topic": "TALK_NONE",
-        "condition": { "not": "mission_has_generic_rewards" },
-        "effect": "clear_mission",
-        "mission_opinion": { "trust": 4, "value": 3 },
-        "opinion": { "fear": -1, "anger": -1 }
-      },
-      {
-        "text": "Glad to help.  Bye!",
-        "topic": "TALK_DONE",
-        "condition": { "not": "mission_has_generic_rewards" },
-        "effect": "clear_mission",
-        "mission_opinion": { "trust": 4, "value": 3 },
-        "opinion": { "fear": -1, "anger": -1 }
-      }
-    ]
-  },
-  {
-    "id": "TALK_MISSION_SUCCESS_LIE",
-    "type": "talk_topic",
-    "responses": [ { "text": "Well, um, sorry.", "topic": "TALK_NONE", "effect": "clear_mission" } ]
+    "responses": [ { "text": "Thanks.", "topic": "TALK_NONE", "effect": "clear_mission" } ]
   },
   {
     "id": "TALK_MISSION_FAILURE",
     "type": "talk_topic",
     "responses": [ { "text": "I'm sorry.  I did what I could.", "topic": "TALK_NONE", "effect": "clear_mission" } ]
-  },
-  {
-    "id": "TALK_MISSION_REWARD",
-    "type": "talk_topic",
-    "dynamic_line": "Sure, here you go!",
-    "responses": [
-      { "text": "Thank you.", "topic": "TALK_NONE", "effect": "clear_mission" },
-      { "text": "Thanks, bye.", "topic": "TALK_DONE", "effect": "clear_mission" }
-    ]
   }
 ]

@@ -196,6 +196,7 @@ struct mission_type {
         translation name = to_translation( "Bugged mission type" );
     public:
         translation description;
+        translation reward_description;
         // The basic goal type
         mission_goal goal = mission_goal::MGOAL_NULL;
         // Difficulty; TODO: come up with a scale
@@ -207,10 +208,10 @@ struct mission_type {
         time_duration deadline_high = 0_turns;
         // If true, the NPC will press this mission!
         bool urgent = false;
-        // If the mission has generic rewards, so that the completion dialogue knows whether to offer them.
-        bool has_generic_rewards = true;
+        // Retained for legacy definitions and dialogue conditions.
+        bool has_generic_rewards = false;
 
-        // A limited subset of the talk_effects on the mission
+        // Unconditional free item grants from completion effects.
         std::vector<std::pair<int, itype_id>> likely_rewards;
 
         // Points of origin
@@ -269,7 +270,8 @@ struct mission_type {
         static void finalize();
         static void check_consistency();
 
-        bool parse_funcs( const JsonObject &jo, std::function<void( mission * )> &phase_func );
+        auto parse_funcs( const JsonObject &jo, std::function<void( mission * )> &phase_func,
+                          bool collect_rewards ) -> bool;
         void load( const JsonObject &jo, const std::string &src );
 
         /**
@@ -306,6 +308,7 @@ class mission
         // Marked on the player's map. (INT_MIN, INT_MIN) for none,
         // global overmap terrain coordinates.
         tripoint_abs_omt target;
+        std::optional<tripoint_abs_omt> objective_destination;
         // Item that needs to be found (or whatever)
         itype_id item_id;
         // The number of above items needed
@@ -353,6 +356,7 @@ class mission
         time_point get_deadline() const;
         std::string get_description() const;
         bool has_target() const;
+        auto get_objective_destination() const -> std::optional<tripoint_abs_omt>;
         const tripoint_abs_omt &get_target() const;
         const mission_type &get_type() const;
         bool has_follow_up() const;

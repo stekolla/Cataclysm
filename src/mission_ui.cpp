@@ -1,5 +1,8 @@
 #include "game.h" // IWYU pragma: associated
 
+#include "overmap/omdata.h"
+#include "overmap/overmapbuffer.h"
+
 #include <algorithm>
 #include <map>
 #include <string>
@@ -9,7 +12,9 @@
 #include "calendar.h"
 #include "color.h"
 #include "debug.h"
+#include "faction.h"
 #include "input.h"
+#include "item.h"
 #include "mission.h"
 #include "npc.h"
 #include "output.h"
@@ -19,7 +24,77 @@
 #include "ui.h"
 #include "ui_manager.h"
 
-void game::list_missions()
+namespace
+{
+/// Describe only tiles the player has seen in this dimension.
+auto known_mission_location( const tripoint_abs_omt &pos, const dimension_id &dimension )
+-> std::string
+{
+    auto &buffer = get_overmapbuffer( dimension );
+    if( !buffer.seen( pos ) ) {
+        return {};
+    }
+    return buffer.ter( pos )->get_name();
+}
+
+auto mission_details( const mission &job, const npc *giver ) -> std::string
+{
+    auto details = std::string();
+    auto giver_location = std::string();
+    if( giver ) {
+        details += string_format( _( "Quest giver: %s" ), giver->disp_name() ) + "\n";
+        if( const auto *fac = giver->get_faction() ) {
+            details += string_format( _( "Faction: %s" ), fac->name ) + "\n";
+        }
+        giver_location = known_mission_location( giver->abs_omt_pos(), giver->get_dimension() );
+        if( !giver_location.empty() ) {
+            details += string_format( _( "Quest giver location: %s" ), giver_location ) + "\n";
+        }
+    } else if( job.get_npc_id().is_valid() ) {
+        details += _( "Quest giver: Unavailable" ) + std::string( "\n" );
+    }
+
+    auto objective = job.get_description();
+    for( const auto &[count, id] : job.get_likely_rewards() ) {
+        objective = replace_all( objective, "<reward_count:" + id.str() + ">", std::to_string( count ) );
+    }
+    details += "\n" + std::string( _( "Objective" ) ) + "\n" +
+               ( objective.empty() ? _( "No objective details recorded." ) : objective ) + "\n";
+
+    details += "\n" + std::string( _( "Reward" ) ) + "\n";
+    const auto &authored_reward = job.get_type().reward_description;
+    if( !authored_reward.empty() ) {
+        details += authored_reward.translated() + "\n";
+    } else {
+        for( const auto &[count, id] : job.get_likely_rewards() ) {
+            details += string_format( _( "%1$d %2$s" ), count, item::nname( id, count ) ) + "\n";
+        }
+        if( job.get_likely_rewards().empty() ) {
+            details += _( "No reward recorded." ) + std::string( "\n" );
+        }
+    }
+    if( const auto destination = job.get_objective_destination() ) {
+        // Legacy saves may only have the return marker after an objective was completed.
+        if( !giver || giver->get_dimension() != job.get_dimension() ||
+            giver->abs_omt_pos() != *destination ) {
+            const auto location = known_mission_location( *destination, job.get_dimension() );
+            details += "\n" + std::string( _( "Destination" ) ) + "\n";
+            details += location.empty() ? _( "Location undiscovered" ) : location;
+            details += "\n";
+        }
+    }
+    if( giver ) {
+        details += "\n" + std::string( _( "Return to" ) ) + "\n" + giver->disp_name();
+        if( !giver_location.empty() ) {
+            details += string_format( _( " (%s)" ), giver_location );
+        }
+        details += "\n";
+    }
+    return details;
+}
+} // namespace
+
+auto game::list_missions() -> void
 {
     catacurses::window w_missions;
 
@@ -33,10 +108,14 @@ void game::list_missions()
     };
     tab_mode tab = tab_mode::FIRST_TAB;
     size_t selection = 0;
-    int entries_per_page = 0;
+    auto entries_per_page = 0;
+    auto details_offset = 0;
+    auto max_details_offset = 0;
     input_context ctxt( "MISSIONS" );
     ctxt.register_cardinal();
     ctxt.register_action( "CONFIRM" );
+    ctxt.register_action( "PAGE_UP" );
+    ctxt.register_action( "PAGE_DOWN" );
     ctxt.register_action( "QUIT" );
     ctxt.register_action( "HELP_KEYBINDINGS" );
 
@@ -45,7 +124,7 @@ void game::list_missions()
         w_missions = new_centered_win( FULL_SCREEN_HEIGHT, FULL_SCREEN_WIDTH );
 
         // content ranges from y=3 to FULL_SCREEN_HEIGHT - 2
-        entries_per_page = FULL_SCREEN_HEIGHT - 4;
+        entries_per_page = std::max( 1, getmaxy( w_missions ) - 4 );
 
         ui.position_from_window( w_missions );
     } );
@@ -55,13 +134,17 @@ void game::list_missions()
 
     ui.on_redraw( [&]( const ui_adaptor & ) {
         werase( w_missions );
+        const auto height = getmaxy( w_missions );
+        const auto width = getmaxx( w_missions );
+        const auto divider = std::min( 30, width / 3 );
+        const auto details_width = width - divider - 3;
         // entries_per_page * page number
         const int top_of_page = entries_per_page * ( selection / entries_per_page );
         const int bottom_of_page =
             std::min( top_of_page + entries_per_page - 1, static_cast<int>( umissions.size() ) - 1 );
 
-        for( int i = 3; i < FULL_SCREEN_HEIGHT - 1; i++ ) {
-            mvwputch( w_missions, point( 30, i ), BORDER_COLOR, LINE_XOXO );
+        for( int i = 3; i < height - 1; i++ ) {
+            mvwputch( w_missions, point( divider, i ), BORDER_COLOR, LINE_XOXO );
         }
 
         const std::vector<std::pair<tab_mode, std::string>> tabs = {
@@ -72,9 +155,9 @@ void game::list_missions()
         draw_tabs( w_missions, tabs, tab );
         draw_border_below_tabs( w_missions );
 
-        mvwputch( w_missions, point( 30, 2 ), BORDER_COLOR,
+        mvwputch( w_missions, point( divider, 2 ), BORDER_COLOR,
                   tab == tab_mode::TAB_COMPLETED ? ' ' : LINE_OXXX ); // ^|^
-        mvwputch( w_missions, point( 30, FULL_SCREEN_HEIGHT - 1 ), BORDER_COLOR, LINE_XXOX ); // _|_
+        mvwputch( w_missions, point( divider, height - 1 ), BORDER_COLOR, LINE_XXOX ); // _|_
 
         draw_scrollbar( w_missions, selection, entries_per_page, umissions.size(), point( 0, 3 ) );
 
@@ -82,7 +165,7 @@ void game::list_missions()
             const auto miss = umissions[i];
             const nc_color col = u.get_active_mission() == miss ? c_light_green : c_white;
             const int y = i - top_of_page + 3;
-            trim_and_print( w_missions, point( 1, y ), 28,
+            trim_and_print( w_missions, point( 1, y ), divider - 2,
                             static_cast<int>( selection ) == i ? hilite( col ) : col,
                             miss->name() );
         }
@@ -90,60 +173,31 @@ void game::list_missions()
         if( selection < umissions.size() ) {
             const auto miss = umissions[selection];
             const nc_color col = u.get_active_mission() == miss ? c_light_green : c_white;
-            std::string for_npc;
-            if( miss->get_npc_id().is_valid() ) {
-                npc *guy = g->find_npc( miss->get_npc_id() );
-                if( guy ) {
-                    for_npc = string_format( _( " for %s" ), guy->disp_name() );
-                }
-            }
-
-            int y = 3;
-            y += fold_and_print( w_missions, point( 31, y ), getmaxx( w_missions ) - 33, col,
-                                 miss->name() + for_npc );
-
-            auto format_tokenized_description = []( const std::string & description,
-            const std::vector<std::pair<int, itype_id>> &rewards ) {
-                std::string formatted_description = description;
-                for( const auto &reward : rewards ) {
-                    std::string token = "<reward_count:" + reward.second.str() + ">";
-                    formatted_description = replace_all( formatted_description, token,
-                                                         string_format( "%d", reward.first ) );
-                }
-                return formatted_description;
-            };
-
-            y++;
-            if( !miss->get_description().empty() ) {
-                y += fold_and_print( w_missions, point( 31, y ), getmaxx( w_missions ) - 33, c_white,
-                                     format_tokenized_description( miss->get_description(), miss->get_likely_rewards() ) );
-            }
+            const auto *giver = miss->get_npc_id().is_valid() ? find_npc( miss->get_npc_id() ) : nullptr;
+            auto details = mission_details( *miss, giver );
             if( miss->has_deadline() ) {
-                const time_point deadline = miss->get_deadline();
-                mvwprintz( w_missions, point( 31, ++y ), c_white, _( "Deadline: %s" ), to_string( deadline ) );
-
-                if( tab != tab_mode::TAB_COMPLETED ) {
-                    // There's no point in displaying this for a completed mission.
-                    // @ TODO: But displaying when you completed it would be useful.
-                    const time_duration remaining = deadline - calendar::turn;
-                    std::string remaining_time;
-
-                    if( remaining <= 0_turns ) {
-                        remaining_time = _( "None!" );
-                    } else if( u.has_watch() ) {
-                        remaining_time = to_string( remaining );
-                    } else {
-                        remaining_time = to_string_approx( remaining );
-                    }
-
-                    mvwprintz( w_missions, point( 31, ++y ), c_white, _( "Time remaining: %s" ), remaining_time );
+                const auto deadline = miss->get_deadline();
+                details += "\n" + string_format( _( "Deadline: %s" ), to_string( deadline ) );
+                if( tab == tab_mode::TAB_ACTIVE ) {
+                    const auto remaining = deadline - calendar::turn;
+                    const auto remaining_time = remaining <= 0_turns ? _( "None!" ) :
+                                                u.has_watch() ? to_string( remaining ) : to_string_approx( remaining );
+                    details += "\n" + string_format( _( "Time remaining: %s" ), remaining_time );
                 }
             }
-            if( miss->has_target() ) {
-                const tripoint_abs_omt pos = u.abs_omt_pos();
-                // TODO: target does not contain a z-component, targets are assumed to be on z=0
-                mvwprintz( w_missions, point( 31, ++y ), c_white, _( "Target: %s   You: %s" ),
-                           miss->get_target().to_string(), pos.to_string() );
+            trim_and_print( w_missions, point( divider + 1, 3 ), details_width, col, miss->name() );
+            const auto lines = foldstring( details, details_width );
+            const auto visible_lines = std::max( 0, height - 6 );
+            max_details_offset = std::max( 0, static_cast<int>( lines.size() ) - visible_lines );
+            details_offset = std::clamp( details_offset, 0, max_details_offset );
+            for( auto row = 0; row < visible_lines && row + details_offset < static_cast<int>( lines.size() );
+                 ++row ) {
+                trim_and_print( w_missions, point( divider + 1, row + 4 ), details_width,
+                                c_white, lines[row + details_offset] );
+            }
+            if( max_details_offset > 0 ) {
+                trim_and_print( w_missions, point( divider + 1, height - 2 ), details_width, c_light_gray,
+                                _( "%1$s / %2$s to scroll" ), ctxt.get_desc( "PAGE_UP" ), ctxt.get_desc( "PAGE_DOWN" ) );
             }
         } else {
             static const std::map< tab_mode, std::string > nope = {
@@ -151,7 +205,8 @@ void game::list_missions()
                 { tab_mode::TAB_COMPLETED, translate_marker( "You haven't completed any missions!" ) },
                 { tab_mode::TAB_FAILED, translate_marker( "You haven't failed any missions!" ) }
             };
-            mvwprintz( w_missions, point( 31, 4 ), c_light_red, _( nope.at( tab ) ) );
+            fold_and_print( w_missions, point( divider + 1, 4 ), details_width, c_light_red,
+                            _( nope.at( tab ) ) );
         }
 
         wnoutrefresh( w_missions );
@@ -185,28 +240,37 @@ void game::list_missions()
         ui_manager::redraw();
         const std::string action = ctxt.handle_input();
         if( action == "RIGHT" ) {
+            details_offset = 0;
             tab = static_cast<tab_mode>( static_cast<int>( tab ) + 1 );
             if( tab >= tab_mode::NUM_TABS ) {
                 tab = tab_mode::FIRST_TAB;
             }
             selection = 0;
         } else if( action == "LEFT" ) {
+            details_offset = 0;
             tab = static_cast<tab_mode>( static_cast<int>( tab ) - 1 );
             if( tab < tab_mode::FIRST_TAB ) {
                 tab = tab_mode::LAST_TAB;
             }
             selection = 0;
         } else if( action == "DOWN" ) {
+            details_offset = 0;
             selection++;
             if( selection >= umissions.size() ) {
                 selection = 0;
             }
         } else if( action == "UP" ) {
+            details_offset = 0;
             if( selection == 0 ) {
                 selection = umissions.empty() ? 0 : umissions.size() - 1;
             } else {
                 selection--;
             }
+        } else if( action == "PAGE_UP" && !umissions.empty() ) {
+            details_offset = std::max( 0, details_offset - std::max( 1, getmaxy( w_missions ) - 6 ) );
+        } else if( action == "PAGE_DOWN" && !umissions.empty() ) {
+            details_offset = std::min( max_details_offset, details_offset + std::max( 1,
+                getmaxy( w_missions ) - 6 ) );
         } else if( action == "CONFIRM" ) {
             if( tab == tab_mode::TAB_ACTIVE && selection < umissions.size() ) {
                 u.set_active_mission( *umissions[selection] );

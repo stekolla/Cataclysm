@@ -26,11 +26,27 @@ NPCs can assign missions to the player. There is a fairly regular structure for 
     "advice": "When I was play'n with the terminal for the one I ran into it kept asking for an ID card.  Finding one would be the first order of business.",
     "inquire": "How 'bout that black box?",
     "success": "America, fuck ya!  I was in the guard a few years back so I'm confident I can make heads-or-tails of these transmissions.",
-    "success_lie": "What?!  I out'ta whip you're ass.",
     "failure": "Damn, I maybe we can find an egg-head to crack the terminal."
   }
 }
 ```
+
+## Authoring conventions
+
+- Use a short title and an actionable journal description. Include the quantity of any required items,
+  the destination or search area, and conditions the player must meet. Identify who to report back to
+  when that differs from the quest giver.
+- Start the `offer` line with the request in the NPC's voice. State what the NPC promises to give
+  the player. If the mission has no promised reward, make that clear where the offer would otherwise
+  imply payment.
+- Grant promised rewards in `end`. Use `start` to provide any equipment needed for the objective.
+  The shared completion response checks the objective, runs the completion effects, and lets the
+  player acknowledge the NPC's response.
+- Use mission-specific dialogue to tell stories about deception. Shared mission dialogue only
+  accepts a completion report after the objective has been met.
+- Keep trade, work offers, and mission reports easy to reach. Group related background questions
+  when a conversation grows, and use `TALK_NONE` for back responses. Keep story-dependent responses
+  reachable whenever their conditions are met.
 
 ### type
 
@@ -55,7 +71,7 @@ to the player. See the example below:
 "id": "MISSION_EXAMPLE_TOKENS",
 "type": "mission_definition",
 "name": "Murder Money",
-"description": "Whack the target in exchange for <reward_item:FMCNote> c-notes and <reward_item:cig> cigarettes.",
+"description": "Whack the target in exchange for <reward_count:FMCNote> c-notes and <reward_count:cig> cigarettes.",
 "goal": "MGOAL_ASSASSINATE",
 "end": {
   "effect": [
@@ -64,8 +80,11 @@ to the player. See the example below:
 }
 ```
 
-This system may be expanded in the future to allow referring to other mission parameters and
-effects.
+The journal lists unconditional, free item grants from the mission's `end` effects.
+Use the optional translatable `reward_description` when that list cannot describe the full reward,
+such as for a scripted or conditional reward. It replaces the journal's generated reward text.
+The legacy `has_generic_rewards` field is accepted for existing definitions. Shared mission
+completion uses the mission's explicit effects.
 
 ### goal
 
@@ -113,8 +132,8 @@ in exactly the same way.
 ### dialogue
 
 This is a dictionary of strings. The NPC says these exact strings in response to the player
-inquiring about the mission or reporting its completion. All these strings are required, even if
-they may not be used in the mission.
+inquiring about the mission or reporting its completion. The standard dialogue lines below are
+required for NPC mission origins. The legacy `success_lie` line is optional.
 
 | string ID     | Usage                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------- |
@@ -125,7 +144,6 @@ they may not be used in the mission.
 | `advice`      | If the player asks for advice on how to complete the mission, they hear this              |
 | `inquire`     | This is used if the NPC asks the player how the mission is going                          |
 | `success`     | The NPC's response to a report that the mission was successful                            |
-| `success_lie` | The NPC's response if they catch the player lying about a mission's success               |
 | `failure`     | The NPC's response if the player reports a failed mission                                 |
 
 ### start

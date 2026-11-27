@@ -242,11 +242,12 @@ void mission_type::load( const JsonObject &jo, const std::string &src )
         mandatory( djo, was_loaded, "advice", dialogue[ "advice" ] );
         mandatory( djo, was_loaded, "inquire", dialogue[ "inquire" ] );
         mandatory( djo, was_loaded, "success", dialogue[ "success" ] );
-        mandatory( djo, was_loaded, "success_lie", dialogue[ "success_lie" ] );
+        optional( djo, was_loaded, "success_lie", dialogue[ "success_lie" ] );
         mandatory( djo, was_loaded, "failure", dialogue[ "failure" ] );
     }
 
     optional( jo, was_loaded, "description", description );
+    optional( jo, was_loaded, "reward_description", reward_description );
     optional( jo, was_loaded, "urgent", urgent );
     optional( jo, was_loaded, "item", item_id, itype_id::NULL_ID() );
     optional( jo, was_loaded, "item_group", group_id );
@@ -255,18 +256,21 @@ void mission_type::load( const JsonObject &jo, const std::string &src )
     optional( jo, was_loaded, "remove_container", remove_container );
     //intended for situations where closed and open container are different
     optional( jo, was_loaded, "empty_container", empty_container, itype_id::NULL_ID() );
-    optional( jo, was_loaded, "has_generic_rewards", has_generic_rewards, true );
+    optional( jo, was_loaded, "has_generic_rewards", has_generic_rewards, false );
 
     goal = jo.get_enum_value<decltype( goal )>( "goal" );
 
     assign_function( jo, "place", place, tripoint_function_map );
     const auto parse_phase = [&]( const std::string & phase,
-    std::function<void( mission * )> &phase_func ) {
+                                  std::function<void( mission * )> &phase_func, bool collect_rewards ) {
         if( jo.has_string( phase ) ) {
+            if( collect_rewards ) {
+                likely_rewards.clear();
+            }
             assign_function( jo, phase, phase_func, mission_function_map );
         } else if( jo.has_member( phase ) ) {
             JsonObject j_start = jo.get_object( phase );
-            if( !parse_funcs( j_start, phase_func ) ) {
+            if( !parse_funcs( j_start, phase_func, collect_rewards ) ) {
                 deferred.emplace_back( jo.get_source_location(), src );
                 jo.allow_omitted_members();
                 j_start.allow_omitted_members();
@@ -275,13 +279,13 @@ void mission_type::load( const JsonObject &jo, const std::string &src )
         }
         return true;
     };
-    if( !parse_phase( "start", start ) ) {
+    if( !parse_phase( "start", start, false ) ) {
         return;
     }
-    if( !parse_phase( "end", end ) ) {
+    if( !parse_phase( "end", end, true ) ) {
         return;
     }
-    if( !parse_phase( "fail", fail ) ) {
+    if( !parse_phase( "fail", fail, false ) ) {
         return;
     }
 

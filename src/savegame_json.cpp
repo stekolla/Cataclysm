@@ -3599,6 +3599,11 @@ void mission::deserialize( JsonIn &jsin )
         target.y() = ja.get_int( 1 );
     }
 
+    auto saved_destination = tripoint_abs_omt();
+    if( jo.read( "objective_destination", saved_destination ) ) {
+        objective_destination = saved_destination;
+    }
+
     if( jo.has_int( "follow_up" ) ) {
         follow_up = mission_type::from_legacy( jo.get_int( "follow_up" ) );
     } else if( jo.has_string( "follow_up" ) ) {
@@ -3655,6 +3660,10 @@ void mission::serialize( JsonOut &json ) const
     json.write( target.y() );
     json.write( target.z() );
     json.end_array();
+
+    if( objective_destination ) {
+        json.member( "objective_destination", *objective_destination );
+    }
 
     json.member( "item_id", item_id );
     json.member( "item_count", item_count );
