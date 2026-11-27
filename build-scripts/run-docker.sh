@@ -27,6 +27,8 @@ cata_docker_args=(
     --env DENO_DIR=/tmp/cata-cache/deno
     --env EM_CACHE=/tmp/cata-cache/emscripten
     --env CHROME_BIN=/usr/local/bin/cata-chromium
+    # Forward interrupts to build subprocesses as well as their parent shell.
+    --env TINI_KILL_PROCESS_GROUP=1
 )
 
 if [[ "${CATA_DOCKER_PUBLISH:-}" == "1" ]]; then

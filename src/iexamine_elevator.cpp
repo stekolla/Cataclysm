@@ -220,9 +220,9 @@ auto move_player( player &p, const int /*movez*/ ) -> void
 {
     auto &here = get_map();
 
-    // yes, this is inefficient, but i'm lazy
-    elevator::find_elevators_nearby( p.bub_pos() )
-    .transform( []( const tripoint_bub_ms & pos ) -> point_rel_sm { return g->place_player( pos ); } );
+    if( const auto pos = elevator::find_elevators_nearby( p.bub_pos() ) ) {
+        g->place_player( *pos );
+    }
 
     cata_event_dispatch::avatar_moves( *p.as_avatar(), here, p.abs_pos() );
 }

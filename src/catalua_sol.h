@@ -5,6 +5,7 @@
 #  pragma clang diagnostic ignored "-Wold-style-cast"
 #  pragma clang diagnostic ignored "-Wmissing-noreturn"
 #  pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#  pragma clang diagnostic ignored "-Wunused-template"
 #endif
 #if defined(__GNUC__) && !defined(__clang__)
 #  pragma GCC diagnostic push

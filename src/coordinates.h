@@ -769,8 +769,8 @@ std::vector<coords::coord_point<Point, Origin, Scale>>
 }
 
 template<typename Point, coords::origin Origin, coords::scale Scale>
-static std::tuple<double, double, double> slope_of( const
-        std::vector<coords::coord_point<Point, Origin, Scale>> &line )
+auto slope_of( const std::vector<coords::coord_point<Point, Origin, Scale>> &line )
+-> std::tuple<double, double, double>
 {
     assert( !line.empty() && line.front() != line.back() );
     const double len = trig_dist( line.front(), line.back() );

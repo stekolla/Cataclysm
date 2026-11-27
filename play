@@ -12,7 +12,7 @@ export CATA_DOCKER_PUBLISH=1
 exec bash "$repo_root/build-scripts/run-docker.sh" bash -lc '
     set -euo pipefail
     cmake --preset wasm-tiles
-    cmake --build --preset wasm-tiles --parallel 2
+    cmake --build --preset wasm-tiles
     echo "Open http://127.0.0.1:8000/cataclysm-bn-tiles.html"
     exec python3 -m http.server 8000 --bind 0.0.0.0 --directory out/build/wasm-tiles/web
 '

@@ -570,6 +570,7 @@ static void get_tile_information( const std::string &config_path, std::string &j
     }
 }
 
+#if defined(DYNAMIC_ATLAS)
 static size_t get_surface_hash( SDL_Surface *surf, const SDL_Rect *rect )
 {
 
@@ -705,6 +706,9 @@ static void apply_blend_filter(
     }
 }
 
+#endif
+
+#if !defined(DYNAMIC_ATLAS)
 template<bool SkipTransparent = true, typename FilterFn>
 static SDL_Surface_Ptr apply_color_filter_blit_copy(
     const SDL_Surface_Ptr &src, FilterFn filter_func )
@@ -732,6 +736,7 @@ static SDL_Surface_Ptr apply_color_filter_blit_copy(
 
     return dst;
 }
+#endif
 
 static bool is_contained( const SDL_Rect &smaller, const SDL_Rect &larger )
 {
@@ -741,6 +746,7 @@ static bool is_contained( const SDL_Rect &smaller, const SDL_Rect &larger )
            smaller.y + smaller.h <= larger.y + larger.h;
 }
 
+#if defined(DYNAMIC_ATLAS)
 /**
  * Creates an identity UV surface for the given dimensions.
  * In offset mode, all pixels are (127, 127) meaning no displacement.
@@ -1134,6 +1140,8 @@ static void apply_uv_remap(
     }
 }
 
+#endif
+
 bool tileset_loader::copy_surface_to_texture( const SDL_Surface_Ptr &surf, const point offset,
         std::vector<texture> &target ) const
 {
@@ -1164,12 +1172,10 @@ bool tileset_loader::copy_surface_to_texture( const SDL_Surface_Ptr &surf, const
     return true;
 }
 
+#if defined(DYNAMIC_ATLAS)
 bool tileset_loader::copy_surface_to_dynamic_atlas(
     const SDL_Surface_Ptr &surf, const point offset )
 {
-#if !defined(DYNAMIC_ATLAS)
-    return false;
-#else
     assert( surf );
     const rect_range<SDL_Rect> input_range(
         sprite_width,
@@ -1221,7 +1227,6 @@ bool tileset_loader::copy_surface_to_dynamic_atlas(
     sdl_restore_render_state( renderer.get(), state );
 
     return true;
-#endif
 }
 
 static color_pixel_function_pointer get_pixel_function( const tileset_fx_type &type )
@@ -1455,6 +1460,7 @@ static void apply_surf_blend_effect(
         );
     }
 }
+#endif
 
 texture_result tileset::get_or_default( const int sprite_index,
                                         const int mask_index,
@@ -1730,7 +1736,11 @@ texture_result tileset::get_or_default( const int sprite_index,
         return { &entry->second.tex, entry->second.warp_offset };
     }
 #else
-    if( sprite_index >= tile_values.size() ) {
+    static_cast<void>( mask_index );
+    static_cast<void>( tint );
+    static_cast<void>( warp_hash );
+    static_cast<void>( sprite_offset );
+    if( sprite_index < 0 || static_cast<size_t>( sprite_index ) >= tile_values.size() ) {
         return { nullptr, point_zero };
     }
 
@@ -1857,11 +1867,13 @@ bool tileset_loader::create_textures_from_tile_atlas( const SDL_Surface_Ptr &til
 #endif
 }
 
+#if !defined(DYNAMIC_ATLAS)
 template<typename T>
 static void extend_vector_by( std::vector<T> &vec, const size_t additional_size )
 {
     vec.resize( vec.size() + additional_size );
 }
+#endif
 
 namespace
 {
@@ -4059,21 +4071,21 @@ void cata_tiles::draw( point dest, const tripoint_bub_ms &center, int width, int
         if( invisible[0] ) {
             return;
         }
-        auto field_at = [&]( const tripoint_bub_ms & q, const bool invis ) -> field_type_id {
+        auto field_at = [&]( const tripoint_bub_ms & q ) -> field_type_id {
             std::optional<mapbuffer_abs_tile_view> tile = here.get_tile_view_at( q );
             if( !tile ) { return fd_null; }
             return tile.value().get_field().displayed_field_type();
         };
 
-        const auto &fld = field_at( p, invisible[0] );
+        const auto &fld = field_at( p );
         if( !fld->display_field ) {
             return;
         }
         const int neighborhood[4] = {
-            static_cast<int>( field_at( p + point_south, invisible[1] ) ),
-            static_cast<int>( field_at( p + point_east, invisible[2] ) ),
-            static_cast<int>( field_at( p + point_west, invisible[3] ) ),
-            static_cast<int>( field_at( p + point_north, invisible[4] ) )
+            static_cast<int>( field_at( p + point_south ) ),
+            static_cast<int>( field_at( p + point_east ) ),
+            static_cast<int>( field_at( p + point_west ) ),
+            static_cast<int>( field_at( p + point_north ) )
         };
 
         int subtile = 0;
@@ -6334,6 +6346,7 @@ bool cata_tiles::draw_zombie_revival_indicators( const tripoint_bub_ms &pos, con
     return false;
 }
 
+#if defined(DYNAMIC_ATLAS)
 // Check if overlay matches any prefix in the list
 // overlay_id is like "wielded_katana", "worn_boots", "mutation_HORNS", etc.
 static bool matches_overlay_prefix_list( const std::string &overlay_id,
@@ -6370,6 +6383,7 @@ static bool group_applies_to_overlay( const state_modifier_group &group,
 
     return true;  // No whitelist = applies to all (that passed blacklist)
 }
+#endif
 
 std::tuple<SDL_Surface_Ptr, point> cata_tiles::build_composite_uv_modifier( const Character &ch,
         const int width, const int height, const std::vector<bool> &group_filter )
@@ -6524,8 +6538,10 @@ void cata_tiles::draw_entity_with_overlays( const Character &ch, const tripoint_
     }
 
     const auto &state_modifiers = tileset_ptr->get_state_modifiers();
+#if defined(DYNAMIC_ATLAS)
     const auto &global_whitelist = tileset_ptr->get_global_warp_whitelist();
     const auto &global_blacklist = tileset_ptr->get_global_warp_blacklist();
+#endif
     const bool use_state_modifiers = get_option<bool>( "STATE_MODIFIERS" ) && !state_modifiers.empty();
 
     // Cache for warp hashes by group filter signature

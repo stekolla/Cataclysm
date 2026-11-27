@@ -59,6 +59,9 @@ jobs:
       - name: Check build directory isolation
         run: bash build-scripts/test-run-docker.sh
 
+      - name: Check Docker interruption
+        run: python3 build-scripts/test-docker-signals.py
+
       - name: Run native test-only suite
         if: inputs.run-native-tests
         run: ./test fast

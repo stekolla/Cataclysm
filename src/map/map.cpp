@@ -7415,18 +7415,6 @@ static inline void shift_tripoint_set(
     }
 }
 
-template <typename T>
-static inline void shift_tripoint_map(
-    std::map<tripoint_bub_ms, T>& map, const point_rel_ms& offset,
-    const half_open_rectangle<point_bub_ms>& boundaries) {
-    std::map<tripoint_bub_ms, T> old_map = std::move(map);
-    map.clear();
-    for (const std::pair<tripoint_bub_ms, T>& pr : old_map) {
-        tripoint_bub_ms new_pt = pr.first + offset;
-        if (boundaries.contains(new_pt.xy())) { map.emplace(new_pt, pr.second); }
-    }
-}
-
 void map::shift_vehicle_z(vehicle& veh, int z_shift) {
     auto src = veh.abs_sm_pos;
     auto dst = src + tripoint_rel_sm(0, 0, z_shift);

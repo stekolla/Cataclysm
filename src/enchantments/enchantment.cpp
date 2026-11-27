@@ -792,21 +792,6 @@ bool enchantment::operator<(const enchantment& rhs) const {
                     rhs.immune_effects, rhs.immune_fields, rhs.flags, rhs.special_visions);
 }
 
-namespace {
-
-template <float mutation_branch::* First>
-auto is_set_value(const trait_id& mut, float val) -> bool {
-    return (*mut).*First == val;
-}
-
-template <float mutation_branch::* First, float mutation_branch::*... Rest,
-          std::enable_if_t<(sizeof...(Rest) > 0), bool> NonEmpty = false>
-auto is_set_value(const trait_id& mut, float val) -> bool {
-    return (*mut).*First == val && is_set_value<Rest...>(mut, val);
-}
-
-} // namespace
-
 void enchantment::finalize() {
     const char* ench_desc = id.is_empty() ? "An inline enchantment" : "Enchantment";
     std::vector<std::string> problems;

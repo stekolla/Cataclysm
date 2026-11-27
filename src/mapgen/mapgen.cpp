@@ -1078,7 +1078,7 @@ map_key::map_key(const JsonMember& member): str(member.name()) {
     if (utf8_width(str) != 1) { member.throw_error("format map key must be 1 column"); }
 }
 
-template <typename T> static auto is_null_helper(const string_id<T>& id) -> bool {
+template <typename T> [[maybe_unused]] static auto is_null_helper(const string_id<T>& id) -> bool {
     return id.is_null();
 }
 

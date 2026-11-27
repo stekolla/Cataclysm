@@ -1969,17 +1969,6 @@ void sounds::sound( const sound_event &soundevent )
 
 }
 
-template <typename C>
-static void vector_quick_remove( std::vector<C> &source, int index )
-{
-    if( source.size() != 1 ) {
-        // Swap the target and the last element of the vector.
-        // This scrambles the vector, but makes removal O(1).
-        std::iter_swap( source.begin() + index, source.end() - 1 );
-    }
-    source.pop_back();
-}
-
 static int get_signal_for_hordes( const sound_event centr, const short ambient_vol,
                                   const short terrain_absorption, const short alt_adjust )
 {
