@@ -1,29 +1,34 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-set -exo pipefail
+cd "$(git rev-parse --show-toplevel)"
+build_path="${BUILD_PATH:-build}"
+jobs="${NUM_JOBS:-$(getconf _NPROCESSORS_ONLN)}"
+affected_files="${AFFECTED_FILES:-affected_files.txt}"
+plugin="$build_path/scripts/clang-tidy-plugin/libCataAnalyzerPlugin.so"
 
-BUILD_TYPE=${BUILD_TYPE:-"RelWithDeb"}
-NUM_JOBS=${NUM_JOBS:-$(nproc)}
-BUILD_PATH=${BUILD_PATH:-"build"}
-COMPILER=${COMPILER:-"/usr/bin/clang++"}
-
-echo "Using bash version $BASH_VERSION with $NUM_JOBS jobs"
-echo "Using build files at $BUILD_PATH"
-
-AFFECTED_FILES=${AFFECTED_FILES:-"affected_files.txt"}
-FILTERED_AFFECTED_FILES=$(mktemp)
-trap 'rm -f "$FILTERED_AFFECTED_FILES"' EXIT
-
-grep -E '^(src|tests)/.*\.(cpp|h|hpp)$' "$AFFECTED_FILES" > "$FILTERED_AFFECTED_FILES" || true
-
-if ! grep -q '[^[:space:]]' "$FILTERED_AFFECTED_FILES"
-then
-  echo "No files to analyze."
-  exit 0
-else
-  echo "Analyzing $(wc -l < "$FILTERED_AFFECTED_FILES") files"
-  # shellcheck disable=SC2002
-  # cat "$AFFECTED_FILES" | parallel  -j"$NUM_JOBS" --no-notice -a ./build-scripts/clang-tidy-wrapper.sh {}
-  set +e # so we can run all the checks
-  < "$FILTERED_AFFECTED_FILES" xargs -n1 -P"$NUM_JOBS" ./build-scripts/clang-tidy-wrapper.sh -quiet
+if [[ ! -r "$affected_files" ]]; then
+    printf 'error: cannot read affected-files list: %s\n' "$affected_files" >&2
+    exit 1
 fi
+
+files=()
+while IFS= read -r file || [[ -n "$file" ]]; do
+    if [[ "$file" =~ ^(src|tests)/.*\.(cpp|h|hpp)$ ]]; then
+        files+=( "$file" )
+    fi
+done < "$affected_files"
+
+if [[ ! ${files[0]+set} ]]; then
+    echo "No files to analyze."
+    exit 0
+fi
+
+if [[ ! -f "$plugin" ]]; then
+    printf 'error: clang-tidy plugin not found: %s\n' "$plugin" >&2
+    exit 1
+fi
+
+printf '%s\0' "${files[@]}" |
+    xargs -0 -n1 -P "$jobs" clang-tidy -p "$build_path" --load="$plugin" \
+        --enable-check-profile --store-check-profile=clang-tidy-trace -quiet

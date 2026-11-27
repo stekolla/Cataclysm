@@ -61,40 +61,54 @@ fi
 
 cpp_files=()
 json_files=()
+format_docs=false
+format_lua=false
 stage_files=()
 
 if [[ "$mode" == staged ]]; then
     while IFS= read -r -d '' file; do
         file="${file#./}"
-        if [[ ! -f "$file" ]]; then
-            continue
-        fi
-
         case "$file" in
             *.cpp|*.h|*.hpp)
                 cpp_files+=( "$file" )
                 stage_files+=( "$file" )
                 ;;
             *.json)
-                if [[ "$file" != data/names/* ]]; then
+                if [[ "$file" != data/names/* && "$file" != .vscode/* ]]; then
                     json_files+=( "$file" )
                     stage_files+=( "$file" )
                 fi
                 ;;
-            *.md|*.lua)
+            *.md)
+                format_docs=true
+                stage_files+=( "$file" )
+                ;;
+            *.lua)
+                format_lua=true
                 stage_files+=( "$file" )
                 ;;
         esac
     done < <(git diff --cached --name-only --diff-filter=ACMR -z)
 fi
 
-dprint fmt --config dprint-docs.json
-dprint fmt
-
 if [[ "$mode" == all ]]; then
+    dprint fmt --config dprint-docs.json
+    dprint fmt
     build-scripts/format-cpp.sh
     build-scripts/format-json.sh
 else
+    for file in "${stage_files[@]+"${stage_files[@]}"}"; do
+        if ! git --literal-pathspecs diff --quiet -- "$file"; then
+            printf 'error: cannot format staged file with unstaged changes: %s\n' "$file" >&2
+            exit 1
+        fi
+    done
+    if "$format_docs"; then
+        dprint fmt --config dprint-docs.json --staged --allow-no-files
+    fi
+    if "$format_lua"; then
+        dprint fmt --staged --allow-no-files
+    fi
     if [[ ${cpp_files[0]+set} ]]; then
         build-scripts/format-cpp.sh "${cpp_files[@]}"
     fi
@@ -102,6 +116,6 @@ else
         build-scripts/format-json.sh "${json_files[@]}"
     fi
     if [[ ${stage_files[0]+set} ]]; then
-        git add -f -- "${stage_files[@]}"
+        git --literal-pathspecs add -- "${stage_files[@]}"
     fi
 fi

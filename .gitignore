@@ -25,7 +25,7 @@ test_user_dir*
 /data/*.template
 /data/mods/user-default-mods.json
 /data/shaders/
-# Downloaded by build-scripts/fetch-loading-screens.sh
+# Optional local loading-screen assets
 /data/json/loading/
 /data/mods/*/loading/
 /data/mods/gunchair/scarf_gunchair.png

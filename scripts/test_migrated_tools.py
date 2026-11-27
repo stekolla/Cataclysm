@@ -81,7 +81,7 @@ class MigratedToolsTests(unittest.TestCase):
 
     def test_bundled_mod(self):
         """Check that bundling uses the locked archive, extracts the mod and writes credits."""
-        bundler = load_script(SCRIPTS.parent / "build-scripts/bundle-registry-mods.py")
+        bundler = load_script(SCRIPTS / "bundle-registry-mods.py")
         archive = io.BytesIO()
         with ZipFile(archive, "w") as source:
             source.writestr("ReleaseRoot/NestedMod/modinfo.json", "[]")

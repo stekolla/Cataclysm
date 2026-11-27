@@ -38,7 +38,4 @@ if [[ "${CATA_DOCKER_INTERACTIVE:-}" == "1" ]]; then
     cata_docker_args+=(--interactive --tty)
 fi
 
-exec docker "${cata_docker_args[@]}" "${cata_image}" env \
-    HOME=/tmp \
-    CHROME_BIN=/usr/local/bin/cata-chromium \
-    "$@"
+exec docker "${cata_docker_args[@]}" "${cata_image}" "$@"

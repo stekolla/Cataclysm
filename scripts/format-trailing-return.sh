@@ -5,7 +5,7 @@ repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
 if (( $# == 0 )); then
-    echo "usage: build-scripts/format-trailing-return.sh <files or dirs>" >&2
+    echo "usage: scripts/format-trailing-return.sh <files or dirs>" >&2
     exit 2
 fi
 

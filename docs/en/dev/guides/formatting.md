@@ -57,8 +57,6 @@ JSON files are formatted with `json_formatter`, a custom tool built from the pro
 
 ```sh
 build-scripts/fmt.sh json
-# or
-build-scripts/format-json.sh
 ```
 
 The script builds `json_formatter` in `out/build/json-format` and formats JSON files. It does not
@@ -77,7 +75,8 @@ Before formatting, you can validate JSON syntax:
 build-scripts/lint-json.sh
 ```
 
-This runs Python's `json.tool` on all JSON files to catch syntax errors.
+This checks JSON syntax in tracked, non-hidden files. Use `build-scripts/lint-all.sh` to also validate
+NPC dialogue.
 
 ## Markdown and Lua Formatting
 
@@ -105,9 +104,8 @@ Install the optional pre-commit hook with [`prek`](https://github.com/j178/prek)
 prek install
 ```
 
-When you commit, the hook runs `build-scripts/fmt.sh`. dprint formats Markdown and Lua across the
-repository. The C++ and JSON formatters process staged additions and modifications. The hook
-re-stages formatted files so the commit includes the changes.
+When you commit, the hook runs `build-scripts/fmt.sh`. It formats and re-stages eligible staged
+files only. If any selected file also has unstaged changes, it stops before formatting.
 
 To run the same formatting manually against staged files:
 
@@ -130,7 +128,7 @@ build-scripts/fmt.sh --all
 The CI pipeline runs these checks automatically:
 
 1. **JSON syntax validation** - `build-scripts/lint-json.sh`
-2. **JSON formatting** - `build-scripts/format-json.sh`
+2. **JSON formatting** - `build-scripts/fmt.sh json`
 3. **Dialogue validation** - `scripts/dialogue_validator.py`
 
 If any check fails, the build will fail. Use the commands above to fix issues locally before
