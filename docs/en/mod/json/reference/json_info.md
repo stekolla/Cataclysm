@@ -14,7 +14,7 @@ This document describes the JSON files used in Cataclysm and their properties.
 ## Navigating the JSON
 
 A lot of the JSON involves cross-references to other JSON entities. To make it easier to navigate,
-we provide a script `tools/json_tools/cddatags.py` that can build a `tags` file for you.
+we provide a script `scripts/json_tools/cddatags.py` that can build a `tags` file for you.
 
 To run the script you'll need Python 3. On Windows you'll probably need to install that, and
 associate `.py` files with Python. Then open a command prompt, navigate to your working copy, and run

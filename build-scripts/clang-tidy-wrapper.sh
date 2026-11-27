@@ -6,7 +6,7 @@ set -x
 
 BUILD_PATH=${BUILD_PATH:-"build"}
 
-PLUGIN=$BUILD_PATH/tools/clang-tidy-plugin/libCataAnalyzerPlugin.so
+PLUGIN=$BUILD_PATH/scripts/clang-tidy-plugin/libCataAnalyzerPlugin.so
 
 clang-tidy \
   --load="$PLUGIN" \

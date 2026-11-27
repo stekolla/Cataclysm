@@ -41,7 +41,7 @@ list_of_files=$(grep '"file": "' build/compile_commands.json | \
     sed "s+.*$PWD/++;s+\"$++" | \
     egrep "$file_regex")
 
-plugin_lib="$top_dir/build/tools/clang-tidy-plugin/libCataAnalyzerPlugin.so"
+plugin_lib="$top_dir/build/scripts/clang-tidy-plugin/libCataAnalyzerPlugin.so"
 plugin_opt=
 if [ -r "$plugin_lib" ]
 then

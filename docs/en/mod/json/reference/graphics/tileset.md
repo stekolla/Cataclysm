@@ -40,7 +40,7 @@ Useful options:
 - `--use-all`: include otherwise unused PNG files with ids based on their filenames.
 - `--palette` and `--palette-copies`: generate 8-bit palette output.
 
-The old `tools/gfx_tools/compose.py` and `tools/gfx_tools/decompose.py` scripts are deprecated for
+The old `scripts/gfx_tools/compose.py` and `scripts/gfx_tools/decompose.py` scripts are deprecated for
 documentation and daily tileset work. They remain in the repository for compatibility and parity
 tests.
 

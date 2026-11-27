@@ -1,6 +1,7 @@
 include(ExternalProject)
 
 add_executable(json_formatter format.cpp ${CMAKE_SOURCE_DIR}/src/json.cpp)
+target_compile_features(json_formatter PRIVATE cxx_std_23)
 
 add_definitions(-DCATA_IN_TOOL)
 

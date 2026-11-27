@@ -45,11 +45,11 @@ Two topics are special:
 
 Keeping track of talk topics and making sure that all the topics referenced in responses are
 defined, and all defined topics are referenced in a response or an NPC's chat, is very tricky. There
-is a python script in `tools/dialogue_validator.py` that will map all topics to responses and vice
+is a python script in `scripts/dialogue_validator.py` that will map all topics to responses and vice
 versa. Invoke it with
 
 ```sh
-python tools/dialogue_validator.py data/json/npcs/* data/json/npcs/Backgrounds/* data/json/npcs/refugee_center/*
+python scripts/dialogue_validator.py data/json/npcs/* data/json/npcs/Backgrounds/* data/json/npcs/refugee_center/*
 ```
 
 If you are writing a mod with dialogue, you can add the paths to the mod's dialogue files.

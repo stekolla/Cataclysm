@@ -5,7 +5,7 @@
 // We centralize that requirement in this header so that IWYU can force this
 // header to be included when such defines are used, via mappings.
 // At time of writing only M_PI has a mapping, which is the most commonly used
-// one.  If more are needed, add them to tools/iwyu/vs.stdlib.imp.
+// one.  If more are needed, add them to scripts/iwyu/vs.stdlib.imp.
 
 // Note that it's important to use math.h here, not cmath.  See
 // https://stackoverflow.com/questions/6563810/m-pi-works-with-math-h-but-not-with-cmath-in-visual-studio/6563891

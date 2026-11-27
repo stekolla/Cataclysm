@@ -56,7 +56,7 @@ C++ style is enforced by the repository formatter helpers. Run `build-scripts/fm
 
 ### JSON
 
-JSON files are formatted using custom formatter available in `tools/format`. Visit
+JSON files are formatted using custom formatter available in `scripts/format`. Visit
 [JSON Style Guide](../mod/json/explanation/json_style.md) for details.
 
 ### Markdown

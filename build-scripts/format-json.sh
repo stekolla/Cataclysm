@@ -24,7 +24,7 @@ if (( ${#json_files[@]} == 0 )); then
 fi
 
 build_dir="${CATA_JSON_FORMAT_BUILD_DIR:-out/build/json-format}"
-json_formatter="$build_dir/tools/format/json_formatter"
+json_formatter="$build_dir/scripts/format/json_formatter"
 
 jobs="${CMAKE_BUILD_PARALLEL_LEVEL:-}"
 if [[ -z "$jobs" ]]; then

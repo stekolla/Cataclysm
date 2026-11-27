@@ -16,7 +16,7 @@ def write_to_json(pathname, data):
         except ValueError:
             fp.write(json.dumps(data))
 
-    json_formatter = "./tools/format/json_formatter.cgi"
+    json_formatter = "./scripts/format/json_formatter.cgi"
     if os.path.isfile(json_formatter):
         cmd = [json_formatter, pathname]
         subprocess.call(cmd)

@@ -15,12 +15,12 @@ append_clang_format_source() {
     fi
 
     case "$file" in
-        src/lua/*|src/sol/*|src/third-party/*|tests/catch/*|tools/clang-tidy-plugin/test/*)
+        src/lua/*|src/sol/*|src/third-party/*|tests/catch/*|scripts/clang-tidy-plugin/test/*)
             return
             ;;
     esac
 
-    if [[ "$file" == src/*/* || "$file" == tests/* || "$file" == tools/format/* || "$file" == tools/clang-tidy-plugin/* ]]; then
+    if [[ "$file" == src/*/* || "$file" == tests/* || "$file" == scripts/format/* || "$file" == scripts/clang-tidy-plugin/* ]]; then
         case "$file" in
             *.cpp|*.h|*.hpp)
                 clang_format_sources+=( "$file" )
@@ -57,7 +57,7 @@ else
 
     while IFS= read -r -d '' file; do
         append_clang_format_source "$file"
-    done < <(find tests tools/format tools/clang-tidy-plugin -type f \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -print0)
+    done < <(find tests scripts/format scripts/clang-tidy-plugin -type f \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -print0)
 
     while IFS= read -r -d '' file; do
         append_astyle_source "$file"

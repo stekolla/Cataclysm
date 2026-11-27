@@ -94,7 +94,7 @@ build-scripts/fmt.sh lua
 NPC dialogue files have additional validation:
 
 ```sh
-tools/dialogue_validator.py data/json/npcs/* data/json/npcs/*/* data/json/npcs/*/*/*
+scripts/dialogue_validator.py data/json/npcs/* data/json/npcs/*/* data/json/npcs/*/*/*
 ```
 
 ## Pre-commit Workflow
@@ -131,7 +131,7 @@ The CI pipeline runs these checks automatically:
 
 1. **JSON syntax validation** - `build-scripts/lint-json.sh`
 2. **JSON formatting** - `build-scripts/format-json.sh`
-3. **Dialogue validation** - `tools/dialogue_validator.py`
+3. **Dialogue validation** - `scripts/dialogue_validator.py`
 
 If any check fails, the build will fail. Use the commands above to fix issues locally before
 pushing.

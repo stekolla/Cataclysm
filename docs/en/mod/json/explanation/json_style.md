@@ -8,7 +8,7 @@ undue disruption to development.
 
 ## Why do we have a homegrown JSON formatter?
 
-DDA wrote their own JSON parser. It lives in `tools/format/format.cpp` and it leverages
+DDA wrote their own JSON parser. It lives in `scripts/format/format.cpp` and it leverages
 `src/json.cpp`to parse and emit JSON.
 
 This isn't optimal solution as it makes using existing JSON formatters impossible,
@@ -56,7 +56,7 @@ or entries.
 ## Formatting tool
 
 The formatting tool can be invoked through the CMake `style-json` target, directly as
-`tools/format/json_formatter.cgi`, or via cgi at http://dev.narc.ro/cataclysm/format.html
+`scripts/format/json_formatter.cgi`, or via cgi at http://dev.narc.ro/cataclysm/format.html
 
 ### For Single file
 

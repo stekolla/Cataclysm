@@ -20,3 +20,6 @@ Run any script with `--help` for its command-line options.
   converts legacy unit fields in place.
 
 The Wasm test image installs Chromium and the Python WebSocket client for `./test wasm`.
+
+The JSON formatter and custom clang-tidy plugin are built through CMake. See the
+[formatting guide](../docs/en/dev/guides/formatting.md) for the developer commands.

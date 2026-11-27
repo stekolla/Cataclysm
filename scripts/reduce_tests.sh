@@ -44,6 +44,6 @@ export REDUCE_TESTS_EXTRA_OPTS="$*"
 # The braces are removed again inside our helper script.
 ./tests/cata_test --list-test-names-only '~[.]' | \
     grep '[^ ]' | sed 's/.*/{&}/' > list_of_tests || true
-multidelta tools/reduce_tests_helper.sh list_of_tests
+multidelta scripts/reduce_tests_helper.sh list_of_tests
 
 # vim:tw=0

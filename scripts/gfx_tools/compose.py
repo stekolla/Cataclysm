@@ -173,7 +173,7 @@ def write_to_json(
     if not format_json:
         return
 
-    json_formatter = Path("tools/format/json_formatter.cgi")
+    json_formatter = Path("scripts/format/json_formatter.cgi")
     if json_formatter.is_file():
         cmd = [json_formatter, pathname]
         subprocess.call(cmd)

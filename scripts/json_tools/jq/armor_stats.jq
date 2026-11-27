@@ -1,6 +1,6 @@
 # Output stats for armor, including resistance calculations
 
-# jq -f tools/json_tools/jq/armor_stats.jq --argfile mat data/json/materials.json data/json/items/*.json
+# jq -f scripts/json_tools/jq/armor_stats.jq --argfile mat data/json/materials.json data/json/items/*.json
 
 # load bash and cut resist data from the material array
 ( $mat | map ( { (.ident):.bash_resist } ) | add ) as $br

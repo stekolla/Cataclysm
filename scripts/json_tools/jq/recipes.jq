@@ -1,6 +1,6 @@
 # Output summary of recipes, with skills/tools/components compacted
 
-# jq -f tools/json_tools/jq/recipes.jq data/json/recipes/*.json
+# jq -f scripts/json_tools/jq/recipes.jq data/json/recipes/*.json
 
 .[] | {
     name:.result,

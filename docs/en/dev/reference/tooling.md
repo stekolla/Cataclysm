@@ -38,10 +38,10 @@ See the [JSON style guide](../../mod/json/explanation/json_style.md).
 ## ctags
 
 In addition to the usual means of creating a `tags` file via e.g.
-[`ctags`](http://ctags.sourceforge.net/), we provide `tools/json_tools/cddatags.py` to augment a
+[`ctags`](http://ctags.sourceforge.net/), we provide `scripts/json_tools/cddatags.py` to augment a
 `tags` file with locations of definitions taken from CDDA JSON data. `cddatags.py` is designed to
 safely update a tags file containing source code tags, so if you want both types of tag in your
-`tags` file then you can run `ctags -R . && tools/json_tools/cddatags.py`.
+`tags` file then you can run `ctags -R . && scripts/json_tools/cddatags.py`.
 
 ## clang-tidy
 
@@ -89,13 +89,13 @@ that worked).
 Then run:
 
 ```sh
-iwyu_tool.py -p $CMAKE_BUILD_DIR/compile_commands.json -- -Xiwyu --mapping_file=$PWD/tools/iwyu/cata.imp | fix_includes.py --nosafe_headers --reorder
+iwyu_tool.py -p $CMAKE_BUILD_DIR/compile_commands.json -- -Xiwyu --mapping_file=$PWD/scripts/iwyu/cata.imp | fix_includes.py --nosafe_headers --reorder
 ```
 
 IWYU will sometimes add C-style library headers which clang-tidy doesn't like, so you might need to
 run clang-tidy (as described above) and then re-run IWYU a second time.
 
-There are mapping files in `tools/iwyu` intended to help IWYU pick the right headers. Mostly they
+There are mapping files in `scripts/iwyu` intended to help IWYU pick the right headers. Mostly they
 should be fairly obvious, but the SDL mappings might warrant further explanation. We want to force
 most SDL includes to go via `sdl_wrappers.h`, because that handles the platform-dependence issues
 (the include paths are different on Windows). There are a couple of exceptions (`SDL_version.h` and

@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-GRAPHICS_TOOLS = Path(__file__).resolve().parent.parent / "tools/gfx_tools"
+GRAPHICS_TOOLS = Path(__file__).resolve().parent.parent / "scripts/gfx_tools"
 PACK_OPTIONS = {
     "--use-all": "Add unused images using their basenames as IDs",
     "--obsolete-fillers": "Warn about obsolete fillers",
