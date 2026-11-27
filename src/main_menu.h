@@ -22,11 +22,9 @@ class main_menu
     private:
         // ASCII art that says "Cataclysm Dark Days Ahead"
         std::vector<std::string> mmenu_title;
-        std::string mmenu_motd;
         std::string mmenu_credits;
-        int mmenu_motd_len;
         int mmenu_credits_len;
-        std::vector<std::string> vMenuItems; // MOTD, New Game, Load Game, etc.
+        std::vector<std::string> vMenuItems;
         std::vector<std::string> vWorldSubItems;
         std::vector<std::string> vNewGameSubItems;
         std::vector<std::string> vNewGameHints;
@@ -66,7 +64,7 @@ class main_menu
         // These variables are shared between @opening_screen and the tab functions.
         // TODO: But this is an ugly short-term solution.
         input_context ctxt;
-        int sel1 = 1;
+        int sel1 = 0;
         int sel2 = 1;
         point LAST_TERM;
         catacurses::window w_open;

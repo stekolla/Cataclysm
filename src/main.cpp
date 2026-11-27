@@ -567,19 +567,6 @@ int main( int argc, char *argv[] )
                         return 1;
                     }
                 },
-                {
-                    "--motdfile", "<filename>",
-                    "Name of the message of the day file within the motd directory",
-                    nullptr,
-                    []( int num_args, const char **params ) -> int {
-                        if( num_args < 1 )
-                        {
-                            return -1;
-                        }
-                        PATH_INFO::set_motd( params[0] );
-                        return 1;
-                    }
-                },
             }
         };
 

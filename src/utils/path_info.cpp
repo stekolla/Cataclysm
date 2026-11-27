@@ -29,7 +29,6 @@ static auto find_translated_file(
     const std::string& path, const std::string& extension, const std::string& fallback)
     -> std::string;
 
-static std::string motd_value;
 static std::string gfxdir_value;
 static std::string config_dir_value;
 static std::string user_dir_value;
@@ -122,7 +121,6 @@ void PATH_INFO::set_standard_filenames() {
     // Shared dirs
 
     // Shared files
-    motd_value = datadir_value + "motd/" + "en.motd";
 
     savedir_value = user_dir_value + "save/";
     memorialdir_value = user_dir_value + "memorial/";
@@ -223,10 +221,6 @@ auto PATH_INFO::credits() -> std::string {
         datadir_value + "credits/", ".credits", datadir_value + "credits/" + "en.credits");
 }
 
-auto PATH_INFO::motd() -> std::string {
-    return find_translated_file(datadir_value + "motd/", ".motd", motd_value);
-}
-
 auto PATH_INFO::title(const holiday) -> std::string { return title_screen::resolve_path(); }
 
 auto PATH_INFO::names() -> std::string {
@@ -240,7 +234,6 @@ void PATH_INFO::set_datadir(const std::string& datadir) {
     gfxdir_value = datadir_value + "gfx/";
 
     // Shared files
-    motd_value = datadir_value + "motd/" + "en.motd";
 }
 
 void PATH_INFO::set_config_dir(const std::string& config_dir) {
@@ -256,5 +249,3 @@ void PATH_INFO::set_memorialdir(const std::string& memorialdir) { memorialdir_va
 void PATH_INFO::set_options(const std::string& options) { options_value = options; }
 
 void PATH_INFO::set_autopickup(const std::string& autopickup) { autopickup_value = autopickup; }
-
-void PATH_INFO::set_motd(const std::string& motd) { motd_value = motd; }
