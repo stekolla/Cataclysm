@@ -1,6 +1,7 @@
 # Designing NPC dialogue and quests
 
-Read this guide before designing a new NPC, quest, or faction storyline. Use the
+Read this guide before designing a new NPC or quest. For a faction storyline, start with the
+[faction and settlement design guide](faction_and_settlement_design.md). Use the
 [NPC dialogue reference](../reference/creatures/npcs.md) and
 [mission reference](../reference/creatures/missions_json.md) when you are ready to implement it.
 

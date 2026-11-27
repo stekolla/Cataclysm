@@ -22,6 +22,7 @@
 | Browser saves | [Browser save behavior](docs/en/game/game_files_and_save_corruption.md) |
 | Lua and C++ bindings | [Lua authoring conventions](docs/en/mod/lua/guides/authoring_conventions.md) |
 | New or substantially revised NPCs, dialogue, or missions | [Dialogue and quest design](docs/en/mod/json/guides/dialogue_and_quest_design.md), then the [NPC](docs/en/mod/json/reference/creatures/npcs.md) and [mission](docs/en/mod/json/reference/creatures/missions_json.md) references |
+| New or substantially revised factions or settlements | [Faction and settlement design](docs/en/mod/json/guides/faction_and_settlement_design.md) |
 | Item data | [Items cookbook](docs/en/dev/guides/items.md) |
 | Generated files or overmap terrain matching | [Development practices](docs/en/dev/explanation/best_practices.md) |
 | End-to-end task workflow | [Development workflow](docs/en/contribute/contributing.md#quickstart) |
