@@ -8,7 +8,7 @@
     "attitude": 0,
     "mission": 3,
     "chat": "TALK_EVAC_MERCHANT",
-    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_1",
+    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_2",
     "faction": "free_merchants"
   },
   {
@@ -255,7 +255,12 @@
         "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
         "topic": "TALK_EVAC_MERCHANT_RANCH"
       },
-      { "text": "Can I do anything for the center?", "topic": "TALK_MISSION_LIST" },
+      {
+        "text": "Do you have any trade work for me?",
+        "topic": "TALK_MISSION_LIST",
+        "condition": { "not": "has_no_available_mission" }
+      },
+      { "text": "Who else needs a hand around here?", "topic": "TALK_EVAC_MERCHANT_STAFF" },
       { "text": "Let's trade then.", "effect": "start_trade", "topic": "TALK_EVAC_MERCHANT" },
       { "text": "When will you have new stuff in stock?", "topic": "TALK_EVAC_MERCHANT_ASKED_RESTOCK" },
       {
@@ -288,7 +293,13 @@
   {
     "id": "TALK_EVAC_MERCHANT_NEW",
     "type": "talk_topic",
-    "dynamic_line": "Before you say anything else, we're full.  We don't have the space, nor the food, to take in more refugees.  We do desperately need supplies and are willing to trade what we can for it.  Pay top dollar for jerky if you have any; just talk to the broker in the back."
+    "dynamic_line": "Before you say anything else, we're full.  We don't have the space, nor the food, to take in more refugees.  We do desperately need supplies and are willing to trade what we can for it.  Pay top dollar for jerky if you have any; just talk to the quartermaster in the back."
+  },
+  {
+    "id": "TALK_EVAC_MERCHANT_STAFF",
+    "type": "talk_topic",
+    "dynamic_line": "I handle trade and deals with people outside the center.  Talk to Milton Lang, our security chief, by the back bay.  The quartermaster in the back handles food and supplies.  Ask the maintenance lead about repairs and power.  You'll find them in the big office with the long table.",
+    "responses": [ { "text": "Thanks.  Can I ask you something else?", "topic": "TALK_EVAC_MERCHANT" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_PLANS",
@@ -533,47 +544,6 @@
     "dynamic_line": "Woah, you're really intent hey?  Okay, if you feel so strongly, ten Merch is enough to get a couple people out of guard duty to help, and you know what?  If you feel that strongly about it, I'll come help out in my down time too.  I respect someone putting their money where their mouth is."
   },
   {
-    "id": "MISSION_FREE_MERCHANTS_EVAC_1",
-    "type": "mission_definition",
-    "name": { "str": "Clear Back Bay" },
-    "description": "Clear out the barricaded back area in the refugee center and lay the former leader of the Free Merchants to rest, in exchange for the local currency: Free Merchant certified notes.",
-    "goal": "MGOAL_KILL_MONSTERS",
-    "difficulty": 2,
-    "value": 50000,
-    "start": {
-      "assign_mission_target": { "om_terrain": "evac_center_9", "reveal_radius": 1 },
-      "update_mapgen": {
-        "om_terrain": "evac_center_9",
-        "place_monster": [ { "group": "GROUP_REFUGEE_BOSS_ZOMBIE", "x": [ 10, 10 ], "y": [ 10, 10 ], "target": true } ],
-        "place_monsters": [ { "monster": "GROUP_REFUGEE_CENTER_BACK_ROOM", "x": [ 2, 15 ], "y": [ 4, 20 ], "density": 0.6, "target": true } ]
-      }
-    },
-    "end": {
-      "effect": [
-        { "u_buy_item": "FMCNote", "count": 25 },
-        { "u_add_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" },
-        { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 3 }
-      ],
-      "update_mapgen": {
-        "om_terrain": "evac_center_9",
-        "set": [ { "square": "terrain", "id": "t_floor", "x": 0, "y": 23, "x2": 1, "y2": 23 } ]
-      }
-    },
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_FREE_MERCHANTS_EVAC_2",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "If you really want to lend a hand we could use your help clearing out the dead in the back bay.  Fearful of going outside during the first days of the Cataclysm we ended up throwing our dead and the zombies we managed to kill in the sealed back bay.  Our promising leader at the time even fell… he turned into something different.  Kill all of them and make sure they won't bother us again.  We can't pay much, besides some of our own internal money which isn't good for that much yet, but it would help us to reclaim the bay.",
-      "accepted": "Please be careful, we don't need any more deaths.",
-      "rejected": "Come back when you get a chance, we really need to start reclaiming the region.",
-      "advice": "If you can, get a friend or two to help you.",
-      "inquire": "Will they be bothering us any longer?",
-      "success": "Thank you, having that big of a threat close to home was nerve wracking.  Here's some of our local certified notes, we've been paying these to our workers in exchange for supplies.  They're getting some value in the center as a trade item, I'm afraid they're all we have to spare at the moment.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    }
-  },
-  {
     "id": "MISSION_FREE_MERCHANTS_EVAC_2",
     "type": "mission_definition",
     "name": { "str": "Missing Caravan" },
@@ -649,7 +619,7 @@
     "followup": "MISSION_FREE_MERCHANTS_EVAC_3",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "This is a bit more involved than the last request, we recently lost a scavenger party coming to trade with us and would like you to investigate.  We strongly suspect a raider band or horde caught them off-guard.  I can give you the coordinates of their last radio message but little else.  In either case, deal with the threat so that the scavengers can continue to pass through in relative safety.  The best reward I can offer is a claim to the supplies they were carrying, plus thirty certified notes - that's our own internal money, good for trading and such.",
+      "offer": "We recently lost a scavenger party coming to trade with us, and I'd like you to investigate.  We strongly suspect a raider band or horde caught them off-guard.  I can give you the coordinates of their last radio message but little else.  In either case, deal with the threat so that the scavengers can continue to pass through in relative safety.  The best reward I can offer is a claim to the supplies they were carrying, plus thirty certified notes - that's our own internal money, good for trading and such.",
       "accepted": "Our community survives on trade, we appreciate it.",
       "rejected": "Come back when you get a chance, we really need to start reclaiming the region.",
       "advice": "If you can, get a friend or two to help you.",
@@ -692,7 +662,6 @@
       }
     },
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_FREE_MERCHANTS_EVAC_4",
     "dialogue": {
       "describe": "We need help…",
       "offer": "We recently set out some skilled people to start an outpost, to secure us some food supplies in a safer location.  The new outpost that we've started could use your assistance.  I need you to get the foreman's prospectus before we begin to send additional refugees to the farming commune.  Consult with the foreman to get more detailed tasks.  We've got 50 Certified Notes for you if you can do this for us.",
@@ -701,83 +670,6 @@
       "advice": "Just follow your map.",
       "inquire": "Do you have the prospectus?",
       "success": "With this we'll be able to convince others to invest in the commune.  Thank you, here's your money.  We also managed to get a manual crank hooked up to the garage in the back, so feel free to make use of that - you've been a great help to us.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    }
-  },
-  {
-    "id": "MISSION_FREE_MERCHANTS_EVAC_4",
-    "type": "mission_definition",
-    "name": { "str": "Solar Power" },
-    "description": "Deliver 10 solar panels to help the Free Merchants set up a renewable power grid, in exchange for a handsome reward.",
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 400000,
-    "item": "solar_panel",
-    "count": 10,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_FREE_MERCHANTS_EVAC_5",
-    "end": {
-      "effect": [
-        { "u_buy_item": "FMCNote", "count": 100 },
-        { "u_add_var": "FMShopkeep_Mission4", "type": "mission", "context": "flag", "value": "yes" }
-      ],
-      "update_mapgen": [
-        {
-          "om_terrain": "evac_center_8_z1",
-          "set": [ { "line": "furniture", "id": "f_solar_unit", "x": 11, "y": 12, "x2": 12, "y2": 12 } ]
-        },
-        {
-          "om_terrain": "evac_center_12_z1",
-          "set": [ { "line": "furniture", "id": "f_solar_unit", "x": 21, "y": 12, "x2": 21, "y2": 14 } ]
-        },
-        {
-          "om_terrain": "evac_center_14_z1",
-          "set": [ { "line": "furniture", "id": "f_solar_unit", "x": 1, "y": 12, "x2": 1, "y2": 14 } ]
-        },
-        {
-          "om_terrain": "evac_center_18_z1",
-          "set": [ { "line": "furniture", "id": "f_solar_unit", "x": 11, "y": 3, "x2": 12, "y2": 3 } ]
-        }
-      ]
-    },
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "We are starting to build new infrastructure here and would like to get a few new electrical systems online… unfortunately our existing system relies on an array of something called RTGs.  Running generators isn't a viable option underground, of course.  We have a big flat roof up top, and if we had a few solar panels we could use them to top up our usage.  We could pay you pretty handsomely to bring us, say, ten solar panels?",
-      "accepted": "If you can do this for us our survival options would vastly increase.",
-      "rejected": "Come back when you get a chance, we really need to start reclaiming the region.",
-      "advice": "Solar panels are pretty common on electric cars and on rooftops.",
-      "inquire": "How is the search going?",
-      "success": "Great, I know it isn't much but we hope to continue to expand thanks to your help.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    }
-  },
-  {
-    "id": "MISSION_FREE_MERCHANTS_EVAC_5",
-    "type": "mission_definition",
-    "name": { "str": "In a Pickle" },
-    "description": "Deliver twenty-five half-liter glass canning jars to the Free Merchants to kickstart their food storage plans.",
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 3,
-    "value": 400000,
-    "item": "jar_glass",
-    "count": 25,
-    "end": {
-      "effect": [
-        { "u_buy_item": "FMCNote", "count": 250 },
-        { "u_add_var": "FMShopkeep_Mission5", "type": "mission", "context": "flag", "value": "yes" }
-      ]
-    },
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "While we've managed to secure day to day food supplies, it's very much hand to mouth.  Our reserves would barely last a few days if something kept our people locked in.  We need a stockpile to avoid that.  Thanks to our outpost we have a bit of meat and vegetables coming in, but we need a better way to preserve them.  Some of our people know enough about food canning that if we had a good stock of canning jars, we could make pickles and canned meats to get us set for the winter.  I'll pay you a premium rate if you can bring us twenty-five glass jars to get us started.",
-      "accepted": "It'll take a load off my shoulders if I can finally stop worrying about this.",
-      "rejected": "We'll hold for the moment, but I'll get an ulcer if I have to keep worrying.  If you reconsider let me know.",
-      "advice": "Grocery stores, house kitchens, there's plenty of places to look.",
-      "inquire": "How is the search going?",
-      "success": "That's one less thing to worry about.  Glad to have someone like you on our side.  Here's 250 merch, and the broker will buy any further glass jars you can find - at a reduced price, we can't keep up the premium rate.  Actually, the broker was saying they had some jobs like this for you, and that it might be easier to just go straight through their office if you want more work.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     }

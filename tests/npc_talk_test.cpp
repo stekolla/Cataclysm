@@ -2,6 +2,7 @@
 #include "../src/overmap/overmapbuffer.h"
 #include "avatar.h"
 #include "calendar.h"
+#include "cata_utility.h"
 #include "catch/catch.hpp"
 #include "character.h"
 #include "character_id.h"
@@ -26,6 +27,7 @@
 #include "string_id.h"
 #include "type_id.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <memory>
 #include <string>
@@ -118,6 +120,54 @@ TEST_CASE("npc_talk_describe_mission", "[npc_talk]") {
     d.add_topic("TALK_DESCRIBE_MISSION");
     std::string d_line = gen_dynamic_line(d);
     CHECK(d_line == "I'm looking for wounded to help.");
+}
+
+/// Open each staff member's work menu on a fresh NPC to check independent offers and follow-ups.
+TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
+    struct staff_missions {
+        const char* npc_id;
+        const char* first_offer;
+        mission_type_id follow_up = mission_type_id::NULL_ID();
+    };
+    const auto expected = GENERATE(
+        staff_missions{
+            .npc_id = "evac_merchant",
+            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_2",
+            .follow_up = mission_type_id("MISSION_FREE_MERCHANTS_EVAC_3")},
+        staff_missions{
+            .npc_id = "evac_broker",
+            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_5",
+            .follow_up = mission_type_id("MISSION_BROKER_1")},
+        staff_missions{
+            .npc_id = "evac_security_chief", .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1"},
+        staff_missions{
+            .npc_id = "evac_maintenance_lead", .first_offer = "MISSION_FREE_MERCHANTS_EVAC_4"});
+    CAPTURE(expected.npc_id);
+    g->faction_manager_ptr->create_if_needed();
+    auto staff = npc();
+    staff.load_npc_template(string_id<npc_template>(expected.npc_id));
+    const auto remove_staff = on_out_of_scope([&staff] {
+        if (auto* staff_faction = staff.get_faction()) {
+            staff_faction->remove_member(staff.getID());
+        }
+    });
+
+    auto d = dialogue();
+    d.alpha = &get_avatar();
+    d.beta = &staff;
+    d.gen_responses(talk_topic(staff.chatbin.first_topic));
+    REQUIRE(std::ranges::any_of(d.responses, [](const auto& response) {
+        return response.success.next_topic.id == "TALK_MISSION_LIST";
+    }));
+
+    d.gen_responses(talk_topic("TALK_MISSION_LIST"));
+    REQUIRE_FALSE(d.responses.empty());
+    REQUIRE(d.responses.front().mission_selected != nullptr);
+    const auto& offered = *d.responses.front().mission_selected;
+    REQUIRE(staff.chatbin.missions.size() == 1);
+    CHECK(offered.get_npc_id() == staff.getID());
+    CHECK(offered.get_type().id == mission_type_id(expected.first_offer));
+    CHECK(offered.get_follow_up() == expected.follow_up);
 }
 
 TEST_CASE("npc_talk_stats", "[npc_talk]") {

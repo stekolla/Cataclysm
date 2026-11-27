@@ -141,7 +141,7 @@
         { "class": "evac_broker", "x": 50, "y": 20 },
         { "class": "guard", "x": 60, "y": 9 },
         { "class": "guard", "x": 54, "y": 20 },
-        { "class": "guard", "x": 63, "y": 15 }
+        { "class": "evac_security_chief", "x": 63, "y": 15 }
       ]
     }
   },
@@ -309,6 +309,7 @@
         { "class": "scavenger_merc", "x": 48, "y": 5 },
         { "class": "guard", "x": 38, "y": 4 },
         { "class": "guard", "x": 38, "y": 7 },
+        { "class": "evac_maintenance_lead", "x": 31, "y": 8 },
         { "class": "arsonist", "x": 38, "y": 19, "add_trait": "FELINE_EARS" },
         { "class": "wasp_exterminator", "x": 40, "y": 19 },
         { "class": "old_guard_rep", "x": 47, "y": 10 },
