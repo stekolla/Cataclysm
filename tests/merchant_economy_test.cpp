@@ -66,6 +66,39 @@ auto quote_for(const auto& quotes, const char* type, int quantity = 1) -> int {
 
 } // namespace
 
+/// Check that a new manager can supply Tacoma's full lumber order, and that normal restocking
+/// replenishes the shop only after the cooldown.
+TEST_CASE("lumbermill_bulk_stock_and_restock", "[npc][trade][pricing][merchant]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto fixture = merchant_test("NPC_lumbermill_merchant");
+    auto& [manager, player] = fixture;
+    calendar::turn += 1_days;
+    REQUIRE(manager.is_shopkeeper());
+    give(player, item::spawn("2x4"));
+
+    const auto check_stock = [&] {
+        const auto state = fixture.quotes();
+        const auto planks = quote_for(state.theirs, "2x4", 200);
+        CHECK(planks <= 50 * 250);
+        CHECK(quote_for(state.yours, "2x4") < planks / 200);
+        CHECK(quote_for(state.theirs, "log") > 0);
+        CHECK(quote_for(state.theirs, "wood_beam") > 0);
+        CHECK(quote_for(state.theirs, "wood_panel") > 0);
+        CHECK(quote_for(state.theirs, "wood_sheet") > 0);
+    };
+
+    check_stock();
+    manager.shop_restock();
+    manager.inv_clear();
+    manager.shop_restock();
+    auto empty = fixture.quotes();
+    CHECK(line_for(empty.theirs, "2x4") == empty.theirs.end());
+
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    manager.shop_restock();
+    check_stock();
+}
+
 /// Check the live quote in each direction and immediately resell an actual purchase.
 TEST_CASE("owen_merchandise_spread_and_currency", "[npc][trade][pricing][merchant]") {
     auto fixture = merchant_test();

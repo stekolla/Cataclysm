@@ -5,6 +5,8 @@
 - This project ships a browser game, not a native game. Run the repository's Docker wrappers
   from the repository root, not CMake on the host. See the [build guide](docs/en/dev/guides/building/cmake.md).
 - Format touched files before building or testing. Do not retain unrelated formatter changes.
+- For dialogue and mission JSON, run a test that loads game data. JSON syntax checks do not
+  catch definitions accidentally nested inside a response array.
 - Choose the smallest relevant validation route. Run one build at a time; rebuild only when
   inputs change or a failure requires it. Reuse the browser game built by the Wasm test suite
   for manual checks. If the user objects to waiting, ask before starting another long build

@@ -12,13 +12,13 @@
   {
     "type": "npc",
     "id": "NPC_lumbermill_merchant",
-    "class": "NC_LUMBERJACK",
+    "class": "NC_LUMBERMILL_SHOPKEEP",
     "name_suffix": "manager",
     "attitude": 0,
-    "mission": 7,
+    "mission": 3,
     "chat": "TALK_NPC_LUMBERMILL_MERCHANT",
     "faction": "wasteland_scavengers",
-    "mission_offered": "MISSION_GET_DRIVEBELTS"
+    "mission_offered": "MISSION_LUMBERMILL_SLEEPING_QUARTERS"
   },
   {
     "type": "npc",
@@ -29,6 +29,44 @@
     "mission": 7,
     "chat": "TALK_NPC_LUMBERMILL_LOGGER",
     "faction": "wasteland_scavengers"
+  },
+  {
+    "type": "npc_class",
+    "id": "NC_LUMBERMILL_SHOPKEEP",
+    "name": { "str": "Mill manager" },
+    "job_description": "I run the lumbermill.",
+    "common": false,
+    "traits": [ { "group": "NPC_starting_traits" }, { "group": "Appearance_demographics" } ],
+    "weapon_override": "NC_LUMBERJACK_tools",
+    "shopkeeper_item_group": "lumbermill_shop_stock",
+    "trade_pricing": {
+      "curated_stock": true,
+      "purchase_percent": 0,
+      "items": {
+        "log": { "retail_percent": 1000, "purchase_percent": 50 },
+        "2x4": { "retail_percent": 100, "purchase_percent": 50 },
+        "wood_beam": { "retail_percent": 500, "purchase_percent": 50 },
+        "wood_panel": { "retail_percent": 1000, "purchase_percent": 50 },
+        "wood_sheet": { "retail_percent": 1000, "purchase_percent": 50 },
+        "nail": { "purchase_percent": 60 },
+        "mattress": { "purchase_percent": 60 },
+        "drivebelt": { "purchase_percent": 60 },
+        "drivebelt_makeshift": { "purchase_percent": 60 },
+        "FMCNote": { "purchase_percent": 80 }
+      }
+    }
+  },
+  {
+    "type": "item_group",
+    "id": "lumbermill_shop_stock",
+    "subtype": "collection",
+    "entries": [
+      { "item": "log", "count": 16 },
+      { "item": "2x4", "count": 240 },
+      { "item": "wood_beam", "count": 16 },
+      { "item": "wood_panel", "count": 30 },
+      { "item": "wood_sheet", "count": 20 }
+    ]
   },
   {
     "type": "npc_class",

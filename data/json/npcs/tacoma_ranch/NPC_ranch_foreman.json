@@ -29,12 +29,49 @@
       { "text": "What's your job here?", "topic": "TALK_RANCH_FOREMAN_JOB" },
       { "text": "What do you need done?", "topic": "TALK_MISSION_LIST" },
       {
+        "text": "Where can I find that many planks?",
+        "topic": "TALK_RANCH_FOREMAN_LUMBERMILL",
+        "condition": { "u_has_mission": "MISSION_RANCH_FOREMAN_1" }
+      },
+      {
         "text": "Hey, are you looking for workers here?  I know a couple people back at the refugee center that might be willing to come.",
         "topic": "TALK_RANCH_FOREMAN_Nunez",
         "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_1" }
       },
       { "text": "I've got to go…", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_RANCH_FOREMAN_LUMBERMILL",
+    "dynamic_line": "I heard the crew at a lumbermill out in the woods kept their saw running.  They might have planks to spare.  I can mark the mill on your map if you want to check it out.  It doesn't matter to me where the planks come from.",
+    "responses": [
+      {
+        "text": "Mark it on my map.  I'll take a look.",
+        "topic": "TALK_RANCH_FOREMAN",
+        "condition": { "not": { "u_has_var": "tacoma_lumbermill_lead", "value": "yes" } },
+        "effect": [ { "assign_mission": "MISSION_TACOMA_FIND_LUMBERMILL" }, { "u_add_var": "tacoma_lumbermill_lead", "value": "yes" } ]
+      },
+      { "text": "Thanks for the tip.", "topic": "TALK_NONE" }
+    ]
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_TACOMA_FIND_LUMBERMILL",
+    "name": "Find the Occupied Lumbermill",
+    "description": "Visit the Occupied Lumbermill.  The Tacoma foreman thinks its crew may have lumber for sale.",
+    "goal": "MGOAL_GO_TO_TYPE",
+    "destination": "lumbermill_0_0_ocu",
+    "difficulty": 1,
+    "value": 0,
+    "start": {
+      "assign_mission_target": {
+        "om_terrain": "lumbermill_0_0_ocu",
+        "om_special": "Occupied Lumbermill",
+        "om_terrain_match_type": "TYPE",
+        "reveal_radius": 1
+      }
+    }
   },
   {
     "id": "TALK_RANCH_FOREMAN_PROSPECTUS",

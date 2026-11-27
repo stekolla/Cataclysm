@@ -10,8 +10,15 @@
       "yes": "Hello there.  Nice to see you again.",
       "no": "A new face at the mill?  Who might you be?"
     },
-    "speaker_effect": { "effect": { "npc_add_var": "talked_to_merchant", "type": "dialogue", "context": "first_meeting", "value": "yes" } },
+    "speaker_effect": [
+      { "effect": { "npc_add_var": "talked_to_merchant", "type": "dialogue", "context": "first_meeting", "value": "yes" } },
+      {
+        "condition": { "npc_has_class": "NC_LUMBERJACK" },
+        "effect": { "npc_change_class": "NC_LUMBERMILL_SHOPKEEP" }
+      }
+    ],
     "responses": [
+      { "text": "I'd like to buy some lumber.", "effect": "start_trade", "topic": "TALK_NPC_LUMBERMILL_MERCHANT_INTRO" },
       {
         "text": "Nice to meet you.",
         "topic": "TALK_NPC_LUMBERMILL_MERCHANT_INTRO",
@@ -35,13 +42,30 @@
   {
     "type": "talk_topic",
     "id": "TALK_NPC_LUMBERMILL_MERCHANT_INTRO",
-    "dynamic_line": "So, what's up?",
+    "dynamic_line": {
+      "npc_has_var": "lumbermill_repaired",
+      "value": "yes",
+      "yes": "The saw's running reliably again.  What can I do for you?",
+      "no": {
+        "npc_has_var": "lumbermill_bunks_ready",
+        "value": "yes",
+        "yes": "The crew's finally getting a decent night's sleep.  What can I do for you?",
+        "no": "So, what's up?"
+      }
+    },
     "responses": [
+      { "text": "I'd like to buy some lumber.", "effect": "start_trade", "topic": "TALK_NONE" },
       { "text": "What are you doing here?", "topic": "TALK_NPC_LUMBERMILL_MERCHANT_STORY" },
       {
         "text": "Any jobs you need done?",
         "condition": { "and": [ { "not": "has_assigned_mission" }, { "not": "has_many_assigned_missions" } ] },
         "topic": "TALK_MISSION_LIST"
+      },
+      { "text": "About that job…", "condition": "has_assigned_mission", "topic": "TALK_MISSION_INQUIRE" },
+      {
+        "text": "About one of those jobs…",
+        "condition": "has_many_assigned_missions",
+        "topic": "TALK_MISSION_LIST_ASSIGNED"
       },
       { "text": "I gotta go.", "topic": "TALK_DONE" }
     ]

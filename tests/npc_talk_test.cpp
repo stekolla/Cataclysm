@@ -35,6 +35,125 @@
 #include <utility>
 #include <vector>
 
+/// Check the manager's three linked jobs and the exact turn-in thresholds for their materials.
+TEST_CASE("lumbermill_mission_progression", "[npc][mission][dialogue]") {
+    clear_all_state();
+    g->faction_manager_ptr->create_if_needed();
+    auto& player = get_avatar();
+    auto manager = npc();
+    manager.load_npc_template(string_id<npc_template>("NPC_lumbermill_merchant"));
+    const auto cleanup = on_out_of_scope([&] {
+        manager.get_faction()->remove_member(manager.getID());
+        clear_all_state();
+    });
+    REQUIRE(manager.chatbin.missions.size() == 1);
+    const auto* quarters = manager.chatbin.missions.front();
+    REQUIRE(quarters->get_type().id == mission_type_id("MISSION_LUMBERMILL_SLEEPING_QUARTERS"));
+    const auto repair_id = quarters->get_follow_up();
+    REQUIRE(repair_id == mission_type_id("MISSION_GET_DRIVEBELTS"));
+    const auto* repair = mission::reserve_new(repair_id, manager.getID());
+    const auto walls_id = repair->get_follow_up();
+    REQUIRE(walls_id == mission_type_id("MISSION_LUMBERMILL_FORTIFY"));
+    const auto* walls = mission::reserve_new(walls_id, manager.getID());
+    CHECK(walls->get_follow_up().is_null());
+
+    const auto check_delivery = [&](const auto& job, const char* material, int count) {
+        CAPTURE(material);
+        REQUIRE_FALSE(job.is_complete(manager.getID()));
+        for (auto i = 0; i < count - 1; ++i) { player.i_add(item::spawn(material), false); }
+        player.invalidate_crafting_inventory();
+        CHECK_FALSE(job.is_complete(manager.getID()));
+        player.i_add(item::spawn(material), false);
+        player.invalidate_crafting_inventory();
+        CHECK(job.is_complete(manager.getID()));
+    };
+    check_delivery(*quarters, "mattress", 6);
+    check_delivery(*repair, "drivebelt_makeshift", 3);
+    player.i_add(item::spawn("nail", calendar::turn, 4999), false);
+    player.invalidate_crafting_inventory();
+    CHECK_FALSE(walls->is_complete(manager.getID()));
+    player.i_add(item::spawn("nail", calendar::turn, 1), false);
+    player.invalidate_crafting_inventory();
+    CHECK(walls->is_complete(manager.getID()));
+}
+
+/// Take Tacoma's optional lead and check that only the occupied mill completes it.
+TEST_CASE("tacoma_lumbermill_discovery", "[npc][mission][dialogue]") {
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto foreman = npc();
+    foreman.load_npc_template(string_id<npc_template>("ranch_foreman"));
+    const auto cleanup = on_out_of_scope([&] {
+        foreman.get_faction()->remove_member(foreman.getID());
+        clear_all_state();
+    });
+
+    auto d = dialogue();
+    d.alpha = &player;
+    d.beta = &foreman;
+    const auto find_reply = [&](const char* topic) {
+        return std::ranges::find_if(d.responses, [&](const auto& reply) {
+            return reply.success.next_topic.id == topic;
+        });
+    };
+    const auto foreman_topic = talk_topic("TALK_RANCH_FOREMAN");
+    const auto lead_topic = talk_topic("TALK_RANCH_FOREMAN_LUMBERMILL");
+    d.gen_responses(foreman_topic);
+    CHECK(find_reply("TALK_RANCH_FOREMAN_LUMBERMILL") == d.responses.end());
+
+    REQUIRE(foreman.chatbin.missions.size() == 1);
+    auto* planks = foreman.chatbin.missions.front();
+    planks->assign(player);
+    d.gen_responses(foreman_topic);
+    REQUIRE(find_reply("TALK_RANCH_FOREMAN_LUMBERMILL") != d.responses.end());
+    d.gen_responses(lead_topic);
+    REQUIRE(find_reply("TALK_NONE") != d.responses.end());
+    CHECK(player.get_active_missions().size() == 1);
+
+    const auto pos = player.abs_omt_pos();
+    auto& overmap = ACTIVE_OVERMAP_BUFFER;
+    const auto old_terrain = overmap.ter(pos);
+    auto visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
+    for (auto y = -1; y <= 1; ++y) {
+        for (auto x = -1; x <= 1; ++x) {
+            const auto tile = pos + point_rel_omt(x, y);
+            visibility.emplace_back(tile, overmap.seen(tile));
+        }
+    }
+    const auto restore_overmap = on_out_of_scope([&] {
+        overmap.ter_set(pos, old_terrain);
+        for (const auto& [tile, seen] : visibility) { overmap.set_seen(tile, seen); }
+    });
+    const auto occupied = oter_id("lumbermill_0_0_ocu_north");
+    overmap.ter_set(pos, occupied);
+    const auto accept = find_reply("TALK_RANCH_FOREMAN");
+    REQUIRE(accept != d.responses.end());
+    CHECK(accept->success.apply(d).id == "TALK_RANCH_FOREMAN");
+
+    const auto jobs = player.get_active_missions();
+    const auto lead_id = mission_type_id("MISSION_TACOMA_FIND_LUMBERMILL");
+    const auto lead = std::ranges::find_if(jobs, [&](const auto* job) {
+        return job->get_type().id == lead_id;
+    });
+    REQUIRE(lead != jobs.end());
+    CHECK((*lead)->get_target() == pos);
+    CHECK(overmap.seen(pos));
+
+    overmap.ter_set(pos, oter_id("lumbermill_0_0_north"));
+    (*lead)->process();
+    CHECK((*lead)->in_progress());
+    overmap.ter_set(pos, occupied);
+    (*lead)->process();
+    CHECK_FALSE((*lead)->in_progress());
+    CHECK(planks->in_progress());
+    d.gen_responses(lead_topic);
+    CHECK(find_reply("TALK_RANCH_FOREMAN") == d.responses.end());
+}
 static const efftype_id effect_gave_quest_item("gave_quest_item");
 static const efftype_id effect_currently_busy("currently_busy");
 static const efftype_id effect_infection("infection");

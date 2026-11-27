@@ -1,25 +1,61 @@
 [
   {
+    "id": "MISSION_LUMBERMILL_SLEEPING_QUARTERS",
+    "type": "mission_definition",
+    "name": "Establish Sleeping Quarters",
+    "description": "Bring six mattresses to the lumbermill manager to finish the crew's sleeping quarters.",
+    "reward_description": "30 Merch and proper sleeping quarters for the crew.",
+    "goal": "MGOAL_FIND_ITEM",
+    "item": "mattress",
+    "count": 6,
+    "difficulty": 5,
+    "value": 0,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_GET_DRIVEBELTS",
+    "end": {
+      "effect": [ { "u_buy_item": "FMCNote", "count": 30 }, { "npc_add_var": "lumbermill_bunks_ready", "value": "yes" } ],
+      "update_mapgen": [
+        { "om_terrain": "lumbermill_1_1_ocu", "place_nested": [ { "chunks": [ "occupied_lum_hotel_1_1" ], "x": 0, "y": 0 } ] },
+        {
+          "om_terrain": "lumbermill_1_1_roof",
+          "place_nested": [ { "chunks": [ "occupied_lum_hotel_roof_1_1" ], "x": 0, "y": 0 } ]
+        }
+      ]
+    },
+    "dialogue": {
+      "describe": "The crew needs somewhere decent to sleep.",
+      "offer": "We've made room for sleeping quarters, but we still need six mattresses.  Bring them here and I'll pay you 30 Merch.",
+      "advice": "Try taking apart ordinary beds in houses or motels.  You'll want a truck for the mattresses.",
+      "accepted": "I'll clear a spot to unload them.",
+      "rejected": "All right.  We'll make do for now.",
+      "inquire": "Did you find six mattresses?",
+      "success": "The crew finally has proper beds.  Here's your 30 Merch.",
+      "success_lie": "I don't see six mattresses.",
+      "failure": "I guess we're sleeping where we can for a while longer."
+    }
+  },
+  {
     "id": "MISSION_GET_DRIVEBELTS",
     "type": "mission_definition",
-    "name": "Find Drive Belts",
-    "description": "Obtain 3 drive belts or makeshift drive belts in exchange for credit with the loggers.",
+    "name": "Repair the Mill",
+    "description": "Bring three drive belts, including makeshift replacements, to keep the lumbermill running reliably.",
+    "reward_description": "20 Merch.",
     "goal": "MGOAL_FIND_ITEM_GROUP",
     "difficulty": 2,
-    "value": 4000,
+    "value": 0,
     "item_group": "spares_drivebelts",
     "count": 3,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_LUMBERMILL_GET_1000_NAILS",
-    "has_generic_rewards": true,
+    "followup": "MISSION_LUMBERMILL_FORTIFY",
+    "end": { "effect": [ { "u_buy_item": "FMCNote", "count": 20 }, { "npc_add_var": "lumbermill_repaired", "value": "yes" } ] },
     "dialogue": {
       "describe": "I need three drive belts.",
-      "offer": "Some of our machinery received some damage before <the_cataclysm> and we were waiting on replacement parts.  Now everything's changed and those parts are more important than ever.  Get us three drive belts and I'll give you some credit with us.",
+      "offer": "We can still cut lumber, but the drive belts are wearing out.  If they go, the saw stops.  Bring three drive belts, factory-made or makeshift, and I'll pay you 20 Merch.",
       "advice": "If you can't find actual drive belts on engines, a good replacement can be made from a belt and some duct tape.  Nothing difficult.",
       "accepted": "I'll be here when you get back.  Good luck!",
       "rejected": "Someone's got to do it.",
       "inquire": "Do you have the belts?",
-      "success": "Wonderful!  Thanks, <name_g>, we'll be fine for a long while from now.",
+      "success": "That'll keep the saw running reliably.  Here's your 20 Merch.",
       "success_lie": "Where are they?  I don't believe you.",
       "failure": "That's unfortunate.  I guess we'll have to find someone else to do it."
     }
@@ -27,6 +63,7 @@
   {
     "id": "MISSION_LUMBERMILL_GET_1000_NAILS",
     "type": "mission_definition",
+    "//": "Only retained for existing saves that already have this mission.",
     "name": "Get 1,000 Nails",
     "description": "Obtain 1,000 nails in exchange for credit with the loggers.",
     "goal": "MGOAL_FIND_ITEM",
@@ -50,19 +87,19 @@
     }
   },
   {
-    "id": "MISSION_LUMBERMILL_GET_6800_NAILS",
+    "id": "MISSION_LUMBERMILL_FORTIFY",
     "type": "mission_definition",
-    "name": "Get 6,800 Nails",
-    "description": "Obtain 6,800 nails in exchange for credit with the loggers.",
-    "//": "170 wood walls * 40 nails per wall",
-    "followup": "MISSION_LUMBERMILL_GET_6_BLANKETS",
+    "name": "Fortify the Lumberyard",
+    "description": "Bring 5,000 nails to finish the lumbermill's perimeter walls.",
+    "reward_description": "90 Merch and new perimeter walls for the lumbermill.",
     "goal": "MGOAL_FIND_ITEM",
     "item": "nail",
-    "count": 6800,
+    "count": 5000,
     "difficulty": 32,
-    "value": 2000000,
+    "value": 0,
     "origins": [ "ORIGIN_SECONDARY" ],
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 90 },
       "update_mapgen": [
         { "om_terrain": "lumbermill_0_0_ocu", "place_nested": [ { "chunks": [ "occupied_lum_wall_0_0" ], "x": 0, "y": 0 } ] },
         {
@@ -79,22 +116,43 @@
         }
       ]
     },
-    "has_generic_rewards": true,
     "dialogue": {
-      "describe": "I need 6,800 nails.",
-      "offer": "While fairly sturdy, the metal fence around this place won't hold out for long.  So, we've decided to replace it with a wall.  However, the nails we had were used to repair our existing structures, and they weren't nearly enough.  After some calculations, we need 6,800 nails to do it.  That may seem like a lot, but we're willing to give you a TON of credit for it.",
+      "describe": "We need 5,000 nails to finish the perimeter.",
+      "offer": "That chain-link fence won't hold forever.  We can cut the wood for a proper wall, and we have some fasteners, but we're still short 5,000 nails.  I'll pay you 90 Merch for the lot.",
       "advice": "You might have to do more than just scrapping a bunch of furniture.  Dismantling a building somewhere in town could get you what you need.",
       "accepted": "I'll be here when you get back.  Good luck!",
       "rejected": "Well, I suppose that's reasonable.",
       "inquire": "Do you have the nails?",
-      "success": "That's absolutely amazing!  I can't thank you enough for this!",
+      "success": "That's the last of what we needed.  The yard's got a proper wall now.  Here's the 90 Merch I promised.",
       "success_lie": "You're a fucking scammer, <name_b>!",
+      "failure": "That's unfortunate.  I guess we'll have to find someone else to do it."
+    }
+  },
+  {
+    "id": "MISSION_LUMBERMILL_GET_6800_NAILS",
+    "type": "mission_definition",
+    "copy-from": "MISSION_LUMBERMILL_FORTIFY",
+    "//": "Existing saves store the nail count and can still be assigned this version.",
+    "name": "Get 6,800 Nails",
+    "description": "Bring 6,800 nails to finish the lumbermill's perimeter walls.",
+    "goal": "MGOAL_FIND_ITEM",
+    "count": 6800,
+    "dialogue": {
+      "describe": "We need 6,800 nails to finish the perimeter.",
+      "offer": "We have the wood for a proper wall, but we're short 6,800 nails.  I'll pay you 90 Merch if you bring them in.",
+      "advice": "Dismantling a building somewhere in town could get you what you need.",
+      "accepted": "I'll be here when you get back.  Good luck!",
+      "rejected": "Well, I suppose that's reasonable.",
+      "inquire": "Do you have the nails?",
+      "success": "That's the last of what we needed.  The yard's got a proper wall now.  Here's 90 Merch for the nails.",
+      "success_lie": "I don't see the nails.",
       "failure": "That's unfortunate.  I guess we'll have to find someone else to do it."
     }
   },
   {
     "id": "MISSION_LUMBERMILL_GET_6_BLANKETS",
     "type": "mission_definition",
+    "//": "Only retained for existing saves that already have this mission.",
     "name": "Find 6 Blankets",
     "description": "Obtain 6 blankets, fur blankets, electric blankets etc in exchange for credit with the loggers.",
     "goal": "MGOAL_FIND_ITEM_GROUP",
@@ -104,6 +162,7 @@
     "count": 6,
     "origins": [ "ORIGIN_SECONDARY" ],
     "end": {
+      "effect": { "npc_add_var": "lumbermill_bunks_ready", "value": "yes" },
       "update_mapgen": [
         { "om_terrain": "lumbermill_1_1_ocu", "place_nested": [ { "chunks": [ "occupied_lum_hotel_1_1" ], "x": 0, "y": 0 } ] },
         {
@@ -112,7 +171,6 @@
         }
       ]
     },
-    "followup": "MISSION_LUMBERMILL_SET_TRADE_ROUTE",
     "has_generic_rewards": true,
     "dialogue": {
       "describe": "I need 6 blankets.",
@@ -129,6 +187,7 @@
   {
     "id": "MISSION_LUMBERMILL_SET_TRADE_ROUTE",
     "type": "mission_definition",
+    "//": "Retained so old saves can load this mission and turn in a writ they already obtained.",
     "name": "Establish A Trade Route",
     "description": "Establish trade relations between the loggers and a refugee center, and bring back a writ of the agreement.",
     "goal": "MGOAL_FIND_ITEM",

@@ -73,6 +73,11 @@ Let conversations change when a relationship or an important objective changes. 
 services and unaffected topics accessible. See the [NPC dialogue reference](../reference/creatures/npcs.md)
 for entry topics, shared responses, and back navigation.
 
+At the Occupied Lumbermill, the manager sells lumber before any jobs are done. The jobs
+improve the crew's quarters, machinery, and perimeter, not the player's access to trade.
+Tacoma's foreman can mark the mill as an optional lead; the player can still bring planks from
+any source.
+
 ## Match the reward to the job
 
 Consider the difficulty, risk, and usefulness of the work. For cash or faction currency, use the
