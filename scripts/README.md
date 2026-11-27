@@ -16,7 +16,6 @@ Run any script with `--help` for its command-line options.
 - `python3 scripts/tileset.py --unpack TILESET` extracts sprites and tile definitions.
 - `python3 scripts/tileset_missing_items.py` reports missing sprites.
 - `python3 scripts/affected_files.py -o affected_files.txt` lists files for clang-tidy.
-- `python3 scripts/semantic.py` regenerates the semantic PR title configuration.
 - `python3 scripts/migrations/3312.migrate_legacy_unit.py --paths data/json data/mods`
   converts legacy unit fields in place.
 

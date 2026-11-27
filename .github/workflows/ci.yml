@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+concurrency:
+  group: wasm-ci-${{ github.event.pull_request.number || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  formatting:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Install formatters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends astyle cmake ninja-build g++-14 pipx
+          pipx install clang-format==22.1.8
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          npm install --global dprint@0.47.5
+      - name: Check formatting
+        env:
+          CXX: g++-14
+        run: |
+          build-scripts/fmt.sh --all
+          git diff --exit-code
+
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Build
+        run: |
+          bash build-scripts/run-docker.sh bash -lc '
+            set -e
+            cmake --preset wasm-tiles
+            cmake --build --preset wasm-tiles
+          '
+      - name: Run fast unit tests
+        run: ./test fast

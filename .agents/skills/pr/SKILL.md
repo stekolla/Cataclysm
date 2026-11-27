@@ -11,7 +11,6 @@ Use before `gh pr create`, `gh pr edit`, PR body edits, or PR title edits.
 ## Sources
 
 - `docs/en/contribute/pr_title_guidelines.md`
-- `.github/semantic.yml`
 - `.github/pull_request_template.md`
 - <https://github.com/scarf005/conventional-prs>
 
