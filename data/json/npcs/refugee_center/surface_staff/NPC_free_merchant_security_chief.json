@@ -10,7 +10,7 @@
     "mission": 8,
     "chat": "TALK_EVAC_SECURITY_CHIEF",
     "faction": "free_merchants",
-    "mission_offered": [ "MISSION_FREE_MERCHANTS_EVAC_1", "MISSION_EVAC_SECURITY_INCIDENT_REPORTS" ]
+    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_1"
   },
   {
     "type": "talk_topic",
@@ -40,6 +40,17 @@
         "text": "About the work you gave me…",
         "topic": "TALK_MISSION_LIST_ASSIGNED",
         "condition": { "or": [ "has_assigned_mission", "has_many_assigned_missions" ] }
+      },
+      {
+        "text": "Anything else the guards need?",
+        "topic": "TALK_EVAC_SECURITY_INCIDENT_REPORTS",
+        "condition": {
+          "and": [
+            { "u_has_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" },
+            { "not": { "u_has_var": "evac_security_incident_reports_accepted", "value": "yes" } },
+            { "not": { "u_has_mission": "MISSION_EVAC_SECURITY_INCIDENT_REPORTS" } }
+          ]
+        }
       },
       {
         "text": "I have equipment for the guards.",
@@ -209,6 +220,19 @@
     }
   },
   {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_SECURITY_INCIDENT_REPORTS",
+    "dynamic_line": "Every time I ask for an incident report, somebody's lost a pen.  Bring me four pens.  Two Certified Notes if it gets me through a shift without hearing that excuse.",
+    "responses": [
+      {
+        "text": "I'll bring you four pens.",
+        "topic": "TALK_EVAC_SECURITY_CHIEF",
+        "effect": { "add_mission": "MISSION_EVAC_SECURITY_INCIDENT_REPORTS" }
+      },
+      { "text": "Maybe later.", "topic": "TALK_EVAC_SECURITY_CHIEF" }
+    ]
+  },
+  {
     "id": "MISSION_EVAC_SECURITY_INCIDENT_REPORTS",
     "type": "mission_definition",
     "name": { "str": "Incident Reports" },
@@ -220,6 +244,7 @@
     "value": 0,
     "has_generic_rewards": false,
     "origins": [ "ORIGIN_SECONDARY" ],
+    "start": { "effect": { "u_add_var": "evac_security_incident_reports_accepted", "value": "yes" } },
     "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } },
     "dialogue": {
       "describe": "I've got a paperwork problem.",

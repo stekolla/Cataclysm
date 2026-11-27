@@ -148,7 +148,6 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
             .name = "Milton Lang, Security Chief",
             .first_offer = "MISSION_FREE_MERCHANTS_EVAC_1",
             .follow_up = mission_type_id("MISSION_EVAC_SECURITY_RADIO_CHECK"),
-            .side_offer = "MISSION_EVAC_SECURITY_INCIDENT_REPORTS",
             .final_offer = mission_type_id("MISSION_EVAC_SECURITY_APPROACH")},
         staff_missions{
             .npc_id = "evac_maintenance_lead",
@@ -191,11 +190,40 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     check_offer(mission_type_id(expected.first_offer), expected.follow_up);
     if (expected.side_offer != nullptr) {
         check_offer(mission_type_id(expected.side_offer), mission_type_id::NULL_ID());
+    }
+    if (!expected.final_offer.is_null()) {
         REQUIRE(expected.follow_up.is_valid());
         REQUIRE(expected.final_offer.is_valid());
         CHECK(expected.follow_up->follow_up == expected.final_offer);
         CHECK(expected.final_offer->follow_up.is_null());
     }
+}
+
+/// Check Milton's dialogue before and after the Back Bay turn-in, and after accepting the pen job.
+TEST_CASE("milton_offers_incident_reports_after_back_bay", "[npc_talk][mission]") {
+    g->faction_manager_ptr->create_if_needed();
+    auto milton = npc();
+    milton.load_npc_template(string_id<npc_template>("evac_security_chief"));
+    const auto remove_milton = on_out_of_scope([&milton] {
+        if (auto* faction = milton.get_faction()) { faction->remove_member(milton.getID()); }
+    });
+
+    auto player = avatar();
+    auto d = dialogue();
+    d.alpha = &player;
+    d.beta = &milton;
+    const auto has_pen_offer = [&]() {
+        d.gen_responses(talk_topic(milton.chatbin.first_topic));
+        return std::ranges::any_of(d.responses, [](const auto& response) {
+            return response.success.next_topic.id == "TALK_EVAC_SECURITY_INCIDENT_REPORTS";
+        });
+    };
+
+    CHECK_FALSE(has_pen_offer());
+    player.set_value("npctalk_var_mission_flag_FMShopkeep_Mission1", "yes");
+    CHECK(has_pen_offer());
+    player.set_value("npctalk_var_evac_security_incident_reports_accepted", "yes");
+    CHECK_FALSE(has_pen_offer());
 }
 
 /// Ask a generic guard for work to check that their referral names all four staff members.
