@@ -1,35 +1,36 @@
 # Creating missions
 
-NPCs can assign missions to the player. There is a fairly regular structure for this:
+NPCs can assign missions to the player. See the [dialogue and quest design guide](../../guides/dialogue_and_quest_design.md)
+for narrative and gameplay design principles. This example shows a basic item turn-in:
 
 ```json
 {
-  "id": "MISSION_GET_BLACK_BOX_TRANSCRIPT",
+  "id": "MISSION_EXAMPLE_BAKERY_FLOUR",
   "type": "mission_definition",
-  "name": "Retrieve Black Box Transcript",
-  "description": "Decrypt the contents of the black box using a terminal from a nearby lab.",
+  "name": "Bring flour to the baker",
+  "description": "Look for flour in kitchens or bakeries. Bring two units of flour to the baker for <reward_count:FMCNote> Merch.",
   "goal": "MGOAL_FIND_ITEM",
-  "difficulty": 2,
-  "value": 150000,
-  "item": "black_box_transcript",
-  "start": {
-    "effect": { "u_buy_item": "black_box" },
-    "assign_mission_target": { "om_terrain": "lab", "reveal_radius": 3 }
-  },
+  "difficulty": 1,
+  "value": 0,
+  "item": "flour",
+  "count": 2,
+  "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } },
   "origins": ["ORIGIN_SECONDARY"],
-  "followup": "MISSION_EXPLORE_SARCOPHAGUS",
   "dialogue": {
-    "describe": "With the black box in hand, we need to find a lab.",
-    "offer": "Thanks to your searching we've got the black box but now we need to have a look'n-side her.  Now, most buildings don't have power anymore but there are a few that might be of use.  Have you ever seen one of those science labs that have popped up in the middle of nowhere?  Them suckers have a glowing terminal out front so I know they have power somewhere inside'em.  If you can get inside and find a computer lab that still works you ought to be able to find out what's in the black box.",
-    "accepted": "Fuck ya, America!",
-    "rejected": "Do you have any better ideas?",
-    "advice": "When I was play'n with the terminal for the one I ran into it kept asking for an ID card.  Finding one would be the first order of business.",
-    "inquire": "How 'bout that black box?",
-    "success": "America, fuck ya!  I was in the guard a few years back so I'm confident I can make heads-or-tails of these transmissions.",
-    "failure": "Damn, I maybe we can find an egg-head to crack the terminal."
+    "describe": "I'm out of flour.",
+    "offer": "Can you bring me two units of flour? I'll pay you two Merch for them.",
+    "accepted": "Thanks. I'll get the oven ready.",
+    "rejected": "All right. I'll make do.",
+    "advice": "Try a kitchen pantry or a bakery.",
+    "inquire": "Did you find any flour?",
+    "success": "Just enough for the next batch. Here's your pay.",
+    "failure": "I suppose bread can wait."
   }
 }
 ```
+
+With the required flour in hand, the player can report success to the baker. The turn-in
+consumes the required flour and the `end` effect grants two Merch.
 
 ## Authoring conventions
 
@@ -44,9 +45,6 @@ NPCs can assign missions to the player. There is a fairly regular structure for 
   player acknowledge the NPC's response.
 - Use mission-specific dialogue to tell stories about deception. Shared mission dialogue only
   accepts a completion report after the objective has been met.
-- Keep trade, work offers, and mission reports easy to reach. Group related background questions
-  when a conversation grows, and use `TALK_NONE` for back responses. Keep story-dependent responses
-  reachable whenever their conditions are met.
 
 ### type
 
@@ -63,7 +61,8 @@ The name is also required, and is displayed to the user in the 'm'issions menu.
 
 ### description
 
-Not required, but it's strongly recommended that you summarize all relevant info for the mission.
+Technically optional, but expected for every authored quest. Summarize the actionable objective
+in the journal without relying on the player to remember the offer.
 You may refer to mission end effects of the "u_buy_item" type, as long as they do not come at a cost
 to the player. See the example below:
 
@@ -88,7 +87,10 @@ completion uses the mission's explicit effects.
 
 ### goal
 
-Must be included, and must be one of these strings:
+When a mission needs multiple physical tools, verify that the goal counts the tools themselves.
+Item goals and dialogue inventory conditions can accept tool charges as quantities.
+
+The goal is required and must be one of these strings:
 
 | goal string               | Goal conditions                                                         |
 | ------------------------- | ----------------------------------------------------------------------- |

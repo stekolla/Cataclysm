@@ -79,13 +79,13 @@ build-scripts/fmt.sh lua
 
 ## Dialogue Validation
 
-NPC dialogue files have additional validation:
-
-```sh
-scripts/dialogue_validator.py data/json/npcs/* data/json/npcs/*/* data/json/npcs/*/*/*
-```
+For NPC dialogue changes, run the [recursive dialogue validator](../../mod/json/reference/creatures/npcs.md#validating-dialogues).
 
 ## Pre-commit Workflow
+
+When migrating a script, compare its CLI output and fixtures with the original before switching
+its callers. When changing the formatter wrapper, exercise staged formatting with the system Bash
+on macOS. Run `./build-scripts/lint-json.sh` when JSON changes require it.
 
 Install the optional pre-commit hook with [`prek`](https://github.com/j178/prek):
 

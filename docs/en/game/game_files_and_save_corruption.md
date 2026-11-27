@@ -11,3 +11,8 @@ close it and reload the page to access your saves.
 
 If a save fails to load or behaves incorrectly, report the problem using the
 [bug report form](https://github.com/stekolla/Cataclysm/issues/new).
+
+## Changing autosave behavior
+
+Keep unsaved moves available for a manual retry after a failed autosave, and rate-limit
+automatic retries.

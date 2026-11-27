@@ -1,5 +1,10 @@
 # Modding with Lua
 
+The browser build bundles Lua source along with JSON. Use the
+[browser build guide](../../../dev/guides/building/cmake.md) to rebuild after editing source
+files, then reload the browser page. Start with the [first JSON mod workflow](../../json/tutorial/modding.md#try-a-minimal-mod-in-the-browser)
+for mod metadata and world setup; place your Lua scripts in the same mod directory.
+
 ## Useful links
 
 - [Lua 5.3 Reference Manual](https://www.lua.org/manual/5.3/)
@@ -27,16 +32,16 @@ entries), or clear it by running `gdebug.clear_lua_log()`.
 
 ## Lua hot-reload
 
-The game supports Lua hot-reload functionality.
+Lua hot reload reruns the reloadable stage described below using files the running game can
+already see. It does not import host source edits into an already-built browser bundle.
 
 There is no filesystem watcher, so hot-reload must be triggered manually via a corresponding
 `Reload Lua Code` hotkey (unbound by default). The hot-reload can also be triggered from console
 window by pressing the corresponding hotkey, or by running `gdebug.reload_lua_code()` command.
 Running the command from regular Lua scripts may have unintended consequences, use at your own risk!
 
-Note that not all code can be hot-reloaded, it'll be explained in later sections.
-The browser build bundles its Lua files, so source edits require a rebuild before they are available
-in the game.
+Hot reload does not rerun every loading stage. See [Game data loading](#game-data-loading)
+for which scripts are rerun.
 
 ## Game data loading
 

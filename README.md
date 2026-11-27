@@ -26,15 +26,14 @@ you played.
 
 ## Contributing
 
-See the [developer build guide](docs/en/dev/guides/building/cmake.md) for local setup and validation.
+Start with the [development workflow](docs/en/contribute/contributing.md#quickstart) or find
+task-specific build, test, and modding guides in the [developer index](docs/en/dev/index.md).
 
 > Cataclysm and its inherited content are developed under the Creative Commons Attribution-ShareAlike 3.0 license. The
 > code and content of the game is free to use, modify, and redistribute for any purpose whatsoever.
 > See http://creativecommons.org/licenses/by-sa/3.0/ for details. Some code distributed with the
 > project is not part of the project and is released under different software licenses, the files
 > covered by different software licenses have their own license notices.
-
-Please read the [contributor guide](docs/en/contribute/contributing.md) for details.
 
 ## Documentation
 

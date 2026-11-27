@@ -4,6 +4,7 @@ Welcome to the comprehensive reference for gameplay, modding, and development. H
 
 - Read the [new player guide](game/new_player_guide.md).
 - Learn about [browser saves](game/game_files_and_save_corruption.md).
-- Mod the game using [JSON](mod/json/tutorial/modding.md) or [Lua](mod/lua/tutorial/modding.md).
-- Learn to [build and develop](dev/guides/building/cmake.md) the game.
-- Learn how to [contribute](contribute/contributing.md), including documentation changes.
+- Author content using the [JSON and Lua modding guides](mod/index.md).
+- Design [NPC dialogue and quests](mod/json/guides/dialogue_and_quest_design.md).
+- Find [developer guides](dev/index.md) for building, testing, and editing the game.
+- Follow the [development workflow](contribute/contributing.md) for repository changes.

@@ -2,6 +2,9 @@
 
 ## Writing Dialogues
 
+See the [dialogue and quest design guide](../../guides/dialogue_and_quest_design.md) for narrative
+and gameplay guidance.
+
 TODO: document the "npc" structure, used to load NPC template
 
 Dialogues work like state machines. They start with a certain topic (the NPC says something), the
@@ -12,6 +15,10 @@ Note that it is perfectly fine to have a response that switches the topic back t
 
 NPC missions are controlled by a separate but related JSON structure and are documented in
 [the missions docs](missions_json.md).
+
+Keep named quest givers and their mission definitions in dedicated NPC files. Use shared topics
+for responses shared with generic NPCs. Specify dialogue effect durations as integer turns;
+the effect parser reads only the leading number in strings such as `"24 h"`.
 
 ## NPC classes
 
@@ -75,20 +82,24 @@ end
 Two topics are special:
 
 - `TALK_DONE` ends the dialogue immediately.
-- `TALK_NONE` goes to the previously talked about topic.
+- `TALK_NONE` backs out to the previous topic. For categorized topics such as shared mission
+  dialogue, it pops consecutive topics in the same category, returning to the enclosing conversation.
 
 ### Validating Dialogues
 
 Keeping track of talk topics and making sure that all the topics referenced in responses are
 defined, and all defined topics are referenced in a response or an NPC's chat, is very tricky. There
 is a python script in `scripts/dialogue_validator.py` that will map all topics to responses and vice
-versa. Invoke it with
+versa. Run it from the repository root with a directory path; the script scans it recursively:
 
 ```sh
-python scripts/dialogue_validator.py data/json/npcs/* data/json/npcs/Backgrounds/* data/json/npcs/refugee_center/*
+python3 scripts/dialogue_validator.py data/json/npcs
 ```
 
-If you are writing a mod with dialogue, you can add the paths to the mod's dialogue files.
+If you are writing a mod with dialogue, add its dialogue directories as arguments alongside
+the base NPC directory so the validator can see references to shared topics.
+Inspect the printed diagnostics even if the script exits successfully. If the base data already
+reports diagnostics, compare with the unchanged baseline to check for regressions.
 
 ## Talk topics
 
@@ -101,9 +112,11 @@ Each topic consists of:
 5. a list of repeated responses that can be spoken by the player character, automatically generated
    if the player or NPC has items in a list of items.
 
-One can specify new topics in json. It is currently not possible to define the starting topic, so
-you have to add a response to some of the default topics (e.g. `TALK_STRANGER_FRIENDLY` or
-`TALK_STRANGER_NEUTRAL`) or to topics that can be reached somehow.
+Set `chat` on a named NPC definition to the ID of its entry `talk_topic`. Responses on that
+topic lead to other topics by ID. To give several entry topics a common response, load it
+against an array of topic IDs as described below, or link each entry topic to a shared submenu.
+For generic NPCs, add responses to reachable shared topics such as `TALK_STRANGER_FRIENDLY`
+or `TALK_STRANGER_NEUTRAL`.
 
 Format:
 
@@ -128,8 +141,8 @@ Must always be there and must always be `"talk_topic"`.
 
 ### id
 
-The topic id can be one of the built-in topics or a new id. However, if several talk topics _in
-json_ have the same id, the last topic definition will override the previous ones.
+The topic id can be one of the built-in topics or a new id. When loading multiple JSON definitions
+for one ID, load response-bearing definitions before line-only definitions.
 
 The topic id can also be an array of strings. This is loaded as if several topics with the exact
 same content have been given in json, each associated with an id from the `id`, array. Note that
@@ -660,6 +673,12 @@ The `effect` field of `speaker_effect` or a `response` can be any of the followi
 effects should be arranged in a list and are processed in the order listed.
 
 ### Missions
+
+`TALK_MISSION_OFFER` shows the selected mission's `offer` line. The accept response calls
+`assign_mission`; declining does not assign it. For progress and turn-in, the shared
+`TALK_MISSION_INQUIRE` responses offer a success report only when the objective is met.
+That report runs `mission_success`, including the mission's `end` effects. Acknowledging
+`TALK_MISSION_SUCCESS` calls `clear_mission`; it does not grant another reward.
 
 | Effect                                                           | Description                                                                                                      |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |

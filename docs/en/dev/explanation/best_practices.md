@@ -3,6 +3,17 @@
 List of conventions used in the project, plus just plain good practices. Not rules per se, most of
 the codebase doesn't meet those standards.
 
+## Repository maintenance
+
+When generated or pulled files stop being tracked, verify the ignore rules with
+`git status --ignored` or by running the generator, and verify that every CI and release
+consumer still receives the files.
+
+## Overmap terrain matching
+
+For `OtMatchType.PREFIX` or `is_ot_match` prefix matches, pass the base token without the
+trailing underscore (for example, `"robofachq"`). The matcher requires the separator itself.
+
 ## Naming
 
 Good names:

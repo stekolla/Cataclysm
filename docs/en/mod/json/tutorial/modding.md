@@ -22,7 +22,36 @@ A mod is created by creating a folder within Cataclysm's `data/mods` directory. 
 are set by the `modinfo.json` file that is present within that folder. In order for Cataclysm to
 recognize the folder as a mod, it **must** have a `modinfo.json` file present within it.
 
-<!--I know this isn't strictly true. A mod will function as long as there's a JSON file with a MOD_INFO structure in it. The file doesn't need to be called "modinfo.json"-->
+### Try a minimal mod in the browser
+
+1. Make a directory named `data/mods/authoring_example`. Save the [metadata example below](#modinfojson)
+   as `modinfo.json` in that directory, using `authoring_example` as the `id` and `Authoring Example`
+   as the `name`.
+2. Save this as `scenarios.json` next to it:
+
+   ```json
+   [
+     {
+       "type": "scenario",
+       "id": "authoring_example_evacuee",
+       "copy-from": "evacuee",
+       "name": "Authoring Example: Evacuee",
+       "description": "Start in an evac shelter to verify that the example mod loaded."
+     }
+   ]
+   ```
+
+3. Use [`./play`](../../../dev/guides/building/cmake.md#build-and-run) to rebuild and serve the
+   browser game. If it was already running, save and quit before restarting the build and
+   reloading the browser page.
+4. Create a disposable world, select **Authoring Example** in the mod list, and start custom
+   character creation in that world. Look for **Authoring Example: Evacuee** in the scenario list.
+   Seeing the mod in the world setup checks its metadata; seeing the scenario checks that its
+   content loaded.
+
+This workflow bundles the mod into a local build. To test compatible third-party source files,
+place a copy under `data/mods` before building. Editing files on your computer does not change
+the data in a hosted browser build.
 
 ### Modinfo.json
 

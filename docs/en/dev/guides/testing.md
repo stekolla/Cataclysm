@@ -39,6 +39,25 @@ or tags.
 
 ## Guidelines
 
+Add or update focused Catch2 tests in `tests/` for changed behavior. Give each new test a short
+`///` comment explaining what it checks, why it matters, and how it exercises the behavior.
+
+### Browser and UI changes
+
+- Exercise the production refresh path in UI regression tests. Do not prepare layout or paging
+  manually.
+- For canvas changes, verify the running game's CSS size, backing pixel size, and terminal size
+  on resize and high-DPI displays. SDL may overwrite canvas styles during startup.
+
+### Mission and dialogue changes
+
+- Give the avatar a valid ID in tests that assign missions, and restore the original ID afterward.
+- Count stackable currency by charges when checking payments.
+- Exercise conditional dialogue through response generation. A string condition missing from the
+  condition dispatcher can silently evaluate to false.
+
+### Test isolation
+
 When creating tests, ensure that all objects used (directly or indirectly) are fully reset before
 testing. Several tests have been rendered flaky by properties of randomly generated objects or
 interactions between tests via global objects (often the player object). As a general guideline,

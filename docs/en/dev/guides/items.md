@@ -3,6 +3,12 @@
 Here are some common tasks that you might want to do with items.
 [For more on item(game objects), check here.](../explanation/game_objects.md)
 
+## Item data conventions
+
+- Use `str_sp` for translatable names with identical singular and plural forms.
+- Give digital files, including scanned books, at least 1 ml volume. Zero-volume items are rejected.
+- For standalone item groups, use `[ "item_id", weight ]` entries in `items`.
+
 ## Processing nested items
 
 Top-level map and vehicle active item caches track the outer item that is placed in the world. If a

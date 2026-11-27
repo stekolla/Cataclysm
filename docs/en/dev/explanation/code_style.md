@@ -54,6 +54,31 @@ auto foo( int arg1, int *arg2 ) -> int
 
 These are less generic guidelines and more pain points we've stumbled across over time.
 
+### Current C++ conventions
+
+- Use C++23, `auto` for local variables (`const auto` for immutable values), and trailing return
+  types for functions and function type aliases, such as `std::function<auto( int ) -> bool>`.
+- Use single-line functions and lambdas where possible. Prefer `auto` lambda parameters and
+  direct function or member references when they can replace a lambda.
+- In astyle files (top-level `src/*.cpp` and `src/*.h`), append `// *NOPAD*` to reference and
+  pointer returns and to `<=>` declarations. Do not add this workaround in clang-format files.
+- Use `snake_case`, triple-slash documentation comments, and `<=>` for comparisons. Keep unused
+  parameter names as comments, for example `bool /*is_avatar*/`.
+- Use designated initializers. For functions with more than three parameters, use an options
+  struct and pass `{ .field = value }` without repeating the type when it can be inferred.
+- Prefer a named struct over returning a pair or tuple. Use `std::optional` for a possibly absent
+  value and `std::expected` for a result that may fail.
+- Use anonymous namespaces instead of `static` for file-local declarations.
+- Use `std::ranges`, `std::views`, `ranges::to`, and helpers from `cata_algo.h` for collection
+  processing, with function-local `using namespace std::views;` and
+  `namespace ranges = std::ranges;`. Avoid manual iterator increments unless mutation requires
+  them. Keep plain loops when index access, early exits, mutation, or nesting is clearer.
+- Prefer a new header with pure functions over modifying a header with more than ten usages.
+- Put new C++ files in subdirectories so clang-format covers them. After moving C++ files into
+  a subdirectory, run `scripts/format-trailing-return.sh <paths>` and
+  `TIDY_CHECK=modernize-use-auto scripts/format-trailing-return.sh <paths>` on those files.
+- Wrap user-facing C++ strings in `_( "text" )` for translation.
+
 ### Prefer Immutable Values
 
 - Prefer immutable values and declare variables with `const`. Less moving parts mean more predictable code flow.
@@ -72,16 +97,16 @@ These are less generic guidelines and more pain points we've stumbled across ove
 
 ### Use Auto Keyword
 
-Use [`auto` keyword](https://learn.microsoft.com/en-us/cpp/cpp/auto-cpp?view=msvc-170) where it makes sense to do so, for example:
+Examples of [`auto`](https://learn.microsoft.com/en-us/cpp/cpp/auto-cpp?view=msvc-170):
 
 #### Trailing Return Types
 
-- Prefer [trailing return types](https://en.wikipedia.org/wiki/Trailing_return_type) in function declarations. Long return types obscure function name and makes reading class methods a painful experience.
+- Use [trailing return types](https://en.wikipedia.org/wiki/Trailing_return_type) in function declarations. Long return types can obscure function names.
   ```cpp
   class Bar;
   auto foo( int a ) -> int
   {
-      const Bar &bar = some_function();
+      const auto &bar = some_function();
 
       return is_bar_ok( bar ) ? 42 : 404;
   }
@@ -122,7 +147,8 @@ Use [`auto` keyword](https://learn.microsoft.com/en-us/cpp/cpp/auto-cpp?view=msv
 
 ### Avoid `using namespace`
 
-- Avoid `using namespace` for standard namespaces, because it pollutes the global namespace.
+- Avoid importing standard namespaces at global scope. The function-local `std::views`
+  convention above keeps the import scoped to the pipeline.
 
 ### Avoid Member Methods
 
