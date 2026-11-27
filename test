@@ -7,7 +7,7 @@ run_tests() {
     bash "$repo_root/build-scripts/run-docker.sh" bash -lc '
         set -euo pipefail
         cmake --preset "$1"
-        cmake --build --preset "$1" --parallel 2
+        cmake --build --preset "$1"
         ctest --test-dir "out/build/$1" --output-on-failure
     ' _ "$1"
 }

@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import signal
 import subprocess
 import tempfile
 import time
@@ -29,10 +30,7 @@ class DevTools:
         self.message_id = 0
 
     def send(self, method, **params):
-        self.message_id += 1
-        self.socket.send(
-            json.dumps({"id": self.message_id, "method": method, "params": params})
-        )
+        self.request(method, **params)
         while True:
             message = json.loads(self.socket.recv())
             if message.get("id") == self.message_id:
@@ -46,6 +44,12 @@ class DevTools:
                 details.get("exception", {}).get("description", details["text"])
             )
         return result
+
+    def request(self, method, **params):
+        self.message_id += 1
+        self.socket.send(
+            json.dumps({"id": self.message_id, "method": method, "params": params})
+        )
 
     def evaluate(self, expression, *, await_promise=False):
         return self.send(
@@ -209,6 +213,7 @@ def run(test_page, chrome):
                         "about:blank",
                     ],
                     stdout=subprocess.DEVNULL,
+                    start_new_session=True,
                 )
                 try:
                     with closing(connect_browser(browser, profile)) as socket:
@@ -217,14 +222,16 @@ def run(test_page, chrome):
                         devtools.send("Runtime.enable")
                         run_catch_tests(devtools, f"{base_url}/{quote(test_page.name)}")
                         check_game(devtools, base_url)
+                        # Closing Chromium can disconnect DevTools before it replies.
+                        devtools.request("Browser.close")
+                        browser.wait(timeout=10)
                 finally:
                     if browser.poll() is None:
-                        browser.terminate()
                         try:
-                            browser.wait(timeout=10)
-                        except subprocess.TimeoutExpired:
-                            browser.kill()
-                            browser.wait()
+                            os.killpg(browser.pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+                        browser.wait()
         finally:
             server.shutdown()
             server_thread.join()
