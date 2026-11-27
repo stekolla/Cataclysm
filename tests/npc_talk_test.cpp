@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -212,6 +213,394 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         CHECK(expected.follow_up->follow_up == expected.final_offer);
         CHECK(expected.final_offer->follow_up.is_null());
     }
+}
+
+/// Generate Dana's real dialogue options to check prices, stock timers, and Tacoma handoffs.
+TEST_CASE("dana_refugee_bread_and_tacoma_dialogue", "[npc_talk][refugee_center]") {
+    auto& u = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(u, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(u, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    auto d = dialogue();
+    auto& dana = prep_test(d);
+    const auto offers = [&](const auto& topic, const auto& destination) {
+        d.gen_responses(talk_topic(topic));
+        return std::ranges::count_if(d.responses, [&](const auto& reply) {
+            return reply.success.next_topic.id == destination;
+        });
+    };
+
+    const auto greeting = "TALK_REFUGEE_Dana_1";
+    const auto bakery = "TALK_REFUGEE_Dana_Background_baking";
+    const auto sold = "TALK_REFUGEE_Dana_Background_baking2";
+    CHECK(offers(greeting, "TALK_REFUGEE_Dana_Background") == 1);
+    CHECK(offers(greeting, "TALK_REFUGEE_Dana_Tacoma") == 0);
+    const auto ranch = "npctalk_var_recruit_general_Nunez_Tacoma";
+    u.set_value("npctalk_var_knowledge_flag_tacoma_started", "yes");
+    REQUIRE(offers(greeting, "TALK_REFUGEE_Dana_Tacoma") == 1);
+    d.apply_speaker_effects(talk_topic("TALK_REFUGEE_Dana_Tacoma"));
+    CHECK(u.get_value(ranch) == "phase_1");
+    REQUIRE(offers("TALK_RANCH_FOREMAN", "TALK_RANCH_FOREMAN_Nunez") == 1);
+    d.apply_speaker_effects(talk_topic("TALK_RANCH_FOREMAN_Nunez"));
+    CHECK(u.get_value(ranch) == "phase_2");
+    d.apply_speaker_effects(talk_topic("TALK_REFUGEE_Dana_Tacoma"));
+    CHECK(u.get_value(ranch) == "phase_2");
+    const auto select = [&](const auto& topic, const auto& next) {
+        REQUIRE(offers(topic, next) == 1);
+        const auto reply = std::ranges::find_if(d.responses, [&](const auto& candidate) {
+            return candidate.success.next_topic.id == next;
+        });
+        CHECK(reply->success.apply(d).id == next);
+    };
+    select(greeting, "TALK_REFUGEE_Dana_Tacoma2");
+    CHECK(u.get_value(ranch) == "phase_3");
+    select("TALK_REFUGEE_Pablo_2", "TALK_REFUGEE_Pablo_Tacoma2");
+    CHECK(u.get_value(ranch) == "phase_4");
+    CHECK(offers("TALK_REFUGEE_Pablo_2", "TALK_REFUGEE_Pablo_Tacoma2") == 0);
+    CHECK(offers(greeting, "TALK_REFUGEE_Dana_Tacoma") == 0);
+    CHECK(offers(greeting, "TALK_REFUGEE_Dana_Tacoma2") == 0);
+
+    const auto flour = itype_id("flour");
+    const auto regular = itype_id("sourdough_bread");
+    const auto improved = itype_id("Dana_sourdough_bread");
+    const auto revival = efftype_id("dana_sourdough_revival");
+    const auto stock = efftype_id("dana_baking_sold");
+    const auto discount = efftype_id("dana_barter_success");
+    u.i_add(item::spawn(flour, calendar::turn, 6));
+    CHECK(offers(bakery, sold) == 0);
+    const auto buy = [&](const auto& bread) {
+        const auto reply = std::ranges::find_if(d.responses, [&](const auto& candidate) {
+            return candidate.success.next_topic.id == sold;
+        });
+        REQUIRE(reply != d.responses.end());
+        CHECK(reply->success.apply(d).id == sold);
+        CHECK(u.charges_of(flour) == 0);
+        CHECK(u.has_amount(bread, 1));
+        d.apply_speaker_effects(talk_topic(sold));
+    };
+    const auto discounted = "TALK_REFUGEE_Dana_Background_baking2_yesbarter";
+    d.apply_speaker_effects(talk_topic(discounted));
+    CHECK(dana.get_effect(discount).get_duration() == 24_hours);
+    REQUIRE(offers(discounted, sold) == 1);
+    buy(regular);
+    CHECK(offers(bakery, sold) == 0);
+    CHECK(dana.get_effect(stock).get_duration() == 18_hours);
+    dana.remove_effect(stock);
+    dana.remove_effect(discount);
+
+    u.set_value("npctalk_var_mission_flag_Dana_Sourdough", "yes");
+    u.i_add(item::spawn(flour, calendar::turn, 8));
+    dana.add_effect(revival, 14_days);
+    CHECK(offers(bakery, sold) == 0);
+    dana.remove_effect(revival);
+    REQUIRE(offers(bakery, sold) == 1);
+    buy(improved);
+}
+
+/// Deliver the actual supplies and collect explicit rewards through each refugee's mission chain.
+TEST_CASE("refugee_center_supply_mission_rewards", "[npc_talk][refugee_center]") {
+    struct delivery {
+        const char* mission_id;
+        const char* item_id;
+        int quantity;
+        int reward;
+    };
+    const auto npc_id = GENERATE(
+        "refugee_JennyForcette", "refugee_UyenTran", "refugee_DracoDune", "refugee_FatimaalJadir",
+        "refugee_VanessaToby", "refugee_DanaNunez", "refugee_BorisBorichenko");
+    const auto name = std::string_view(npc_id);
+    auto jobs = std::vector<delivery>();
+    if (name == "refugee_JennyForcette") {
+        jobs =
+            {{.mission_id = "MISSION_REFUGEE_Jenny_GET_MOTOR",
+              .item_id = "motor",
+              .quantity = 1,
+              .reward = 4},
+             {.mission_id = "MISSION_REFUGEE_Jenny_GET_TANK",
+              .item_id = "metal_tank",
+              .quantity = 1,
+              .reward = 5}};
+    } else if (name == "refugee_UyenTran") {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Uyen_1",
+             .item_id = "disinfectant",
+             .quantity = 50,
+             .reward = 8},
+            {.mission_id = "MISSION_REFUGEE_Uyen_2",
+             .item_id = "bandages",
+             .quantity = 30,
+             .reward = 7},
+            {.mission_id = "MISSION_REFUGEE_Uyen_3",
+             .item_id = "prozac",
+             .quantity = 60,
+             .reward = 5}};
+    } else if (name == "refugee_DracoDune") {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Draco_GET_GUITAR",
+             .item_id = "acoustic_guitar",
+             .quantity = 1,
+             .reward = 0}};
+    } else if (name == "refugee_FatimaalJadir") {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Fatima_1",
+             .item_id = "holybook_quran",
+             .quantity = 1,
+             .reward = 5}};
+    } else if (name == "refugee_DanaNunez") {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Dana_Sourdough",
+             .item_id = "landough_calrisean",
+             .quantity = 1,
+             .reward = 0}};
+    } else if (name == "refugee_BorisBorichenko") {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Boris_CLEANUP",
+             .item_id = "",
+             .quantity = 0,
+             .reward = 5},
+            {.mission_id = "MISSION_REFUGEE_Boris_WORKSPACE",
+             .item_id = "circsaw_off",
+             .quantity = 1,
+             .reward = 5},
+            {.mission_id = "MISSION_REFUGEE_Boris_LAPTOP",
+             .item_id = "laptop_boris",
+             .quantity = 1,
+             .reward = 5}};
+    } else {
+        jobs = {
+            {.mission_id = "MISSION_REFUGEE_Vanessa_1",
+             .item_id = "survivor_hairtrimmer",
+             .quantity = 1,
+             .reward = 0}};
+    }
+
+    auto& u = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(u, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(u, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    u.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    const auto giver_id =
+        get_map().place_npc(u.bub_pos() + point(5, 0), string_id<npc_template>(npc_id), true);
+    g->load_npcs();
+    auto* giver = g->find_npc(giver_id);
+    REQUIRE(giver != nullptr);
+    auto* faction = giver->get_faction();
+    REQUIRE(faction != nullptr);
+    const auto restore_likes = restore_on_out_of_scope(faction->likes_u);
+    const auto restore_respect = restore_on_out_of_scope(faction->respects_u);
+    const auto restore_power = restore_on_out_of_scope(faction->power);
+    auto d = dialogue();
+    d.alpha = &u;
+    d.beta = giver;
+    const auto merch = itype_id("FMCNote");
+
+    const auto find_response = [&](const auto& next) {
+        return std::ranges::find_if(d.responses, [&](const auto& reply) {
+            return reply.success.next_topic.id == next;
+        });
+    };
+    if (name == "refugee_BorisBorichenko") {
+        const auto work = talk_topic("TALK_REFUGEE_Boris_Work1");
+        const auto next = "TALK_REFUGEE_Boris_Work2";
+        d.gen_responses(work);
+        CHECK(find_response(next) == d.responses.end());
+        u.set_value("npctalk_var_mission_flag_FMShopkeep_Mission1", "yes");
+        d.gen_responses(work);
+        CHECK(find_response(next) != d.responses.end());
+    }
+
+    for (const auto& delivery : jobs) {
+        CAPTURE(delivery.mission_id);
+        REQUIRE(giver->chatbin.missions.size() == 1);
+        auto* job = giver->chatbin.missions.front();
+        REQUIRE(job->get_type().id == mission_type_id(delivery.mission_id));
+        giver->chatbin.mission_selected = job;
+        // Item placement quests need a known target outside the crafting inventory radius.
+        const auto target = u.abs_omt_pos() + point_rel_omt(6, 0);
+        const auto previous_terrain = ACTIVE_OVERMAP_BUFFER.ter(target);
+        const auto restore_terrain = on_out_of_scope([&] {
+            ACTIVE_OVERMAP_BUFFER.ter_set(target, previous_terrain);
+        });
+        if (std::string_view(delivery.item_id) == "landough_calrisean") {
+            ACTIVE_OVERMAP_BUFFER.ter_set(target, oter_id("bakery_north"));
+        } else if (std::string_view(delivery.item_id) == "laptop_boris") {
+            ACTIVE_OVERMAP_BUFFER.ter_set(target, oter_id("shelter_2_vandal_north"));
+        }
+        talk_function::assign_mission(*giver);
+        CHECK_FALSE(job->is_complete(giver_id));
+        if (delivery.quantity == 0) {
+            const auto recruit =
+                [&](const auto& menu, const auto& accept, const auto& recruit_npc) {
+                    auto volunteer = npc();
+                    volunteer.load_npc_template(string_id<npc_template>(recruit_npc));
+                    const auto restore_talker = on_out_of_scope([&] {
+                        d.beta = giver;
+                        if (auto* volunteer_faction = volunteer.get_faction()) {
+                            volunteer_faction->remove_member(volunteer.getID());
+                        }
+                    });
+                    d.beta = &volunteer;
+                    d.gen_responses(talk_topic(menu));
+                    const auto reply = find_response(accept);
+                    REQUIRE(reply != d.responses.end());
+                    CHECK(reply->success.apply(d).id == accept);
+                    d.apply_speaker_effects(talk_topic(accept));
+                    d.gen_responses(talk_topic(menu));
+                    CHECK(find_response(accept) == d.responses.end());
+                };
+            recruit("TALK_REFUGEE_Aleesha_2", "TALK_REFUGEE_Accept_Boris_Mission_1",
+                    "refugee_AleeshaSeward");
+            recruit("TALK_REFUGEE_Garry_2", "TALK_REFUGEE_Accept_Boris_Mission_1",
+                    "refugee_GarryVilleneuve");
+            recruit("TALK_OLD_GUARD_REP", "TALK_OLD_GUARD_REP_Accept_Boris_Mission_1",
+                    "old_guard_rep");
+            CHECK_FALSE(job->is_complete(giver_id));
+
+            auto merchant = npc();
+            merchant.load_npc_template(string_id<npc_template>("evac_merchant"));
+            const auto restore_talker = on_out_of_scope([&] {
+                d.beta = giver;
+                if (auto* merchant_faction = merchant.get_faction()) {
+                    merchant_faction->remove_member(merchant.getID());
+                }
+            });
+            d.beta = &merchant;
+            const auto offer = "TALK_EVAC_MERCHANT_Boris_Mission_1";
+            d.gen_responses(talk_topic("TALK_EVAC_MERCHANT"));
+            REQUIRE(find_response(offer) != d.responses.end());
+            d.apply_speaker_effects(talk_topic(offer));
+            u.i_add(item::spawn(merch, calendar::turn, 5));
+            d.gen_responses(talk_topic(offer));
+            const auto hire = find_response("TALK_EVAC_MERCHANT_Boris_Mission_1b");
+            REQUIRE(hire != d.responses.end());
+            CHECK(hire->success.apply(d).id == "TALK_EVAC_MERCHANT_Boris_Mission_1b");
+        } else {
+            const auto supply = itype_id(delivery.item_id);
+            REQUIRE(supply.is_valid());
+            if (item::count_by_charges(supply)) {
+                u.i_add(item::spawn(supply, calendar::turn, delivery.quantity));
+            } else {
+                REQUIRE(delivery.quantity == 1);
+                u.i_add(item::spawn(supply));
+            }
+        }
+        u.invalidate_crafting_inventory();
+        REQUIRE(job->is_complete(giver_id));
+        const auto before = u.charges_of(merch);
+        d.gen_responses(talk_topic("TALK_MISSION_INQUIRE"));
+        const auto report = std::ranges::find_if(d.responses, [](const auto& reply) {
+            return reply.success.next_topic.id == "TALK_MISSION_SUCCESS";
+        });
+        REQUIRE(report != d.responses.end());
+        CHECK(report->success.apply(d).id == "TALK_MISSION_SUCCESS");
+        talk_function::mission_success(*giver);
+        CHECK(u.charges_of(merch) == before + delivery.reward);
+        CHECK_FALSE(job->in_progress());
+        CHECK_FALSE(job->has_generic_rewards());
+        d.gen_responses(talk_topic("TALK_MISSION_SUCCESS"));
+        REQUIRE(d.responses.size() == 1);
+        CHECK(d.responses.front().success.apply(d).id == "TALK_NONE");
+
+        if (name == "refugee_DanaNunez") {
+            const auto revival = efftype_id("dana_sourdough_revival");
+            CHECK(giver->get_effect(revival).get_duration() == 14_days);
+        }
+        if (name == "refugee_JennyForcette") {
+            const auto project = d.dynamic_line(talk_topic("TALK_REFUGEE_JENNY_Project2"));
+            if (delivery.reward == 4) {
+                CHECK(project.find("still need a 60-liter metal tank") != std::string::npos);
+            } else {
+                CHECK(project.find("start building a prototype") != std::string::npos);
+                u.remove_value("npctalk_var_mission_completed_Jenny_mission_3");
+                CHECK(d.dynamic_line(talk_topic("TALK_REFUGEE_JENNY_Project2")) == project);
+            }
+        }
+    }
+    CHECK(giver->chatbin.missions.empty());
+
+    if (name == "refugee_UyenTran") {
+        d.gen_responses(talk_topic("TALK_REFUGEE_Uyen_Background"));
+        REQUIRE(find_response("TALK_REFUGEE_Uyen_Teach") != d.responses.end());
+        d.apply_speaker_effects(talk_topic("TALK_REFUGEE_Uyen_Teach"));
+        d.gen_responses(talk_topic("TALK_REFUGEE_Uyen_Teach"));
+        CHECK(find_response("TALK_TRAIN") != d.responses.end());
+    } else if (name == "refugee_DracoDune") {
+        CHECK(d.dynamic_line(talk_topic("TALK_REFUGEE_Draco_7")).find("patron of the arts")
+              != std::string::npos);
+        const auto joint = itype_id("joint");
+        for (auto i = 0; i < 5; ++i) { u.i_add(item::spawn(joint)); }
+        const auto trading = talk_topic("TALK_REFUGEE_Draco_10_approve");
+        const auto sold = "TALK_REFUGEE_Draco_10_sold";
+        d.gen_responses(trading);
+        const auto sale = find_response(sold);
+        REQUIRE(sale != d.responses.end());
+        CHECK(sale->success.apply(d).id == sold);
+        CHECK(u.charges_of(merch) == 6);
+        CHECK_FALSE(u.has_amount(joint, 1));
+        d.gen_responses(trading);
+        CHECK(find_response(sold) == d.responses.end());
+    } else if (name == "refugee_VanessaToby") {
+        d.gen_responses(talk_topic("TALK_REFUGEE_Vanessa_2"));
+        CHECK(find_response("TALK_REFUGEE_Vanessa_Haircut") != d.responses.end());
+        const auto services = talk_topic("TALK_REFUGEE_Vanessa_Haircut");
+        d.gen_responses(services);
+        CHECK(std::ranges::any_of(d.responses, [](const auto& reply) {
+            return reply.truetext.translated().find("owe me a free haircut") != std::string::npos;
+        }));
+        u.i_add(item::spawn(merch, calendar::turn, 6));
+        d.gen_responses(services);
+        for (const auto* option : {"Please give me a haircut.", "Please give me a shave."}) {
+            CHECK(std::ranges::any_of(d.responses, [&](const auto& reply) {
+                return reply.truetext.translated() == option;
+            }));
+        }
+    }
+}
+
+/// Generate conversations on both sides of staff milestones to verify the new options and lines.
+TEST_CASE("refugee_center_milestone_dialogue", "[npc_talk][refugee_center]") {
+    auto& u = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(u, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(u, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    auto d = dialogue();
+    prep_test(d);
+
+    const auto has_option = [&](const auto& menu, const auto& next) {
+        d.gen_responses(talk_topic(menu));
+        return std::ranges::any_of(d.responses, [&](const auto& reply) {
+            return reply.success.next_topic.id == next;
+        });
+    };
+    CHECK_FALSE(has_option("TALK_REFUGEE_Dana_Situation", "TALK_REFUGEE_Dana_Preservation"));
+    CHECK_FALSE(has_option("TALK_REFUGEE_JENNY_Project1", "TALK_REFUGEE_JENNY_Solar"));
+    u.set_value("npctalk_var_mission_flag_FMShopkeep_Mission5", "yes");
+    u.set_value("npctalk_var_mission_flag_FMShopkeep_Mission4", "yes");
+    CHECK(has_option("TALK_REFUGEE_Dana_Situation", "TALK_REFUGEE_Dana_Preservation"));
+    CHECK(has_option("TALK_REFUGEE_JENNY_Project1", "TALK_REFUGEE_JENNY_Solar"));
+
+    const auto uyen = talk_topic("TALK_REFUGEE_Uyen_Situation");
+    const auto garry = talk_topic("TALK_REFUGEE_Garry_Situation");
+    const auto stan = talk_topic("TALK_REFUGEE_Stan_Situation");
+    const auto security = talk_topic("TALK_EVAC_SECURITY_CHIEF");
+    CHECK(d.dynamic_line(uyen).find("water pressure") == std::string::npos);
+    CHECK(d.dynamic_line(garry).find("workshop") == std::string::npos);
+    CHECK(d.dynamic_line(stan).find("workshop") == std::string::npos);
+    CHECK(d.dynamic_line(security).find("approach is safer") == std::string::npos);
+    u.set_value("npctalk_var_mission_flag_evac_maintenance_pump", "yes");
+    u.set_value("npctalk_var_mission_completed_Boris_mission_2", "yes");
+    u.set_value("npctalk_var_mission_flag_evac_security_approach", "yes");
+    CHECK(d.dynamic_line(uyen).find("water pressure") != std::string::npos);
+    CHECK(d.dynamic_line(garry).find("workshop") != std::string::npos);
+    CHECK(d.dynamic_line(stan).find("workshop") != std::string::npos);
+    CHECK(d.dynamic_line(security).find("approach is safer") != std::string::npos);
 }
 
 /// Turn in coffee before the canning chain and check each reward and the final jar-buyback unlock.

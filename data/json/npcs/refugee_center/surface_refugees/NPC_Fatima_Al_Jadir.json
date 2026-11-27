@@ -188,6 +188,8 @@
         { "u_add_var": "Fatima_Mission1", "type": "mission", "context": "flag", "value": "yes" },
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 1 }
       ]
-    }
+    },
+    "description": "Find one translated copy of the Quran in a library, bookstore, or religious building and bring it to Fatima at the Refugee Center. She pays <reward_count:FMCNote> Merch.",
+    "has_generic_rewards": false
   }
 ]

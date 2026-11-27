@@ -184,7 +184,14 @@
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_3",
     "//": "This option is Boris' start point after you've finished his first mission and got to know him a bit.",
-    "dynamic_line": "It is good to see you too.  I would not say things are looking \"up\" yet, but they are not so much looking down perhaps.  I am keeping a bit busier.",
+    "dynamic_line": {
+      "u_has_var": "Boris_mission_2",
+      "type": "mission",
+      "context": "completed",
+      "value": "yes",
+      "yes": "It is good to see you.  I have been working in the back bay again.  Keeping my hands busy helps.",
+      "no": "It is good to see you too.  I would not say things are looking \"up\" yet, but they are not so much looking down perhaps.  I am keeping a bit busier."
+    },
     "responses": [
       { "text": "Let’s talk about something else.", "topic": "TALK_NONE" },
       { "text": "Want to talk about it a little?", "topic": "TALK_REFUGEE_Boris_Son" },
@@ -194,7 +201,14 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_Background",
-    "dynamic_line": "I was a carpenter.  I like to keep my hands busy, especially when I am stressed.  Now, here I am, picking my nose and stuck thinking about my problems and all that I've lost.",
+    "dynamic_line": {
+      "u_has_var": "Boris_mission_2",
+      "type": "mission",
+      "context": "completed",
+      "value": "yes",
+      "yes": "I was a carpenter.  Now I am working with my hands again, in the back bay.  It helps to have something to do when the memories come back.",
+      "no": "I was a carpenter.  I like to keep my hands busy, especially when I am stressed.  Now, here I am, picking my nose and stuck thinking about my problems and all that I've lost."
+    },
     "responses": [
       { "text": "What have you lost, if it's okay for me to ask?", "topic": "TALK_REFUGEE_Boris_Background_loss" },
       {
@@ -205,7 +219,13 @@
       {
         "text": "Now that things are cleaned up in the back, is there anything holding you back from working?",
         "topic": "TALK_MISSION_LIST",
-        "condition": { "u_has_var": "Boris_mission_1", "type": "mission", "context": "completed", "value": "yes" }
+        "condition": {
+          "and": [
+            { "u_has_var": "Boris_mission_1", "type": "mission", "context": "completed", "value": "yes" },
+            { "not": { "u_has_var": "Boris_mission_2", "type": "mission", "context": "completed", "value": "yes" } },
+            { "not": "has_no_available_mission" }
+          ]
+        }
       },
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.", "topic": "TALK_DONE" }
@@ -260,6 +280,15 @@
   },
   {
     "type": "talk_topic",
+    "id": "TALK_REFUGEE_Boris_Son_Tough",
+    "dynamic_line": "I am still here, friend.  Some days that takes all I have.  I would rather talk about something else now.",
+    "responses": [
+      { "text": "What were you saying before?", "topic": "TALK_NONE" },
+      { "text": "I'd better get going.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_Son_Writing",
     "dynamic_line": "No.  In the evacuation shelter, distracted by grief, I forgot it.  We were rushed onto the bus so quickly, and… well, I don't remember much of that time.  His work was all saved on the hard drive, we thought we could download it from the cloud when we arrived but, well, there is no cloud now.  Even if there were, it would only have his writing, not his little games, his silly voice recordings.",
     "//": "TK add a quest.",
@@ -292,16 +321,28 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_Work2",
-    "dynamic_line": "We could put together a little clean up group, but everyone here has terrible memories of that place.  I could not ask anyone here to go back and see the leftovers of people we knew.  Still, it's a big job.  Who here might be able to do it?",
+    "dynamic_line": "We could put together a cleanup crew.  Some of us have terrible memories of that place, but people elsewhere in the Center might be able to face it.  Could you ask around, including the guards and merchants?",
     "responses": [
-      { "text": "I'm sure there's someone.  Would you like me to ask around?", "topic": "TALK_MISSION_LIST" },
+      {
+        "text": "I'm sure there's someone.  Would you like me to ask around?",
+        "topic": "TALK_MISSION_LIST",
+        "condition": { "not": "has_no_available_mission" }
+      },
+      { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.", "topic": "TALK_DONE" }
     ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_Situation",
-    "dynamic_line": "Everyone agrees this is bad.  Sleeping on a cot on the floor, crowded in with strangers, woken by zombies in the night.  To me, though, that is all just a drop in the bucket.  What is killing me is being forced to sit with nothing but my thoughts of what I've lost.",
+    "dynamic_line": {
+      "u_has_var": "Boris_mission_2",
+      "type": "mission",
+      "context": "completed",
+      "value": "yes",
+      "yes": "It is still crowded, and it is still hard to sleep.  But I can go to the workshop and make something useful with my hands.  That helps, even on the bad days.",
+      "no": "Everyone agrees this is bad.  Sleeping on a cot on the floor, crowded in with strangers, woken by zombies in the night.  To me, though, that is all just a drop in the bucket.  What is killing me is being forced to sit with nothing but my thoughts of what I've lost."
+    },
     "responses": [
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.", "topic": "TALK_DONE" }
@@ -345,7 +386,7 @@
     "id": "MISSION_REFUGEE_Boris_CLEANUP",
     "type": "mission_definition",
     "name": { "str": "Find someone to clean up the back bay." },
-    "description": "Ask around the Refugee Center and recruit at least five people to help clean up the back bay. Report back to Boris.",
+    "description": "Recruit at least five volunteers at the Refugee Center to clean up the back bay. Ask around the whole Center, including the guards, merchants, and refugees. Report back to Boris. Boris pays <reward_count:FMCNote> Merch.",
     "difficulty": 1,
     "value": 0,
     "goal": "MGOAL_CONDITION",
@@ -354,10 +395,10 @@
     "origins": [ "ORIGIN_SECONDARY" ],
     "dialogue": {
       "describe": "Find a few people able to help clean the back, people without too much trauma there.",
-      "offer": "Yes, please.  If you can ask around for someone who can help, I can gather the tools they will need and some payment for them.",
+      "offer": "Yes, please.  Find me five volunteers from anywhere in the Center.  Ask the guards, the merchants, anyone who can stomach the work.  I can gather the tools they will need and some payment for them.",
       "accepted": "You are a kind soul.",
       "rejected": "Ah well.  I can ask around myself, perhaps.",
-      "advice": "Those of us here in the back have too many bad memories, but perhaps someone who didn't come with the original refugee groups would be less burdened.",
+      "advice": "Some of us have too many bad memories of that room.  Try the guards, the merchants, or anyone else used to hard jobs.  A few of the refugees might be willing too.",
       "inquire": "Greetings, my friend.  Have you found anyone?",
       "success": "This has great promise.  Perhaps something to keep me busy will help.  Here, I found some small money to thank you.",
       "success_lie": "I see…  Well I shall get things in order!",
@@ -401,7 +442,7 @@
       ]
     },
     "//": "TK add update mapgen.",
-    "description": "Bring Boris one handheld circular saw for his new workshop at the Refugee Center.",
+    "description": "Bring Boris one handheld circular saw for his workshop at the Refugee Center. The merchants may have one for sale. Boris pays <reward_count:FMCNote> Merch.",
     "has_generic_rewards": false
   },
   {
@@ -421,10 +462,7 @@
         "random": true,
         "search_range": 120
       },
-      "update_mapgen": {
-        "om_terrain": "shelter_2_vandal",
-        "place_item": [ { "item": "laptop_boris", "x": 15, "y": 12 }, { "item": "mbag", "x": 15, "y": 12 } ]
-      }
+      "update_mapgen": { "place_item": [ { "item": "laptop_boris", "x": 15, "y": 12 }, { "item": "mbag", "x": 15, "y": 12 } ] }
     },
     "dialogue": {
       "describe": "Find Boris' son's laptop.",
@@ -444,7 +482,7 @@
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 2 }
       ]
     },
-    "description": "Recover Ash’s sticker-covered laptop from the marked vandalized evacuation shelter and bring it back to Boris.",
+    "description": "Recover Ash’s sticker-covered laptop from the marked vandalized evacuation shelter and bring it back to Boris. Boris pays <reward_count:FMCNote> Merch.",
     "has_generic_rewards": false
   },
   {

@@ -91,6 +91,8 @@ If a mistake is found during a task, update AGENTS.md or the skill and fix the c
 - Load response-bearing dialogue topic definitions before line-only definitions of the same IDs.
 - Exercise conditional dialogue through response generation. A string condition can silently evaluate
   to false if its name is missing from the condition dispatcher.
+- Use integer turns for dialogue effect durations. The effect parser reads only the leading number
+  in strings such as `"24 h"`.
 
 - Keep named quest givers and their mission definitions in dedicated NPC files. Use shared dialogue
   topics for responses shared with generic NPCs.

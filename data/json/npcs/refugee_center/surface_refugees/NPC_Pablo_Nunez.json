@@ -95,7 +95,8 @@
       {
         "text": "Dana wanted me to be the one to let you know: they've got work for you over at the ranch.  You could get out of here if you want.",
         "topic": "TALK_REFUGEE_Pablo_Tacoma2",
-        "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_3" }
+        "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_3" },
+        "effect": { "u_add_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_4" }
       },
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.  Bye, Pablo.", "topic": "TALK_DONE" }
@@ -195,20 +196,33 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Pablo_Situation",
-    "dynamic_line": "It's pretty tough here.  We're packed into too small a location with too many people.  Everyone is dealing with their own trauma.  Rhy is trying to help out, but she can't be a proper counselor in these circumstances.  I don't know how we're going to survive for long.  As for me, I wish I could be anywhere but here.  I need to see the sky again, or I'm going to go insane.",
+    "dynamic_line": {
+      "u_has_var": "Nunez_Tacoma",
+      "type": "recruit",
+      "context": "general",
+      "value": "phase_4",
+      "yes": "It's still crowded here, but Dana and I are getting packed for Tacoma Ranch.  We're hoping to get a place on the next caravan out.",
+      "no": "It's pretty tough here.  We're packed into too small a location with too many people.  Everyone is dealing with their own trauma.  Rhy is trying to help out, but she can't be a proper counselor in these circumstances.  I don't know how we're going to survive for long.  As for me, I wish I could be anywhere but here.  I need to see the sky again, or I'm going to go insane."
+    },
     "responses": [
       {
-        "text": "Why not move to the Tacoma Commune?",
+        "text": "Why not move to Tacoma Ranch?",
         "topic": "TALK_REFUGEE_Pablo_Tacoma",
         "effect": { "u_add_var": "Pablo_ask_tacoma", "type": "recruit", "context": "general", "value": "yes" },
-        "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" }
+        "condition": {
+          "and": [
+            { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
+            { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "" },
+            { "not": { "u_has_var": "Pablo_ask_tacoma", "type": "recruit", "context": "general", "value": "yes" } }
+          ]
+        }
       }
     ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Pablo_Tacoma",
-    "dynamic_line": "I heard about that place.  What use would they have for an accountant, though?  If they have work for my wife Dana and I, I'd definitely consider it."
+    "dynamic_line": "I heard about that place.  What use would they have for an accountant, though?  If they have work for my wife Dana and I, I'd definitely consider it.  Ask Dana what she thinks."
   },
   {
     "type": "talk_topic",

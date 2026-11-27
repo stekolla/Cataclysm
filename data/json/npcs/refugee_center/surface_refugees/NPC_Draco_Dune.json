@@ -264,7 +264,7 @@
       {
         "text": "Let's talk about getting you that guitar.",
         "topic": "TALK_MISSION_LIST",
-        "condition": { "not": { "u_has_var": "NC_REFUGEE_Draco_has_guitar", "type": "general", "context": "mission", "value": "yes" } }
+        "condition": { "not": "has_no_available_mission" }
       },
       {
         "text": "I've been thinking about that deal you mentioned.",
@@ -454,6 +454,9 @@
       "success": "Hell yeah, bud!  You just made a lot of people really happy!  In thanks, I'll have enough cash to offer you more recompense for our little dealings.",
       "success_lie": "Huh.  This… is something, isn't it.",
       "failure": "No worries.  They don't grow from trees, but we have time."
-    }
+    },
+    "description": "Find one acoustic guitar at a music store or elsewhere and bring it to Draco at the Refugee Center.",
+    "has_generic_rewards": false,
+    "reward_description": "Draco offers better payment in his personal trades."
   }
 ]

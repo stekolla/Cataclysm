@@ -83,10 +83,10 @@
     "type": "talk_topic",
     "//": "common talk responses",
     "id": [
+      "TALK_REFUGEE_Dana_1",
+      "TALK_REFUGEE_Dana_1_firstmeet",
       "TALK_REFUGEE_Dana_2",
       "TALK_REFUGEE_Dana_Background",
-      "TALK_REFUGEE_Dana_Background_baking",
-      "TALK_REFUGEE_Dana_Background_baking_revival",
       "TALK_REFUGEE_Dana_Situation"
     ],
     "responses": [
@@ -100,14 +100,35 @@
             }
           ]
         },
-        "topic": "TALK_REFUGEE_GENERAL_Refuse_Boris_Mission_1"
+        "topic": "TALK_REFUGEE_Refuse_Boris_Mission_1"
       },
       { "text": "What's your story?", "topic": "TALK_REFUGEE_Dana_Background" },
       { "text": "How are things here?", "topic": "TALK_REFUGEE_Dana_Situation" },
       {
-        "text": "I spoke to your husband about getting you a job at the Tacoma Ranch.  What would you think about that?",
+        "text": "Would you and Pablo consider working at Tacoma Ranch?",
         "topic": "TALK_REFUGEE_Dana_Tacoma",
-        "condition": { "u_has_var": "Pablo_ask_tacoma", "type": "recruit", "context": "general", "value": "yes" }
+        "condition": {
+          "and": [
+            { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
+            { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "" }
+          ]
+        }
+      },
+      {
+        "text": "Any thoughts about Tacoma Ranch?",
+        "topic": "TALK_REFUGEE_Dana_Tacoma",
+        "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_1" }
+      },
+      {
+        "text": "The foreman at Tacoma Ranch says there's work for you and Pablo.",
+        "topic": "TALK_REFUGEE_Dana_Tacoma2",
+        "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_2" },
+        "effect": { "u_add_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_3" }
+      },
+      {
+        "text": "Is there anything I could do to help with your baking?",
+        "topic": "TALK_MISSION_LIST",
+        "condition": { "not": "has_no_available_mission" }
       },
       {
         "text": "Your husband said to ask you what you'd think about getting out of this place and coming to work for me at my own camp.",
@@ -120,7 +141,7 @@
         "condition": { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "in_progress" }
       },
       {
-        "text": "Got any more bread I can trade flour for?",
+        "text": "Have you done any baking lately?",
         "topic": "TALK_REFUGEE_Dana_Background_baking",
         "condition": {
           "and": [
@@ -155,15 +176,33 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Dana_1",
-    "dynamic_line": [ "Hello, nice to see you again.  What brings you around today?", "It's good to see you're still around." ],
-    "responses": [ { "text": "Hi Dana, nice to see you too.  I gotta go though.", "topic": "TALK_DONE" } ]
+    "dynamic_line": {
+      "u_has_var": "u_met_Dana_Nunez",
+      "type": "general",
+      "context": "meeting",
+      "value": "yes",
+      "yes": [ "Hello, nice to see you again.  What brings you around today?", "It's good to see you're still around." ],
+      "no": "Hi there.  I'm Dana, Dana Nunez.  Nice to see a new face."
+    },
+    "responses": [ { "text": "I'd better get going.  Bye, Dana.", "topic": "TALK_DONE" } ],
+    "speaker_effect": { "effect": { "u_add_var": "u_met_Dana_Nunez", "type": "general", "context": "meeting", "value": "yes" } }
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_REFUGEE_Dana_2",
+    "dynamic_line": "Sure.  What else did you want to talk about?",
+    "responses": [ { "text": "I'd better get going.  Bye, Dana.", "topic": "TALK_DONE" } ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Dana_Background",
     "dynamic_line": "I was working in a nice restaurant as a baker, until <the_cataclysm>.  I was pregnant, and it was getting close to time to go on mat leave; lots of time on my feet, getting up stupid-early to make pastries, you know.  Because of the pregnancy we were evacuated early and shipped out this way, but our bus was attacked in the chaos.  We managed to escape, but had to hike the rest of the way, with the Singhs and a few other refugees that didn't make it.  I lost the baby.  It wasn't a good time.",
     "responses": [
-      { "text": "Have you done any baking lately?", "topic": "TALK_REFUGEE_Dana_Background_baking" },
+      {
+        "text": "Have you done any baking lately?",
+        "topic": "TALK_REFUGEE_Dana_Background_baking",
+        "condition": { "not": { "npc_has_effect": "dana_sourdough_revival" } }
+      },
       { "text": "I'm sorry for your loss.", "topic": "TALK_REFUGEE_Dana_Background_sorry" },
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.  Bye, Dana.", "topic": "TALK_DONE" }
@@ -174,16 +213,17 @@
     "//": "Common 'buy bread' dialogue options put here to avoid reprinting.",
     "id": [
       "TALK_REFUGEE_Dana_Background_baking",
-      "TALK_REFUGEE_Dana_Background_baking_nobarter",
+      "TALK_REFUGEE_Dana_Background_baking2_nobarter",
       "TALK_REFUGEE_Dana_Background_baking2_yesbarter"
     ],
     "responses": [
       {
         "//": "Regular sourdough, trade flour, regular price",
-        "text": "That sounds like a great deal, here's some flour for you.",
+        "text": "That sounds like a great deal.  Here's eight cups of flour.",
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
             { "not": { "npc_has_effect": "dana_barter_success" } },
             { "u_has_items": { "item": "flour", "count": 8 } },
@@ -198,6 +238,7 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
             { "not": { "npc_has_effect": "dana_barter_success" } },
             { "u_has_items": { "item": "FMCNote", "count": 2 } },
@@ -212,12 +253,14 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
+            { "npc_has_effect": "dana_barter_success" },
             { "u_has_items": { "item": "flour", "count": 6 } },
             { "not": { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" } }
           ]
         },
-        "effect": [ { "u_sell_item": "flour", "count": 8 }, { "u_buy_item": "sourdough_bread" } ]
+        "effect": [ { "u_sell_item": "flour", "count": 6 }, { "u_buy_item": "sourdough_bread" } ]
       },
       {
         "//": "Regular sourdough, trade merch, barter price",
@@ -225,6 +268,7 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
             { "npc_has_effect": "dana_barter_success" },
             { "u_has_items": { "item": "FMCNote", "count": 1 } },
@@ -235,17 +279,18 @@
       },
       {
         "//": "Special sourdough, trade flour, regular price",
-        "text": "That sounds like a great deal, here's some flour for you.",
+        "text": "That sounds like a great deal.  Here's eight cups of flour.",
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
             { "not": { "npc_has_effect": "dana_barter_success" } },
             { "u_has_items": { "item": "flour", "count": 8 } },
-            { "not": { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" } }
+            { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" }
           ]
         },
-        "effect": [ { "u_sell_item": "flour", "count": 8 }, { "u_buy_item": "sourdough_bread" } ]
+        "effect": [ { "u_sell_item": "flour", "count": 8 }, { "u_buy_item": "Dana_sourdough_bread" } ]
       },
       {
         "//": "Special sourdough, trade merch, regular price",
@@ -253,12 +298,14 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
+            { "not": { "npc_has_effect": "dana_barter_success" } },
             { "u_has_items": { "item": "FMCNote", "count": 2 } },
-            { "not": { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" } }
+            { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" }
           ]
         },
-        "effect": [ { "u_sell_item": "FMCNote", "count": 2 }, { "u_buy_item": "sourdough_bread" } ]
+        "effect": [ { "u_sell_item": "FMCNote", "count": 2 }, { "u_buy_item": "Dana_sourdough_bread" } ]
       },
       {
         "//": "Special sourdough, trade flour, barter price",
@@ -266,12 +313,14 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
+            { "npc_has_effect": "dana_barter_success" },
             { "u_has_items": { "item": "flour", "count": 6 } },
             { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" }
           ]
         },
-        "effect": [ { "u_sell_item": "flour", "count": 8 }, { "u_buy_item": "Dana_sourdough_bread" } ]
+        "effect": [ { "u_sell_item": "flour", "count": 6 }, { "u_buy_item": "Dana_sourdough_bread" } ]
       },
       {
         "//": "Special sourdough, trade merch, barter price",
@@ -279,6 +328,7 @@
         "topic": "TALK_REFUGEE_Dana_Background_baking2",
         "condition": {
           "and": [
+            { "not": { "npc_has_effect": "dana_sourdough_revival" } },
             { "not": { "npc_has_effect": "dana_baking_sold" } },
             { "npc_has_effect": "dana_barter_success" },
             { "u_has_items": { "item": "FMCNote", "count": 1 } },
@@ -295,12 +345,23 @@
     "dynamic_line": {
       "npc_has_effect": "dana_baking_sold",
       "no": {
-        "u_has_var": "Dana_Bread_Sales",
-        "type": "knowledge",
-        "context": "trade",
-        "value": "yes",
-        "yes": "I sure do, if you've got the flour or the merch for me, I'd be happy to trade you another loaf.",
-        "no": "I do a bit.  I got a sourdough starter going almost as soon as I arrived, and it's making passable bread already.  I cooked some up yesterday actually, I could probably trade a loaf of fresh bread for, say, about eight cups of flour, or two merch."
+        "npc_has_effect": "dana_barter_success",
+        "yes": "I've got a loaf for you.  Six cups of flour or one merch, like we agreed.",
+        "no": {
+          "u_has_var": "Dana_Sourdough",
+          "type": "mission",
+          "context": "flag",
+          "value": "yes",
+          "yes": "Landough's back in business.  A loaf from the family starter is eight cups of flour or two merch.",
+          "no": {
+            "u_has_var": "Dana_Bread_Sales",
+            "type": "knowledge",
+            "context": "trade",
+            "value": "yes",
+            "yes": "I sure do, if you've got the flour or the merch for me, I'd be happy to trade you another loaf.",
+            "no": "I do a bit.  I got a sourdough starter going almost as soon as I arrived, and it's making passable bread already.  I cooked some up yesterday actually, I could probably trade a loaf of fresh bread for, say, about eight cups of flour, or two merch."
+          }
+        }
       },
       "yes": "Not since I last saw you, sorry.  Come by tomorrow and I'll try to keep a loaf set aside for you, but they disappear fast."
     },
@@ -343,7 +404,7 @@
     "id": "TALK_REFUGEE_Dana_Background_baking2_nobarter",
     "dynamic_line": "Sorry, it's not something I can bend on.  I don't make a big profit off this, I use what I get to make more bread.  If I cut you a deal, I'll run out of supplies.",
     "//": "see above for responses to buy bread at original price.",
-    "speaker_effect": { "effect": { "npc_add_effect": "dana_barter_fail", "duration": "24 h" } },
+    "speaker_effect": { "effect": { "npc_add_effect": "dana_barter_fail", "duration": 86400 } },
     "responses": [
       { "text": "Well, I tried.  Can we talk about something else?", "topic": "TALK_REFUGEE_Dana_2" },
       { "text": "Thanks, but I think I'll pass.  I gotta run.", "topic": "TALK_DONE" }
@@ -353,7 +414,7 @@
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Dana_Background_baking2_yesbarter",
     "dynamic_line": "Oh, fine.  Six cups of flour, or one merch.  I'm not going any lower, I got a business to run here.",
-    "speaker_effect": { "effect": { "npc_add_effect": "dana_barter_success", "duration": "24 h" } },
+    "speaker_effect": { "effect": { "npc_add_effect": "dana_barter_success", "duration": 86400 } },
     "responses": [
       { "text": "You know, I think I changed my mind.  Can we talk about something else?", "topic": "TALK_REFUGEE_Dana_2" },
       { "text": "I guess I'm outta here then.", "topic": "TALK_DONE" }
@@ -384,12 +445,12 @@
       ],
       "no": "Great, here's a loaf of my locally-famous, not-very-mature sourdough.  It's not too bad honestly.  Everyone here seems to like it."
     },
-    "speaker_effect": { "effect": [ { "npc_add_effect": "dana_baking_sold", "duration": "18 h" } ] },
+    "speaker_effect": { "effect": [ { "npc_add_effect": "dana_baking_sold", "duration": 64800 } ] },
     "responses": [
       {
         "text": "You seem pretty unhappy about the quality of your bread.  Is there something I can do to help?",
         "topic": "TALK_MISSION_LIST",
-        "condition": { "not": { "u_has_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" } }
+        "condition": { "not": "has_no_available_mission" }
       },
       { "text": "Thanks, can we talk about something else?", "topic": "TALK_REFUGEE_Dana_2" },
       { "text": "It smells awesome.  I'm going to head out now, thanks!", "topic": "TALK_DONE" }
@@ -398,7 +459,7 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Dana_Background_baking_revival",
-    "dynamic_line": "Sorry, not quite yet.  Landough was in pretty rough shape.  No fault of yours, it was no good having him cooped up in a dank fridge for that long… and I think my apprentice baker may have fucked with him before the Cataclysm too.  He'd better hope he's a zombie now, because if I see him alive… anyway, it's gonna take a few more feeds before I can get him ready for prime time, check back in a couple days.",
+    "dynamic_line": "Sorry, not quite yet.  Landough was in pretty rough shape.  No fault of yours, it was no good having him cooped up in a dank fridge for that long… and I think my apprentice baker may have fucked with him before the Cataclysm too.  He'd better hope he's a zombie now, because if I see him alive… anyway, it's gonna take a few more feeds before I can get him ready for prime time, check back once the two weeks are up.",
     "responses": [
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.  Bye, Dana.", "topic": "TALK_DONE" }
@@ -407,11 +468,29 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Dana_Situation",
-    "dynamic_line": "Things are tense at the best of times.  We didn't choose this crowd, so not all of us really get along.  I like Jenny and Fatima, and the three of us are kind of lucky to have friends here, but that doesn't make up for us being a bunch of unfamiliar faces crammed into a tiny space.  Someone's gonna murder someone soon, mark my words.",
+    "dynamic_line": {
+      "u_has_var": "Nunez_Tacoma",
+      "type": "recruit",
+      "context": "general",
+      "value": "phase_4",
+      "yes": "It's still tense here, but Pablo and I are getting ready to leave for Tacoma Ranch.  I'll miss Jenny and Fatima.  I hope we can get on the next caravan.",
+      "no": "Things are tense at the best of times.  We didn't choose this crowd, so not all of us really get along.  I like Jenny and Fatima, and the three of us are kind of lucky to have friends here, but that doesn't make up for us being a bunch of unfamiliar faces crammed into a tiny space.  Someone's gonna murder someone soon, mark my words."
+    },
     "responses": [
+      {
+        "text": "How's Ruth's food storage coming along?",
+        "topic": "TALK_REFUGEE_Dana_Preservation",
+        "condition": { "u_has_var": "FMShopkeep_Mission5", "type": "mission", "context": "flag", "value": "yes" }
+      },
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.  Bye, Dana.", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_REFUGEE_Dana_Preservation",
+    "dynamic_line": "Ruth's getting food put by for when supplies run short.  Pickles, canned meat, things that'll keep.  My bread is for eating fresh.  Around here it never lasts long enough to go stale.",
+    "responses": [ { "text": "What were you saying before?", "topic": "TALK_NONE" } ]
   },
   {
     "type": "talk_topic",
@@ -424,14 +503,11 @@
       "no": "Huh.  I've made a few friends here, but not so much as I'd stick around here with no future prospects, hoping someone downstairs dies to make room for me.  It does sound nice, if they're looking for more workers.",
       "yes": "Have you heard anything back from the ranch about jobs yet?"
     },
-    "speaker_effect": { "effect": { "u_add_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_1" } },
+    "speaker_effect": {
+      "effect": { "u_add_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_1" },
+      "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "" }
+    },
     "responses": [
-      {
-        "text": "I spoke to the foreman over at Tacoma Ranch.  If you're willing to put in the work, they'll find some work for you over there.",
-        "topic": "TALK_REFUGEE_Dana_Tacoma2",
-        "condition": { "u_has_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_2" },
-        "effect": { "u_add_var": "Nunez_Tacoma", "type": "recruit", "context": "general", "value": "phase_3" }
-      },
       { "text": "I'll look into that.  What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I'll look into that.  I'd better get going though.", "topic": "TALK_DONE" }
     ]
@@ -464,13 +540,13 @@
     "item": "landough_calrisean",
     "start": {
       "assign_mission_target": { "om_terrain": "bakery", "reveal_radius": 1, "random": true, "search_range": 120 },
-      "update_mapgen": { "om_terrain": "bakery", "place_item": [ { "item": "landough_calrisean", "x": 5, "y": 16 } ] },
+      "update_mapgen": { "place_item": [ { "item": "landough_calrisean", "x": 5, "y": 16 } ] },
       "effect": { "u_add_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "in_progress" }
     },
     "end": {
       "effect": [
         { "u_add_var": "Dana_Sourdough", "type": "mission", "context": "flag", "value": "yes" },
-        { "npc_add_effect": "dana_sourdough_revival", "duration": "14 d" },
+        { "npc_add_effect": "dana_sourdough_revival", "duration": 1209600 },
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 2 }
       ]
     },
@@ -482,10 +558,13 @@
       "rejected": "I can understand why you think you wouldn't want to risk your life for a bread starter.  You haven't tried that bread.",
       "advice": "He'll be in the right-hand fridge, in a jar with a picture of the Millennium Falcon on it.",
       "inquire": "So, you seen my sourdough starter?",
-      "success": "Oh, you will not regret this.  He may not look like much, but he's got it where it counts, kid.  It's gonna take me a few days to revive him after being abandoned so long, but he'll be operational soon and then you can come back for some real bread.",
+      "success": "Oh, you will not regret this.  He may not look like much, but he's got it where it counts, kid.  It's gonna take me two weeks to revive him after being abandoned so long, but he'll be operational soon and then you can come back for some real bread.",
       "success_lie": "This ain't it.",
       "failure": "I am not sure if I'm gonna make it through the Cataclysm without my special jar of goop."
-    }
+    },
+    "description": "Find one jar of Dana’s family sourdough starter in the right-hand fridge at the marked bakery. Bring it back to Dana at the Refugee Center.",
+    "has_generic_rewards": false,
+    "reward_description": "Dana will sell improved sourdough bread after two weeks."
   },
   {
     "id": "landough_calrisean",

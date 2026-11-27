@@ -130,7 +130,7 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Guneet_2",
-    "dynamic_line": ".",
+    "dynamic_line": "Yeah?  What did you want to talk about?",
     "responses": [ { "text": "I'd better get going.", "topic": "TALK_DONE" } ]
   },
   {

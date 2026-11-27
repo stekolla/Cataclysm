@@ -143,7 +143,14 @@
   {
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Stan_Situation",
-    "dynamic_line": "Mostly my family and I have just been mourning.  This isn't the best place to do it.  I hope we'll have something productive to do soon; Boris, in particular, has skills to contribute that might help him feel alive again.",
+    "dynamic_line": {
+      "u_has_var": "Boris_mission_2",
+      "type": "mission",
+      "context": "completed",
+      "value": "yes",
+      "yes": "Mostly my family and I have just been mourning.  This isn't the best place to do it.  Boris has a workshop now, and I'm glad he's found something productive to do.  We still have hard days, both of us.",
+      "no": "Mostly my family and I have just been mourning.  This isn't the best place to do it.  I hope we'll have something productive to do soon; Boris, in particular, has skills to contribute that might help him feel alive again."
+    },
     "responses": [
       { "text": "What were you saying before?", "topic": "TALK_NONE" },
       { "text": "I had better be going.", "topic": "TALK_DONE" }

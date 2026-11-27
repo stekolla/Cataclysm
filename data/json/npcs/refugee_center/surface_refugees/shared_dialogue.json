@@ -20,7 +20,7 @@
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Accept_Boris_Mission_1",
     "dynamic_line": [
-      "This is for Boris?  Yeah, Boris is has been through a lot, I'll do it for him.",
+      "This is for Boris?  Yeah, Boris has been through a lot, I'll do it for him.",
       "It won't be pretty, but I'll see what I can do.  We'll all benefit from it after all.",
       "I can try.  It's worth trying for Boris.",
       "That's a big ask, for sure.  Okay, I'll see what I can do."
@@ -32,8 +32,8 @@
       ]
     },
     "responses": [
-      { "text": "Thanks anyway.  What were you saying before?", "topic": "TALK_NONE" },
-      { "text": "Well, thanks anyway.", "topic": "TALK_DONE" }
+      { "text": "Thanks for helping.  What were you saying before?", "topic": "TALK_NONE" },
+      { "text": "Thanks for helping.  See you around.", "topic": "TALK_DONE" }
     ]
   }
 ]
