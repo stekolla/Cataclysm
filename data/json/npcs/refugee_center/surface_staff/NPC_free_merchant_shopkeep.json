@@ -165,20 +165,7 @@
   },
   {
     "//": "table of contents: common response strings appearing in this list of topics",
-    "id": [
-      "TALK_EVAC_MERCHANT",
-      "TALK_EVAC_MERCHANT_NEW",
-      "TALK_EVAC_MERCHANT_PLANS2",
-      "TALK_EVAC_MERCHANT_PLANS3",
-      "TALK_EVAC_MERCHANT_WORLD",
-      "TALK_EVAC_MERCHANT_RANCH2",
-      "TALK_EVAC_MERCHANT_MERCH",
-      "TALK_EVAC_MERCHANT_HORDES",
-      "TALK_EVAC_MERCHANT_PRIME_LOOT",
-      "TALK_EVAC_MERCHANT_BACKGROUND",
-      "TALK_EVAC_MERCHANT_Boris_Mission_1b",
-      "TALK_EVAC_MERCHANT_Boris_Mission_1c"
-    ],
+    "id": "TALK_EVAC_MERCHANT",
     "type": "talk_topic",
     "responses": [
       {
@@ -198,49 +185,46 @@
         },
         "topic": "TALK_EVAC_MERCHANT_Boris_Mission_1"
       },
-      { "text": "I heard this place was a refugee center…", "topic": "TALK_EVAC_MERCHANT_NEW" },
-      { "text": "What are you doing here?", "topic": "TALK_EVAC_MERCHANT_PLANS" },
       { "text": "Heard anything about the outside world?", "topic": "TALK_EVAC_MERCHANT_WORLD" },
-      { "text": "Is there any way I can join your group?", "topic": "TALK_EVAC_MERCHANT_ASK_JOIN" },
-      {
-        "text": "What's with these beggars?",
-        "condition": { "not": { "u_has_var": "beggars_recruited", "type": "general", "context": "recruit", "value": "yes" } },
-        "topic": "TALK_EVAC_MERCHANT_BEGGARS1"
-      },
       {
         "text": "I took care of your beggar problem.",
         "condition": { "u_has_var": "beggars_recruited", "type": "general", "context": "recruit", "value": "yes" },
         "topic": "TALK_EVAC_MERCHANT_BEGGARS2"
       },
       {
-        "text": "Tell me more about that ranch of yours.",
-        "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
-        "topic": "TALK_EVAC_MERCHANT_RANCH"
-      },
-      {
         "text": "Do you have any trade work for me?",
         "topic": "TALK_MISSION_LIST",
         "condition": { "not": "has_no_available_mission" }
       },
-      { "text": "Who else needs a hand around here?", "topic": "TALK_EVAC_MERCHANT_STAFF" },
       { "text": "Let's trade then.", "effect": "start_trade", "topic": "TALK_EVAC_MERCHANT" },
-      { "text": "What kind of salvage are you buying?", "topic": "TALK_EVAC_MERCHANT_TRADE_STOCK" },
-      { "text": "When will you have new stuff in stock?", "topic": "TALK_EVAC_MERCHANT_ASKED_RESTOCK" },
-      {
-        "text": "What's with these 'free merchant certified notes'?",
-        "topic": "TALK_EVAC_MERCHANT_MERCH",
-        "condition": { "u_has_item": "FMCNote" }
-      },
-      { "text": "What's your story?", "topic": "TALK_EVAC_MERCHANT_BACKGROUND" },
+      { "text": "Can I ask you about the Refugee Center?", "topic": "TALK_EVAC_MERCHANT_CENTER" },
+      { "text": "Can I ask about your stock?", "topic": "TALK_EVAC_MERCHANT_STOCK" },
       { "text": "What was it you were saying before?", "topic": "TALK_NONE" },
       { "text": "Well, I'd better be going.  Bye.", "topic": "TALK_DONE" }
     ]
   },
   {
+    "type": "talk_topic",
+    "id": [
+      "TALK_EVAC_MERCHANT_NEW",
+      "TALK_EVAC_MERCHANT_PLANS2",
+      "TALK_EVAC_MERCHANT_PLANS3",
+      "TALK_EVAC_MERCHANT_WORLD",
+      "TALK_EVAC_MERCHANT_RANCH2",
+      "TALK_EVAC_MERCHANT_MERCH",
+      "TALK_EVAC_MERCHANT_HORDES",
+      "TALK_EVAC_MERCHANT_PRIME_LOOT",
+      "TALK_EVAC_MERCHANT_BACKGROUND",
+      "TALK_EVAC_MERCHANT_Boris_Mission_1b",
+      "TALK_EVAC_MERCHANT_Boris_Mission_1c"
+    ],
+    "responses": [ { "text": "What were we talking about?", "topic": "TALK_NONE" } ]
+  },
+  {
     "id": "TALK_EVAC_MERCHANT_TRADE_STOCK",
     "type": "talk_topic",
     "dynamic_line": "Hardware, mostly: tools, building supplies, and spare parts. I don't deal in guns or ammunition. If you've got food to sell, talk to Ruth Calder in the back.",
-    "responses": [ { "text": "Good to know.", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Good to know.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_ASKED_RESTOCK",
@@ -250,7 +234,7 @@
       "Stick around for <interval>, there will surely be something you'd like."
     ],
     "responses": [
-      { "text": "Actually, I wanted to ask…", "topic": "TALK_EVAC_MERCHANT" },
+      { "text": "Actually, I wanted to ask…", "topic": "TALK_NONE" },
       { "text": "Thanks, I will make sure to check back.  Farewell.", "topic": "TALK_DONE" }
     ]
   },
@@ -268,7 +252,7 @@
     "id": "TALK_EVAC_MERCHANT_STAFF",
     "type": "talk_topic",
     "dynamic_line": "I handle trade and deals with people outside the center.  Talk to Milton Lang, our security chief, by the back bay.  Ruth Calder, the quartermaster in the back, handles food and supplies.  Ask Mara Velez about repairs and power.  You'll find her in the big office with the long table.",
-    "responses": [ { "text": "Thanks.  Can I ask you something else?", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Thanks.  Can I ask you something else?", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_PLANS",
@@ -307,14 +291,14 @@
     "id": "TALK_EVAC_MERCHANT_PRIME_LOOT",
     "type": "talk_topic",
     "dynamic_line": "Well, there is a party of about a dozen 'scavengers' that found some sort of government facility.  They bring us a literal truck load of jumpsuits, m4's, and canned food every week or so.  Since some of those guys got family here, we've been doing alright.  As to where it is, I don't have the foggiest of ideas.",
-    "responses": [ { "text": "Thanks, I'll keep an eye out.", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Thanks, I'll keep an eye out.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_HUB01",
     "type": "talk_topic",
     "dynamic_line": "We had an odd group came by two days after the power grid went off, two armed guards wearing brown uniforms, escorting what seemed to be a gov' doctor of some sort, had a hazmat suit and mask they never took off.  They looked rather organized, probably military remnant from somewhere close by.",
     "responses": [
-      { "text": "I was hoping for something more substantial than that.", "topic": "TALK_EVAC_MERCHANT" },
+      { "text": "I was hoping for something more substantial than that.", "topic": "TALK_NONE" },
       { "text": "Just that?", "topic": "TALK_EVAC_MERCHANT_HUB01_ACTIVITY" }
     ]
   },
@@ -324,7 +308,7 @@
     "dynamic_line": "They surely didn't seem the nice talkative type.  Doctor paid us in advance to get some old FEMA info from our computers here, told us to deliver the data to some remote locale afterwards.  Still haven't done that however, we're half thinking it must have been some sort of strange trap.",
     "responses": [
       { "text": "Think you could share that meeting location?", "topic": "TALK_EVAC_MERCHANT_HUB01_DELIVERY_MISSION_OFFER" },
-      { "text": "Seems like you are right to be suspicious.", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "Seems like you are right to be suspicious.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -337,7 +321,7 @@
         "topic": "TALK_EVAC_MERCHANT_HUB_DELIVERY_ACCEPTED",
         "effect": { "add_mission": "MISSION_FREE_MERCHANTS_HUB_DELIVERY_1" }
       },
-      { "text": "That seems rather dangerous, I think I'll pass.", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "That seems rather dangerous, I think I'll pass.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -353,13 +337,13 @@
     "id": "TALK_EVAC_MERCHANT_NO",
     "type": "talk_topic",
     "dynamic_line": "I'm sorry, not a risk we are willing to take right now.",
-    "responses": [ { "text": "Fine…", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Fine…", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_HELL_NO",
     "type": "talk_topic",
     "dynamic_line": "There isn't a chance in hell!  We had one guy come in here with bloody fur all over his body… well I guess that isn't all that strange but I'm pretty sure whatever toxic waste is still out there is bound to mutate more than just his hair.",
-    "responses": [ { "text": "Fine… *coughupyourscough*", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Fine… *coughupyourscough*", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_ASK_JOIN",
@@ -378,7 +362,7 @@
         "topic": "TALK_EVAC_MERCHANT_NO",
         "condition": { "and": [ { "not": { "u_has_intelligence": 7 } }, { "u_has_strength": 11 } ] }
       },
-      { "text": "I guess I'll look somewhere else…", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "I guess I'll look somewhere else…", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -389,7 +373,7 @@
       { "text": "Hordes?", "topic": "TALK_EVAC_MERCHANT_HORDES" },
       { "text": "Heard of anything better than the odd gun cache?", "topic": "TALK_EVAC_MERCHANT_PRIME_LOOT" },
       { "text": "Any other settlements nearby?", "topic": "TALK_EVAC_MERCHANT_HUB01" },
-      { "text": "Was hoping for something more…", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "Was hoping for something more…", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -409,7 +393,7 @@
     "id": "TALK_EVAC_MERCHANT_BEGGARS1_Reward",
     "type": "talk_topic",
     "dynamic_line": "We don't have much to share, but I'm sure we could pay you in our own currency if you could clean up our burgeoning health hazard without anyone getting hurt, yeah.",
-    "responses": [ { "text": "I'll see what I can do.", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "I'll see what I can do.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_BEGGARS2",
@@ -421,7 +405,7 @@
         "topic": "TALK_EVAC_MERCHANT_BEGGARS2_Reward",
         "condition": { "npc_has_var": "beggars_reward_agreed", "type": "general", "context": "recruit", "value": "yes" }
       },
-      { "text": "Just glad to help.", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "Just glad to help.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -439,7 +423,7 @@
         "topic": "TALK_EVAC_MERCHANT_BEGGARS2_RewardNo",
         "condition": { "npc_has_var": "beggars_reward_collected", "type": "general", "context": "recruit", "value": "yes" }
       },
-      { "text": "Nevermind.", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "Nevermind.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -452,13 +436,13 @@
         { "npc_add_var": "beggars_reward_collected", "type": "general", "context": "recruit", "value": "yes" }
       ]
     },
-    "responses": [ { "text": "Thanks.", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Thanks.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_BEGGARS2_RewardNo",
     "type": "talk_topic",
     "dynamic_line": "Did you hit your head?  I already paid you.",
-    "responses": [ { "text": "Oh, my bad.", "topic": "TALK_EVAC_MERCHANT" } ]
+    "responses": [ { "text": "Oh, my bad.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_EVAC_MERCHANT_RANCH",
@@ -469,7 +453,7 @@
         "text": "Didn't that free up some space for the beggars and people stuck upstairs?",
         "topic": "TALK_EVAC_MERCHANT_RANCH2"
       },
-      { "text": "Thanks for the story.", "topic": "TALK_EVAC_MERCHANT" }
+      { "text": "Thanks for the story.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -516,7 +500,7 @@
     "id": "MISSION_FREE_MERCHANTS_EVAC_2",
     "type": "mission_definition",
     "name": { "str": "Missing Caravan" },
-    "description": "Investigate the last known location of a disappeared scavenger trading party, and eliminate any bandits or raiders in the vicinity in exchange for <reward_count:FMCNote> certified notes.",
+    "description": "Search the marked site where the scavenger trading party disappeared and eliminate the bandits or raiders nearby. Report back to Owen Mercer.",
     "goal": "MGOAL_ASSASSINATE",
     "difficulty": 5,
     "value": 5000,
@@ -602,7 +586,7 @@
     "id": "MISSION_FREE_MERCHANTS_EVAC_3",
     "type": "mission_definition",
     "name": { "str": "Retrieve Prospectus" },
-    "description": "Visit the farming commune and bring the foreman's prospectus back to the refugee center, for <reward_count:FMCNote> certified notes.",
+    "description": "Visit Tacoma Ranch and bring the foreman's prospectus back to Owen Mercer at the Refugee Center.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
     "value": 50000,
@@ -647,7 +631,7 @@
     "id": "MISSION_FREE_MERCHANTS_HUB_DELIVERY_1",
     "type": "mission_definition",
     "name": { "str": "Unknown Recipient" },
-    "description": "Deliver the hdd to the military remnant.  Return to the Evacuation Center when the trade is complete.",
+    "description": "Deliver the hard drive to the military remnant, then report back to Owen Mercer at the Refugee Center.",
     "goal": "MGOAL_CONDITION",
     "difficulty": 5,
     "start": {
@@ -761,6 +745,44 @@
         "effect": { "u_buy_item": "trade_writ_chemist" },
         "topic": "TALK_DONE"
       }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_MERCHANT_CENTER",
+    "dynamic_line": "What do you want to know about the center?",
+    "responses": [
+      { "text": "I heard this place was a refugee center…", "topic": "TALK_EVAC_MERCHANT_NEW" },
+      { "text": "What are you doing here?", "topic": "TALK_EVAC_MERCHANT_PLANS" },
+      { "text": "Is there any way I can join your group?", "topic": "TALK_EVAC_MERCHANT_ASK_JOIN" },
+      {
+        "text": "What's with these beggars?",
+        "condition": { "not": { "u_has_var": "beggars_recruited", "type": "general", "context": "recruit", "value": "yes" } },
+        "topic": "TALK_EVAC_MERCHANT_BEGGARS1"
+      },
+      {
+        "text": "Tell me more about that ranch of yours.",
+        "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
+        "topic": "TALK_EVAC_MERCHANT_RANCH"
+      },
+      { "text": "Who else needs a hand around here?", "topic": "TALK_EVAC_MERCHANT_STAFF" },
+      {
+        "text": "What's with these 'free merchant certified notes'?",
+        "topic": "TALK_EVAC_MERCHANT_MERCH",
+        "condition": { "u_has_item": "FMCNote" }
+      },
+      { "text": "What's your story?", "topic": "TALK_EVAC_MERCHANT_BACKGROUND" },
+      { "text": "Back to the other topics.", "topic": "TALK_NONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_EVAC_MERCHANT_STOCK",
+    "dynamic_line": "What are you looking for?",
+    "responses": [
+      { "text": "What kind of salvage are you buying?", "topic": "TALK_EVAC_MERCHANT_TRADE_STOCK" },
+      { "text": "When will you have new stuff in stock?", "topic": "TALK_EVAC_MERCHANT_ASKED_RESTOCK" },
+      { "text": "Back to the other topics.", "topic": "TALK_NONE" }
     ]
   }
 ]

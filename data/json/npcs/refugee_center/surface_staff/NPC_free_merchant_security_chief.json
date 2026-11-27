@@ -76,19 +76,19 @@
     "type": "talk_topic",
     "id": "TALK_EVAC_SECURITY_CHIEF_BACKGROUND",
     "dynamic_line": "I worked nights at a distribution warehouse.  Kept track of who came through the loading dock and broke up the odd fight over a parking space.  Here I started taking the shifts nobody wanted.  After we sealed the bay, people started coming to me to see who was on watch.  Eventually I just took over the roster.",
-    "responses": [ { "text": "Can I ask you something else?", "topic": "TALK_EVAC_SECURITY_CHIEF" } ]
+    "responses": [ { "text": "Can I ask you something else?", "topic": "TALK_NONE" } ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_EVAC_SECURITY_CHIEF_RULES",
     "dynamic_line": "Keep the hallways clear, especially near the doors.  If someone gets hurt or starts acting strange, get a guard.  We've had people try to handle it quietly for a friend's sake.  That never ends well.",
-    "responses": [ { "text": "Got it.", "topic": "TALK_EVAC_SECURITY_CHIEF" } ]
+    "responses": [ { "text": "Got it.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "MISSION_FREE_MERCHANTS_EVAC_1",
     "type": "mission_definition",
     "name": { "str": "Clear Back Bay" },
-    "description": "Clear out the barricaded back area in the refugee center and lay the former leader of the Free Merchants to rest, in exchange for the local currency: Free Merchant certified notes.",
+    "description": "Clear the zombies from the barricaded back bay of the Refugee Center, including the former leader of the Free Merchants.",
     "goal": "MGOAL_KILL_MONSTERS",
     "difficulty": 2,
     "value": 50000,
@@ -147,7 +147,7 @@
         },
         "effect": [ { "u_sell_item": "flashlight" }, { "u_adjust_var": "evac_security_flashlights", "adjustment": 1 } ]
       },
-      { "text": "That's all for now.", "topic": "TALK_EVAC_SECURITY_CHIEF" }
+      { "text": "That's all for now.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -226,10 +226,10 @@
     "responses": [
       {
         "text": "I'll bring you four pens.",
-        "topic": "TALK_EVAC_SECURITY_CHIEF",
+        "topic": "TALK_NONE",
         "effect": { "add_mission": "MISSION_EVAC_SECURITY_INCIDENT_REPORTS" }
       },
-      { "text": "Maybe later.", "topic": "TALK_EVAC_SECURITY_CHIEF" }
+      { "text": "Maybe later.", "topic": "TALK_NONE" }
     ]
   },
   {

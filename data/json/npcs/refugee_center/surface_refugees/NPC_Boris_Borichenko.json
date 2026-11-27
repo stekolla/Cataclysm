@@ -68,15 +68,7 @@
   {
     "type": "talk_topic",
     "//": "common talk responses",
-    "id": [
-      "TALK_REFUGEE_Boris_2",
-      "TALK_REFUGEE_Boris_3",
-      "TALK_REFUGEE_Boris_Background",
-      "TALK_REFUGEE_Boris_Background_B",
-      "TALK_REFUGEE_Boris_Background_loss",
-      "TALK_REFUGEE_Boris_Work1",
-      "TALK_REFUGEE_Boris_Situation"
-    ],
+    "id": [ "TALK_REFUGEE_Boris_2", "TALK_REFUGEE_Boris_3" ],
     "responses": [
       {
         "text": "I'm trying to put a cleanup crew together to tidy up the back room.  Can you help?",
@@ -110,9 +102,7 @@
         "topic": "TALK_REFUGEE_Boris_ReadLaptop1",
         "condition": { "u_has_var": "Boris_mission_3", "type": "mission", "context": "completed", "value": "yes" }
       },
-      { "text": "What's your story?", "topic": "TALK_REFUGEE_Boris_Background" },
-      { "text": "You don't seem to be doing great.", "topic": "TALK_REFUGEE_Boris_Background_B" },
-      { "text": "How are things here?", "topic": "TALK_REFUGEE_Boris_Situation" }
+      { "text": "Can we talk a little?", "topic": "TALK_REFUGEE_Boris_Conversation" }
     ]
   },
   {
@@ -152,6 +142,11 @@
         "condition": { "u_has_var": "Boris_mission_1", "type": "mission", "context": "completed", "value": "yes" }
       },
       {
+        "text": "About the work you gave me…",
+        "topic": "TALK_MISSION_LIST_ASSIGNED",
+        "condition": { "not": "has_no_assigned_mission" }
+      },
+      {
         "text": "Hi Boris, nice to meet you.  I gotta go though.",
         "effect": { "u_add_var": "u_met_Boris_Borichenko", "type": "general", "context": "meeting", "value": "yes" },
         "condition": { "not": { "u_has_var": "u_met_Boris_Borichenko", "type": "general", "context": "meeting", "value": "yes" } },
@@ -180,7 +175,10 @@
     "type": "talk_topic",
     "id": "TALK_REFUGEE_Boris_2",
     "dynamic_line": "What is \"up\"?  Less than I would like, it seems.  I am better when I am busy, and I am not at all busy.",
-    "responses": [ { "text": "I'd better get going.", "topic": "TALK_DONE" } ]
+    "responses": [
+      { "text": "Let’s talk about something else.", "topic": "TALK_NONE" },
+      { "text": "I'd better get going.", "topic": "TALK_DONE" }
+    ]
   },
   {
     "type": "talk_topic",
@@ -188,6 +186,7 @@
     "//": "This option is Boris' start point after you've finished his first mission and got to know him a bit.",
     "dynamic_line": "It is good to see you too.  I would not say things are looking \"up\" yet, but they are not so much looking down perhaps.  I am keeping a bit busier.",
     "responses": [
+      { "text": "Let’s talk about something else.", "topic": "TALK_NONE" },
       { "text": "Want to talk about it a little?", "topic": "TALK_REFUGEE_Boris_Son" },
       { "text": "I'd better get going.", "topic": "TALK_DONE" }
     ]
@@ -346,7 +345,7 @@
     "id": "MISSION_REFUGEE_Boris_CLEANUP",
     "type": "mission_definition",
     "name": { "str": "Find someone to clean up the back bay." },
-    "description": "Boris in the refugee center is looking for at least five people to help clean up the back bay",
+    "description": "Ask around the Refugee Center and recruit at least five people to help clean up the back bay. Report back to Boris.",
     "difficulty": 1,
     "value": 0,
     "goal": "MGOAL_CONDITION",
@@ -370,7 +369,8 @@
         { "u_add_var": "Boris_mission_1", "type": "mission", "context": "completed", "value": "yes" },
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 3 }
       ]
-    }
+    },
+    "has_generic_rewards": false
   },
   {
     "id": "MISSION_REFUGEE_Boris_WORKSPACE",
@@ -400,7 +400,9 @@
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 2 }
       ]
     },
-    "//": "TK add update mapgen."
+    "//": "TK add update mapgen.",
+    "description": "Bring Boris one handheld circular saw for his new workshop at the Refugee Center.",
+    "has_generic_rewards": false
   },
   {
     "id": "MISSION_REFUGEE_Boris_LAPTOP",
@@ -441,7 +443,9 @@
         { "u_add_var": "Boris_mission_3", "type": "mission", "context": "completed", "value": "yes" },
         { "u_adjust_var": "refugee_happiness", "type": "counter", "context": "refugee_center", "adjustment": 2 }
       ]
-    }
+    },
+    "description": "Recover Ash’s sticker-covered laptop from the marked vandalized evacuation shelter and bring it back to Boris.",
+    "has_generic_rewards": false
   },
   {
     "id": "laptop_boris",
@@ -449,5 +453,16 @@
     "type": "TOOL",
     "name": { "str": "Ash's laptop computer" },
     "description": "A small, somewhat worn-out laptop computer.  The flip-top is decorated with various stickers."
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_REFUGEE_Boris_Conversation",
+    "dynamic_line": "Of course.  What is on your mind?",
+    "responses": [
+      { "text": "What's your story?", "topic": "TALK_REFUGEE_Boris_Background" },
+      { "text": "You don't seem to be doing great.", "topic": "TALK_REFUGEE_Boris_Background_B" },
+      { "text": "How are things here?", "topic": "TALK_REFUGEE_Boris_Situation" },
+      { "text": "Back to the other topics.", "topic": "TALK_NONE" }
+    ]
   }
 ]

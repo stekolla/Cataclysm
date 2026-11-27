@@ -88,11 +88,16 @@ If a mistake is found during a task, update AGENTS.md or the skill and fix the c
 
 ## Data and Review
 
+- Load response-bearing dialogue topic definitions before line-only definitions of the same IDs.
+- Exercise conditional dialogue through response generation. A string condition can silently evaluate
+  to false if its name is missing from the condition dispatcher.
+
 - Keep named quest givers and their mission definitions in dedicated NPC files. Use shared dialogue
   topics for responses shared with generic NPCs.
 
 - Keep unsaved moves available for manual retry after failed autosaves, and rate-limit automatic retries.
 
+- Use `str_sp` for translatable names with identical singular and plural forms.
 - Digital files keep at least 1 ml volume; zero-volume items are rejected, including scanned books.
 - For standalone item groups, use `[ "item_id", weight ]` entries in `items`. When a mission
   needs multiple physical tools, verify that its goal counts the tools themselves. Item goals and

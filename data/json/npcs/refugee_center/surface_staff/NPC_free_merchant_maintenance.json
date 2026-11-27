@@ -25,7 +25,7 @@
       {
         "text": "About that maintenance work…",
         "topic": "TALK_MISSION_LIST_ASSIGNED",
-        "condition": "has_assigned_mission"
+        "condition": { "not": "has_no_assigned_mission" }
       },
       { "text": "How did you get into maintenance?", "topic": "TALK_EVAC_MAINTENANCE_BACKGROUND" },
       { "text": "What's the hardest thing to keep running?", "topic": "TALK_EVAC_MAINTENANCE_REPAIRS" },
@@ -36,7 +36,7 @@
     "type": "talk_topic",
     "id": "TALK_EVAC_MAINTENANCE_BACKGROUND",
     "dynamic_line": "I did maintenance for the school district.  The oldest building still had hand-lettered tags on the pipes, and half of them were wrong.  I got used to tracing things myself.  My first week here I spent more time finding shutoff valves than sleeping.",
-    "responses": [ { "text": "Can I ask you something else?", "topic": "TALK_EVAC_MAINTENANCE_LEAD" } ]
+    "responses": [ { "text": "Can I ask you something else?", "topic": "TALK_NONE" } ]
   },
   {
     "type": "talk_topic",
@@ -63,7 +63,7 @@
         }
       }
     },
-    "responses": [ { "text": "I'll keep an eye out.", "topic": "TALK_EVAC_MAINTENANCE_LEAD" } ]
+    "responses": [ { "text": "I'll keep an eye out.", "topic": "TALK_NONE" } ]
   },
   {
     "id": "MISSION_EVAC_MAINTENANCE_SUPPLIES",
@@ -161,7 +161,7 @@
     "id": "MISSION_FREE_MERCHANTS_EVAC_4",
     "type": "mission_definition",
     "name": { "str": "Solar Power" },
-    "description": "Deliver 10 solar panels to help the Free Merchants set up a renewable power grid, in exchange for <reward_count:FMCNote> Certified Notes.",
+    "description": "Bring Mara Velez 10 solar panels to set up a renewable power grid at the Refugee Center.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
     "value": 400000,

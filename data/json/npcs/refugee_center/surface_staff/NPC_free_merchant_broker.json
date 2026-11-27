@@ -15,19 +15,7 @@
   },
   {
     "//": "table of contents - these options will appear in the listed dialogue topics",
-    "id": [
-      "TALK_FREE_MERCHANT_STOCKS",
-      "TALK_FREE_MERCHANT_STOCKS_NEW",
-      "TALK_FREE_MERCHANT_STOCKS_ALL",
-      "TALK_FREE_MERCHANT_STOCKS_BACKGROUND",
-      "TALK_FREE_MERCHANT_STOCKS_FMCN",
-      "TALK_FREE_MERCHANT_STOCKS_REFUGEES",
-      "TALK_FREE_MERCHANT_STOCKS_BEGGARS",
-      "TALK_FREE_MERCHANT_STOCKS_SEALED1",
-      "TALK_FREE_MERCHANT_STOCKS_SEALED2",
-      "TALK_FREE_MERCHANT_STOCKS_RANCH",
-      "TALK_FREE_MERCHANT_STOCKS_Boris_Mission_1"
-    ],
+    "id": "TALK_FREE_MERCHANT_STOCKS",
     "type": "talk_topic",
     "responses": [
       { "text": "I'm here to deliver some food supplies.", "topic": "TALK_FREE_MERCHANT_STOCKS_DELIVER" },
@@ -58,31 +46,26 @@
         "topic": "TALK_MISSION_LIST",
         "condition": { "not": "has_no_available_mission" }
       },
-      { "text": "Who are you?", "topic": "TALK_FREE_MERCHANT_STOCKS_NEW" },
-      {
-        "text": "What's the deal with this written-on paper money you guys use?",
-        "topic": "TALK_FREE_MERCHANT_STOCKS_FMCN"
-      },
-      { "text": "The refugees stuck up here seem a bit disgruntled.", "topic": "TALK_FREE_MERCHANT_STOCKS_REFUGEES" },
-      { "text": "Do you know about those beggars in the lobby?", "topic": "TALK_FREE_MERCHANT_STOCKS_BEGGARS" },
-      {
-        "text": "What's the deal with the closed-off areas of the building?",
-        "topic": "TALK_FREE_MERCHANT_STOCKS_SEALED1",
-        "condition": { "not": { "u_has_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" } }
-      },
-      {
-        "text": "What are you going to do with that back bay area now that I've cleaned it out for you?",
-        "topic": "TALK_FREE_MERCHANT_STOCKS_SEALED2",
-        "condition": { "u_has_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" }
-      },
-      {
-        "text": "Tell me more about that ranch of yours.",
-        "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
-        "topic": "TALK_FREE_MERCHANT_STOCKS_RANCH"
-      },
+      { "text": "Can I ask about the Refugee Center?", "topic": "TALK_FREE_MERCHANT_STOCKS_CENTER" },
       { "text": "What were you saying before that?", "topic": "TALK_NONE" },
       { "text": "I'd better get going.  Bye!", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "talk_topic",
+    "id": [
+      "TALK_FREE_MERCHANT_STOCKS_NEW",
+      "TALK_FREE_MERCHANT_STOCKS_ALL",
+      "TALK_FREE_MERCHANT_STOCKS_BACKGROUND",
+      "TALK_FREE_MERCHANT_STOCKS_FMCN",
+      "TALK_FREE_MERCHANT_STOCKS_REFUGEES",
+      "TALK_FREE_MERCHANT_STOCKS_BEGGARS",
+      "TALK_FREE_MERCHANT_STOCKS_SEALED1",
+      "TALK_FREE_MERCHANT_STOCKS_SEALED2",
+      "TALK_FREE_MERCHANT_STOCKS_RANCH",
+      "TALK_FREE_MERCHANT_STOCKS_Boris_Mission_1"
+    ],
+    "responses": [ { "text": "What were we talking about?", "topic": "TALK_NONE" } ]
   },
   {
     "id": "TALK_FREE_MERCHANT_STOCKS",
@@ -168,7 +151,7 @@
     "dynamic_line": "All three are easy to locally produce in significant quantities and are non-perishable.  We have a local farmer or two and a few hunter types that have been making attempts to provide us with the nutritious supplies.  We do always need more suppliers though.  I buy the foods we can keep in bulk, at regular rates in Merch.  I carry any fraction of a Merch over to your next sale.  For general trade or leads on other food production work, ask the Merchant up front.  The folks at Tacoma Ranch are building up their food supply, too.",
     "responses": [
       { "text": "Are you looking to buy anything else?", "topic": "TALK_FREE_MERCHANT_STOCKS_ALL" },
-      { "text": "Very well… let's talk about something else.", "topic": "TALK_FREE_MERCHANT_STOCKS" }
+      { "text": "Very well… let's talk about something else.", "topic": "TALK_NONE" }
     ]
   },
   {
@@ -216,7 +199,7 @@
     "speaker_effect": [
       { "effect": { "u_add_var": "told_about_FM_evacuation", "type": "general", "context": "conversation", "value": "yes" } }
     ],
-    "responses": [ { "text": "Thanks, can I ask you something else?", "topic": "TALK_FREE_MERCHANT_STOCKS" } ]
+    "responses": [ { "text": "Thanks, can I ask you something else?", "topic": "TALK_NONE" } ]
   },
   {
     "type": "talk_topic",
@@ -237,7 +220,7 @@
     "id": "MISSION_BROKER_CANNING_POT",
     "type": "mission_definition",
     "name": { "str": "Getting Ready to Preserve" },
-    "description": "Bring Ruth Calder a canning pot in exchange for 10 Merch.",
+    "description": "Bring Ruth Calder one canning pot at the Refugee Center.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 2,
     "value": 2500,
@@ -262,7 +245,7 @@
     "id": "MISSION_BROKER_COFFEE",
     "type": "mission_definition",
     "name": { "str": "The Coffee Budget" },
-    "description": "Bring Ruth Calder a full package of coffee powder (20 charges) in exchange for 3 Merch.",
+    "description": "Bring Ruth Calder 20 charges of coffee powder at the Refugee Center.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 1,
     "value": 750,
@@ -286,7 +269,7 @@
     "id": "MISSION_FREE_MERCHANTS_EVAC_5",
     "type": "mission_definition",
     "name": { "str": "In a Pickle" },
-    "description": "Deliver twenty-five half-liter glass canning jars to the Free Merchants to kickstart their food storage plans.",
+    "description": "Bring Ruth Calder 25 half-liter glass canning jars to start the Refugee Center’s food storage operation.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 3,
     "value": 5000,
@@ -316,7 +299,7 @@
     "id": "MISSION_BROKER_1",
     "type": "mission_definition",
     "name": { "str": "In a Pickle Pt. 2" },
-    "description": "Deliver 20 large three-liter jars in exchange for <reward_count:FMCNote> certified notes.",
+    "description": "Bring Ruth Calder 20 three-liter glass canning jars at the Refugee Center.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 3,
     "value": 6250,
@@ -340,5 +323,35 @@
       "success_lie": "What good does this do us?",
       "failure": "I wonder where all the jars went…"
     }
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_FREE_MERCHANT_STOCKS_CENTER",
+    "dynamic_line": "What would you like to know?",
+    "responses": [
+      { "text": "Who are you?", "topic": "TALK_FREE_MERCHANT_STOCKS_NEW" },
+      {
+        "text": "What's the deal with this written-on paper money you guys use?",
+        "topic": "TALK_FREE_MERCHANT_STOCKS_FMCN"
+      },
+      { "text": "The refugees stuck up here seem a bit disgruntled.", "topic": "TALK_FREE_MERCHANT_STOCKS_REFUGEES" },
+      { "text": "Do you know about those beggars in the lobby?", "topic": "TALK_FREE_MERCHANT_STOCKS_BEGGARS" },
+      {
+        "text": "What's the deal with the closed-off areas of the building?",
+        "topic": "TALK_FREE_MERCHANT_STOCKS_SEALED1",
+        "condition": { "not": { "u_has_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" } }
+      },
+      {
+        "text": "What are you going to do with that back bay area now that I've cleaned it out for you?",
+        "topic": "TALK_FREE_MERCHANT_STOCKS_SEALED2",
+        "condition": { "u_has_var": "FMShopkeep_Mission1", "type": "mission", "context": "flag", "value": "yes" }
+      },
+      {
+        "text": "Tell me more about that ranch of yours.",
+        "condition": { "u_has_var": "tacoma_started", "type": "knowledge", "context": "flag", "value": "yes" },
+        "topic": "TALK_FREE_MERCHANT_STOCKS_RANCH"
+      },
+      { "text": "Back to the other topics.", "topic": "TALK_NONE" }
+    ]
   }
 ]
