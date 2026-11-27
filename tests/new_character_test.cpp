@@ -199,7 +199,7 @@ TEST_CASE("default_character_respects_scenario_whitelist", "[new_character][scen
     auto points = points_left();
     g->scen = scenario::generic();
 
-    ch.randomize(false, points, true);
+    ch.randomize(false, points);
 
     CHECK(g->scen->ident() == whitelisted_scenario);
 }

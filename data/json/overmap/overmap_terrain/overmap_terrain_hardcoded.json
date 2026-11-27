@@ -269,14 +269,5 @@
     "color": "light_red",
     "see_cost": 2,
     "flags": [ "KNOWN_DOWN", "NO_ROTATE", "RISK_HIGH" ]
-  },
-  {
-    "type": "overmap_terrain",
-    "id": "tutorial",
-    "name": "tutorial room",
-    "sym": "O",
-    "color": "cyan",
-    "see_cost": 5,
-    "flags": [ "NO_ROTATE" ]
   }
 ]

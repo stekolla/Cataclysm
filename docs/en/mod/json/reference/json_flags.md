@@ -986,7 +986,6 @@ Multiple death functions can be used. Not all combinations make sense.
 - `FOCUSEDBEAM` Blinding ray.
 - `FUNGALBURST` Explode with a cloud of fungal haze.
 - `FUNGUS` Explodes in spores.
-- `GAMEOVER` Game over man! Game over! Defense mode.
 - `GAS` Explodes in toxic gas.
 - `GUILT` Moral penalty. There is also a flag with a similar effect.
 - `JABBERWOCKY` Snicker-snack!

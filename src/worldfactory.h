@@ -13,7 +13,6 @@
 #include "type_id.h"
 #include "world.h"
 
-enum class special_game_type;
 
 class JsonIn;
 class JsonObject;
@@ -36,7 +35,6 @@ class worldfactory
 
         // Generate a world
         WORLDINFO *make_new_world( bool show_prompt = true, const std::string &world_to_copy = "" );
-        WORLDINFO *make_new_world( special_game_type special_type );
         // Used for unit tests - does NOT verify if the mods can be loaded
         WORLDINFO *make_new_world( const std::vector<mod_id> &mods );
         // Returns the *existing* world of given name.
@@ -49,7 +47,7 @@ class worldfactory
 
         void init();
 
-        WORLDINFO *pick_world( bool show_prompt = true, bool empty_only = false );
+        WORLDINFO *pick_world();
 
         std::unique_ptr<world> active_world;
 

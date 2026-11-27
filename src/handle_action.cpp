@@ -34,7 +34,6 @@
 #include "game.h" // IWYU pragma: associated
 #include "game_constants.h"
 #include "game_inventory.h"
-#include "gamemode.h"
 #include "gates.h"
 #include "gun_mode.h"
 #include "help.h"
@@ -2097,12 +2096,6 @@ bool game::handle_action()
         return false;
     }
 
-    // This has no action unless we're in a special game mode.
-    {
-        ZoneScopedN( "handle_action_gamemode_pre_action" );
-        gamemode->pre_action( act );
-    }
-
     int soffset = 0;
     {
         ZoneScopedN( "handle_action_move_view_option" );
@@ -3206,7 +3199,6 @@ bool game::handle_action()
         ZoneScopedN( "handle_action_elapsed_moves" );
         u.mod_moves( -current_turn.moves_elapsed() );
     }
-    gamemode->post_action( act );
     const auto moves_before_debug_restore = u.moves;
     if( act != ACTION_PAUSE ) {
         restore_debug_infinite_speed_moves( before_action_moves );

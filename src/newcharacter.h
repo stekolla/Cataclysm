@@ -16,7 +16,6 @@ struct points_left {
         FREEFORM = 0,
         ONE_POOL,
         MULTI_POOL,
-        TRANSFER,
     };
     point_limit limit = point_limit::FREEFORM;
 

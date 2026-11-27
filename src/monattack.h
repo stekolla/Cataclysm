@@ -86,7 +86,6 @@ bool chickenbot( monster *z );
 /// Tazer, flame, M4, MGL, or 120mm!
 bool multi_robot( monster *z );
 bool ratking( monster *z );
-bool generator( monster *z );
 bool upgrade( monster *z );
 bool breathe( monster *z );
 bool brandish( monster *z );

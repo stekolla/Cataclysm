@@ -84,7 +84,6 @@ void mapgen_rift(mapgendata& dat);
 void mapgen_hellmouth(mapgendata& dat);
 void mapgen_subway(mapgendata& dat);
 void mapgen_sewer(mapgendata& dat);
-void mapgen_tutorial(mapgendata& dat);
 void mapgen_lake_shore(mapgendata& dat);
 
 void mremove_trap(mapgen_constructor* m, const point_omt_ms&);

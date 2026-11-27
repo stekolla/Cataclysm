@@ -219,9 +219,8 @@ tab_direction set_magic( avatar &u, points_left &points );
 tab_direction set_scenario( avatar &u, points_left &points, tab_direction direction );
 tab_direction set_profession( avatar &u, points_left &points, tab_direction direction );
 tab_direction set_skills( avatar &u, points_left &points );
-tab_direction set_description( avatar &you, bool allow_reroll, points_left &points );
+tab_direction set_description( avatar &you, points_left &points );
 
-static std::optional<std::string> query_for_template_name();
 void reset_scenario( avatar &u, const scenario *scen );
 
 void Character::pick_name( bool bUseDefault )
@@ -233,12 +232,9 @@ void Character::pick_name( bool bUseDefault )
     }
 }
 
-static matype_id choose_ma_style( const character_type type, const std::vector<matype_id> &styles,
+static matype_id choose_ma_style( const std::vector<matype_id> &styles,
                                   const avatar &u )
 {
-    if( type == character_type::NOW || type == character_type::FULL_RANDOM ) {
-        return random_entry( styles );
-    }
     if( styles.size() == 1 ) {
         return styles.front();
     }
@@ -294,7 +290,7 @@ static void learn_spells( const profession &prof, avatar &you )
     }
 }
 
-void avatar::randomize( const bool random_scenario, points_left &points, bool play_now )
+void avatar::randomize( const bool random_scenario, points_left &points )
 {
     const int max_stat_points = points.is_freeform() ? 20 : MAX_STAT;
     const int max_trait_points = get_option<int>( "MAX_TRAIT_POINTS" );
@@ -303,7 +299,7 @@ void avatar::randomize( const bool random_scenario, points_left &points, bool pl
 
     male = ( rng( 1, 100 ) > 50 );
     if( !MAP_SHARING::isSharing() ) {
-        play_now ? pick_name() : pick_name( true );
+        pick_name( true );
     } else {
         name = MAP_SHARING::getUsername();
     }
@@ -575,7 +571,7 @@ void avatar::randomize_cosmetics()
     } );
 }
 
-bool avatar::create( character_type type, const std::string &tempname )
+auto avatar::create() -> bool
 {
     // TODO: This block should not be needed
     if( get_body().contains( body_part_arm_r ) ) {
@@ -586,45 +582,10 @@ bool avatar::create( character_type type, const std::string &tempname )
     g->scen = scenario::generic();
     male = get_option<std::string>( "DEF_CHAR_GENDER" ) == "male";
 
-    const bool interactive = type != character_type::NOW &&
-                             type != character_type::FULL_RANDOM;
-
-    int tab = 0;
-    points_left points = points_left();
-
-    switch( type ) {
-        case character_type::CUSTOM:
-            // We can randomize cosmetics for a custom character, it's fine. Not sure I like the idea of a "default" appearance
-            randomize_cosmetics();
-            // don't make them bald!
-            set_default_hair_style( *this );
-            break;
-        case character_type::RANDOM:
-            //random scenario, default name if exist
-            randomize( true, points );
-            tab = get_max_tabs( prof );
-            break;
-        case character_type::NOW:
-            //default world, fixed scenario, random name
-            randomize( false, points, true );
-            break;
-        case character_type::FULL_RANDOM:
-            //default world, random scenario, random name
-            randomize( true, points, true );
-            break;
-        case character_type::TEMPLATE:
-            if( !load_template( tempname, points ) ) {
-                return false;
-            }
-            // We want to prevent recipes known by the template from being applied to the
-            // new character. The recipe list will be rebuilt when entering the game.
-            // Except if it is a character transfer template
-            if( points.limit != points_left::TRANSFER ) {
-                learned_recipes->clear();
-            }
-            tab = get_max_tabs( prof );
-            break;
-    }
+    auto tab = 0;
+    auto points = points_left();
+    randomize_cosmetics();
+    set_default_hair_style( *this );
 
     auto nameExists = [&]( const std::string & name ) {
         return world_generator->active_world->info->save_exists( save_t::from_save_id( name ) ) &&
@@ -633,22 +594,8 @@ bool avatar::create( character_type type, const std::string &tempname )
                              "Continue anyways?" ), name );
     };
     set_body();
-    const bool allow_reroll = true;
     tab_direction result = tab_direction::QUIT;
     do {
-        if( !interactive ) {
-            // no window is created because "Play now"  does not require any configuration
-            if( nameExists( name ) ) {
-                return false;
-            }
-
-            break;
-        }
-
-        if( points.limit == points_left::TRANSFER ) {
-            tab = get_max_tabs( prof );
-        }
-
         switch( tab ) {
             case 0:
                 result = set_points( *this, points );
@@ -681,7 +628,7 @@ bool avatar::create( character_type type, const std::string &tempname )
                 if( prof->forbids_bionics() || g->scen->forbids_bionics() ) {
                     if( !has_any_magic( prof ) ||
                         prof->forbids_spells() || g->scen->forbids_spells() ) {
-                        result = set_description( *this, allow_reroll, points );
+                        result = set_description( *this, points );
                     } else {
                         result = set_skills( *this, points );
                     }
@@ -694,16 +641,16 @@ bool avatar::create( character_type type, const std::string &tempname )
                 break;
             case 7:
                 if( prof->forbids_bionics() || g->scen->forbids_bionics() ) {
-                    result = set_description( *this, allow_reroll, points );
+                    result = set_description( *this, points );
                 } else if( !has_any_magic( prof ) ||
                            prof->forbids_spells() || g->scen->forbids_spells() ) {
-                    result = set_description( *this, allow_reroll, points );
+                    result = set_description( *this, points );
                 } else {
                     result = set_skills( *this, points );
                 }
                 break;
             case 8:
-                result = set_description( *this, allow_reroll, points );
+                result = set_description( *this, points );
                 break;
         }
 
@@ -734,12 +681,6 @@ bool avatar::create( character_type type, const std::string &tempname )
     if( tab < 0 ) {
         return false;
     }
-
-    if( points.limit == points_left::TRANSFER ) {
-        return true;
-    }
-
-    save_template( _( "Last Character" ), points );
 
     recalc_hp();
 
@@ -829,7 +770,7 @@ bool avatar::create( character_type type, const std::string &tempname )
             }
         }
         if( !styles.empty() ) {
-            const matype_id ma_type = choose_ma_style( type, styles, *this );
+            const matype_id ma_type = choose_ma_style( styles, *this );
             martial_arts_data->add_martialart( ma_type );
             martial_arts_data->set_style( ma_type );
         }
@@ -3547,8 +3488,7 @@ static void draw_age( const catacurses::window &w_age, const avatar &you, const 
 }
 } // namespace char_creation
 
-tab_direction set_description( avatar &you, const bool allow_reroll,
-                               points_left &points )
+tab_direction set_description( avatar &you, points_left &points )
 {
     static constexpr int RANDOM_START_LOC_ENTRY = INT_MIN;
     const std::string RANDOM_START_LOC_TEXT_TEMPLATE =
@@ -3634,7 +3574,6 @@ tab_direction set_description( avatar &you, const bool allow_reroll,
 
     input_context ctxt( "NEW_CHAR_DESCRIPTION" );
     ctxt.register_cardinal();
-    ctxt.register_action( "SAVE_TEMPLATE" );
     ctxt.register_action( "RANDOMIZE_CHAR_DESCRIPTION" );
     ctxt.register_action( "CHANGE_GENDER" );
     ctxt.register_action( "PREV_TAB" );
@@ -3729,8 +3668,7 @@ tab_direction set_description( avatar &you, const bool allow_reroll,
         wnoutrefresh( w_stats );
 
         mvwprintz( w_traits, point_zero, COL_HEADER, _( "Traits: " ) );
-        std::vector<trait_id> current_traits = points.limit == points_left::TRANSFER ? you.get_mutations() :
-                                               you.get_base_traits();
+        auto current_traits = you.get_base_traits();
         std::sort( current_traits.begin(), current_traits.end(), trait_display_sort );
         if( current_traits.empty() ) {
             wprintz( w_traits, c_light_red, _( "None!" ) );
@@ -3826,12 +3764,10 @@ tab_direction set_description( avatar &you, const bool allow_reroll,
             // Here we can display the actual level because it is not editing it
             int level = you.get_skill_level( elem->ident(), false );
 
-            if( points.limit != points_left::TRANSFER ) {
-                for( auto &prof_skill : you.prof->skills() ) {
-                    if( prof_skill.first == elem->ident() ) {
-                        level += static_cast<int>( prof_skill.second );
-                        break;
-                    }
+            for( auto &prof_skill : you.prof->skills() ) {
+                if( prof_skill.first == elem->ident() ) {
+                    level += static_cast<int>( prof_skill.second );
+                    break;
                 }
             }
 
@@ -3876,18 +3812,11 @@ tab_direction set_description( avatar &you, const bool allow_reroll,
                            "or <color_light_green>%s</color> to go back." ),
                         ctxt.get_desc( "NEXT_TAB" ),
                         ctxt.get_desc( "PREV_TAB" ) );
-        if( allow_reroll ) {
-            fold_and_print( w_guide, point( 0, getmaxy( w_guide ) - 5 ), ( TERMX / 2 ), c_light_gray,
-                            _( "Press <color_light_green>%s</color> to save character template, "
-                               "<color_light_green>%s</color> to re-roll or <color_light_green>%s</color> for random scenario." ),
-                            ctxt.get_desc( "SAVE_TEMPLATE" ),
-                            ctxt.get_desc( "REROLL_CHARACTER" ),
-                            ctxt.get_desc( "REROLL_CHARACTER_WITH_SCENARIO" ) );
-        } else {
-            fold_and_print( w_guide, point( 0, getmaxy( w_guide ) - 5 ), ( TERMX / 2 ), c_light_gray,
-                            _( "Press <color_light_green>%s</color> to save a template of this character." ),
-                            ctxt.get_desc( "SAVE_TEMPLATE" ) );
-        }
+        fold_and_print( w_guide, point( 0, getmaxy( w_guide ) - 5 ), ( TERMX / 2 ), c_light_gray,
+                        _( "Press <color_light_green>%s</color> to re-roll or "
+                           "<color_light_green>%s</color> for random scenario." ),
+                        ctxt.get_desc( "REROLL_CHARACTER" ),
+                        ctxt.get_desc( "REROLL_CHARACTER_WITH_SCENARIO" ) );
         wnoutrefresh( w_guide );
 
         wclear( w_name );
@@ -4225,20 +4154,16 @@ tab_direction set_description( avatar &you, const bool allow_reroll,
                 default:
                     break;
             }
-        } else if( action == "REROLL_CHARACTER" && allow_reroll ) {
+        } else if( action == "REROLL_CHARACTER" ) {
             points.init_from_options();
             you.randomize( false, points );
             // Return tab_direction::NONE so we re-enter this tab again, but it forces a complete redrawing of it.
             return tab_direction::NONE;
-        } else if( action == "REROLL_CHARACTER_WITH_SCENARIO" && allow_reroll ) {
+        } else if( action == "REROLL_CHARACTER_WITH_SCENARIO" ) {
             points.init_from_options();
             you.randomize( true, points );
             // Return tab_direction::NONE so we re-enter this tab again, but it forces a complete redrawing of it.
             return tab_direction::NONE;
-        } else if( action == "SAVE_TEMPLATE" ) {
-            if( const auto name = query_for_template_name() ) {
-                you.save_template( *name, points );
-            }
         } else if( action == "RANDOMIZE_CHAR_DESCRIPTION" ) {
             you.male = one_in( 2 );
             if( !MAP_SHARING::isSharing() ) { // Don't allow random names when sharing maps. We don't need to check at the top as you won't be able to edit the name
@@ -4473,131 +4398,6 @@ void Character::randomize_cosmetic_trait( std::string mutation_type )
     }
 }
 
-std::optional<std::string> query_for_template_name()
-{
-    static const std::set<int> fname_char_blacklist = {
-#if defined(_WIN32)
-        '\"', '*', '/', ':', '<', '>', '?', '\\', '|',
-        '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',         '\x09',
-        '\x0B', '\x0C',         '\x0E', '\x0F', '\x10', '\x11', '\x12',
-        '\x13', '\x14',         '\x16', '\x17', '\x18', '\x19', '\x1A',
-        '\x1C', '\x1D', '\x1E', '\x1F'
-#else
-        '/'
-#endif
-    };
-    std::string title = _( "Name of template:" );
-    std::string desc = _( "Keep in mind you may not use special characters like / in filenames" );
-
-    string_input_popup spop;
-    spop.title( title );
-    spop.description( desc );
-    spop.width( FULL_SCREEN_WIDTH - utf8_width( title ) - 8 );
-    for( int character : fname_char_blacklist ) {
-        spop.callbacks[ character ] = []() {
-            return true;
-        };
-    }
-
-    spop.query_string( true );
-    if( spop.canceled() ) {
-        return std::nullopt;
-    } else {
-        return spop.text();
-    }
-}
-
-void avatar::character_to_template( const std::string &name )
-{
-    points_left points;
-    points.stat_points = 0;
-    points.trait_points = 0;
-    points.skill_points = 0;
-    points.limit = points_left::TRANSFER;
-    save_template( name, points );
-}
-
-void avatar::save_template( const std::string &name, const points_left &points )
-{
-    std::string name_san = ensure_valid_file_name( name );
-    write_to_file( PATH_INFO::templatedir() + name_san + ".template", [&]( std::ostream & fout ) {
-        JsonOut jsout( fout, true );
-
-        jsout.start_array();
-
-        jsout.start_object();
-        jsout.member( "stat_points", points.stat_points );
-        jsout.member( "trait_points", points.trait_points );
-        jsout.member( "skill_points", points.skill_points );
-        jsout.member( "limit", points.limit );
-        jsout.member( "starting_vehicle", starting_vehicle );
-        jsout.member( "random_start_location", random_start_location );
-        if( !random_start_location ) {
-            jsout.member( "start_location", start_location );
-        }
-        jsout.end_object();
-
-        serialize( jsout );
-
-        jsout.end_array();
-    }, _( "player template" ) );
-}
-
-bool avatar::load_template( const std::string &template_name, points_left &points )
-{
-    return read_from_file_json( PATH_INFO::templatedir() + template_name +
-    ".template", [&]( JsonIn & jsin ) {
-
-        if( jsin.test_array() ) {
-            // not a legacy template
-            jsin.start_array();
-
-            if( jsin.end_array() ) {
-                return;
-            }
-
-            JsonObject jobj = jsin.get_object();
-
-            points.stat_points = jobj.get_int( "stat_points" );
-            points.trait_points = jobj.get_int( "trait_points" );
-            points.skill_points = jobj.get_int( "skill_points" );
-            points.limit = static_cast<points_left::point_limit>( jobj.get_int( "limit" ) );
-
-            if( jobj.has_member( "starting_vehicle" ) ) {
-                starting_vehicle = vproto_id( jobj.get_string( "starting_vehicle" ) );
-            } else {
-                starting_vehicle = vproto_id::NULL_ID();
-            }
-            random_start_location = jobj.get_bool( "random_start_location", true );
-            const std::string jobj_start_location = jobj.get_string( "start_location", "" );
-
-            // g->scen->allowed_start( loc.ident() ) is checked once scenario loads in avatar::load()
-            for( const auto &loc : start_locations::get_all() ) {
-                if( loc.id.str() == jobj_start_location ) {
-                    random_start_location = false;
-                    this->start_location = loc.id;
-                    break;
-                }
-            }
-
-            if( jsin.end_array() ) {
-                return;
-            }
-        } else {
-            points.stat_points = 0;
-            points.trait_points = 0;
-            points.skill_points = 0;
-        }
-
-        deserialize( jsin );
-
-        if( MAP_SHARING::isSharing() ) {
-            // just to make sure we have the right name
-            name = MAP_SHARING::getUsername();
-        }
-    } );
-}
-
 void reset_scenario( avatar &u, const scenario *scen )
 {
     auto psorter = profession_sorter;
@@ -4655,8 +4455,6 @@ int points_left::stat_points_left() const
         case MULTI_POOL:
             return std::min( trait_points_left(),
                              stat_points + std::min( 0, trait_points + skill_points ) );
-        case TRANSFER:
-            return 0;
     }
 
     return 0;
@@ -4670,8 +4468,6 @@ int points_left::trait_points_left() const
             return stat_points + trait_points + skill_points;
         case MULTI_POOL:
             return stat_points + trait_points + std::min( 0, skill_points );
-        case TRANSFER:
-            return 0;
     }
 
     return 0;
@@ -4712,8 +4508,6 @@ std::string points_left::to_string()
                    is_valid() ? "light_gray" : "red", stat_points + trait_points + skill_points );
     } else if( limit == ONE_POOL ) {
         return string_format( _( "Points left: %4d" ), skill_points_left() );
-    } else if( limit == TRANSFER ) {
-        return _( "Character Transfer: No changes can be made." );
     } else {
         return _( "Freeform" );
     }

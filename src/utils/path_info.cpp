@@ -194,7 +194,6 @@ auto PATH_INFO::savedir() -> std::string {
 }
 auto PATH_INFO::shaders() -> std::string { return datadir_value + "shaders/"; }
 auto PATH_INFO::sokoban() -> std::string { return datadir_value + "raw/" + "sokoban.txt"; }
-auto PATH_INFO::templatedir() -> std::string { return user_dir_value + "templates/"; }
 auto PATH_INFO::user_dir() -> std::string { return user_dir_value; }
 auto PATH_INFO::user_gfx() -> std::string { return user_dir_value + "gfx/"; }
 auto PATH_INFO::user_keybindings() -> std::string { return config_dir_value + "keybindings.json"; }

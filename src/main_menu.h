@@ -54,11 +54,6 @@ class main_menu
         bool load_character_tab( const std::string &worldname );
         void world_tab( const std::string &worldname );
 
-        /*
-         * Load character templates from template folder
-         */
-        void load_char_templates();
-
         // These variables are shared between @opening_screen and the tab functions.
         // TODO: But this is an ugly short-term solution.
         input_context ctxt;
@@ -67,7 +62,6 @@ class main_menu
         point LAST_TERM;
         catacurses::window w_open;
         point menu_offset;
-        std::vector<std::string> templates;
         int extra_w = 0;
         std::vector<save_t> savegames;
         std::vector<std::pair<inclusive_rectangle<point>, std::pair<int, int>>> main_menu_sub_button_map;

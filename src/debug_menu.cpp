@@ -116,7 +116,6 @@
 #include <utility>
 #include <vector>
 
-static const mtype_id mon_generator( "mon_generator" );
 
 extern std::map<std::string, weighted_int_list<std::shared_ptr<mapgen_function_json_nested>> >
         nested_mapgen;
@@ -1854,9 +1853,7 @@ void debug()
             for( monster &critter : g->all_monsters() ) {
                 // Use the normal death functions, useful for testing death
                 // and for getting a corpse.
-                if( critter.type->id != mon_generator ) {
-                    critter.die( nullptr );
-                }
+                critter.die( nullptr );
             }
             g->cleanup_dead();
         }

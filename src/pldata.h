@@ -8,14 +8,6 @@ class JsonIn;
 class JsonOut;
 template <typename E> struct enum_traits;
 
-enum class character_type : int {
-    CUSTOM,
-    RANDOM,
-    TEMPLATE,
-    NOW,
-    FULL_RANDOM,
-};
-
 enum class add_type : int {
     NONE,
     CAFFEINE, ALCOHOL, SLEEP, PKILLER, SPEED, CIG,

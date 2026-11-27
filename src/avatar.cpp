@@ -323,14 +323,6 @@ mission *avatar::get_active_mission() const
     return active_mission;
 }
 
-void avatar::reset_all_missions()
-{
-    active_mission = nullptr;
-    active_missions.clear();
-    completed_missions.clear();
-    failed_missions.clear();
-}
-
 tripoint_abs_omt avatar::get_active_mission_target() const
 {
     if( active_mission == nullptr ) {

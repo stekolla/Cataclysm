@@ -81,12 +81,9 @@ class avatar : public player
         void clear_map_memory();
 
         // newcharacter.cpp
-        bool create( character_type type, const std::string &tempname = "" );
-        void randomize( bool random_scenario, points_left &points, bool play_now = false );
+        auto create() -> bool;
+        void randomize( bool random_scenario, points_left &points );
         void randomize_cosmetics();
-        bool load_template( const std::string &template_name, points_left &points );
-        void save_template( const std::string &name, const points_left &points );
-        void character_to_template( const std::string &name );
 
         bool is_avatar() const override {
             return true;
@@ -139,8 +136,6 @@ class avatar : public player
 
         /** Provides the window and detailed morale data */
         void disp_morale();
-        /** Resets all missions before saving character to template */
-        void reset_all_missions();
 
         std::vector<mission *> get_active_missions() const;
         std::vector<mission *> get_completed_missions() const;

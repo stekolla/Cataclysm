@@ -65,7 +65,6 @@ not comprehensive, but covers the broad strokes.
 | tips.json                  | tips of the day                                                       |
 | tool_qualities.json        | standard tool qualities and their actions                             |
 | traps.json                 | standard traps                                                        |
-| tutorial.json              | messages for the tutorial (that is out of date)                       |
 | vehicle_groups.json        | vehicle spawn groups                                                  |
 | vehicle_parts.json         | vehicle parts, does NOT affect flag effects                           |
 | vitamin.json               | vitamins and their deficiencies                                       |

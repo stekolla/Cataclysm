@@ -105,7 +105,6 @@ enum safe_mode_type {
 enum body_part : int;
 enum action_id : int;
 
-struct special_game;
 
 class achievements_tracker;
 class avatar;
@@ -737,8 +736,6 @@ class game : public submap_load_listener
         item *inv_map_splice( const item_filter &filter, const std::string &title, int radius = 0,
                               const std::string &none_message = "" );
 
-        bool has_gametype() const;
-        special_game_type gametype() const;
 
         void toggle_fullscreen();
         void toggle_pixel_minimap();
@@ -1276,7 +1273,6 @@ class game : public submap_load_listener
         /** Zone manager toggle for submap grid overlay (only active while the UI is open) */
         bool zone_submap_grid_overlay = false;
 
-        std::unique_ptr<special_game> gamemode;
 
         int user_action_counter = 0; // Times the user has input an action
 

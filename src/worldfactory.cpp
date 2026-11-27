@@ -119,38 +119,6 @@ WORLDINFO *worldfactory::make_new_world( bool show_prompt, const std::string &wo
     return add_world( std::move( retworld ) );
 }
 
-WORLDINFO *worldfactory::make_new_world( special_game_type special_type )
-{
-    std::string worldname;
-    switch( special_type ) {
-        case special_game_type::TUTORIAL:
-            worldname = "TUTORIAL";
-            break;
-        case special_game_type::DEFENSE:
-            worldname = "DEFENSE";
-            break;
-        default:
-            return nullptr;
-    }
-
-    // Look through all worlds and see if a world named worldname already exists. If so, then just return it instead of
-    // making a new world.
-    if( has_world( worldname ) ) {
-        return all_worlds[worldname].get();
-    }
-
-    std::unique_ptr<WORLDINFO> special_world = std::make_unique<WORLDINFO>();
-    special_world->world_name = worldname;
-
-    special_world->WORLD_OPTIONS["WORLD_END"].setValue( "delete" );
-
-    if( !special_world->save() ) {
-        return nullptr;
-    }
-
-    return ( all_worlds[worldname] = std::move( special_world ) ).get();
-}
-
 void worldfactory::set_active_world( WORLDINFO *new_world )
 {
     DebugLog( DL::Info, DC::Main ) << "Setting active world to " << ( new_world ?
@@ -179,6 +147,12 @@ void worldfactory::init()
     // worlds exist by having an option file
     // create worlds
     for( const auto &world_dir : get_directories_with( qualifiers, PATH_INFO::savedir(), true ) ) {
+        const auto name_index = world_dir.find_last_of( "/\\" );
+        const auto worldname = world_dir.substr( name_index + 1 );
+        if( worldname == "TUTORIAL" || worldname == "DEFENSE" ) {
+            continue;
+        }
+
         // get the save files
         auto world_sav_files = get_files_from_path( SAVE_EXTENSION, world_dir, false );
         // split the save file names between the directory and the extension
@@ -187,11 +161,6 @@ void worldfactory::init()
             world_sav_file = world_sav_file.substr( world_dir.size() + 1,
                                                     save_index - ( world_dir.size() + 1 ) );
         }
-        // the directory name is the name of the world
-        std::string worldname;
-        size_t name_index = world_dir.find_last_of( "/\\" );
-        worldname = world_dir.substr( name_index + 1 );
-
         // create and store the world
         all_worlds[worldname] = std::make_unique<WORLDINFO>();
         // give the world a name
@@ -260,36 +229,17 @@ std::vector<std::string> worldfactory::all_worldnames() const
     return result;
 }
 
-WORLDINFO *worldfactory::pick_world( bool show_prompt, bool empty_only )
+WORLDINFO *worldfactory::pick_world()
 {
     std::vector<std::string> world_names = all_worldnames();
 
-    // Filter out special worlds (TUTORIAL | DEFENSE) from world_names.
-    for( std::vector<std::string>::iterator it = world_names.begin(); it != world_names.end(); ) {
-        if( *it == "TUTORIAL" || *it == "DEFENSE" ||
-            ( empty_only && !get_world( *it )->world_saves.empty() ) ) {
-            it = world_names.erase( it );
-        } else {
-            ++it;
-        }
-    }
     // If there is only one world to pick from, autoreturn it.
     if( world_names.size() == 1 ) {
         return get_world( world_names[0] );
     }
     // If there are no worlds to pick from, immediately try to make one.
     else if( world_names.empty() ) {
-        return make_new_world( show_prompt );
-    }
-    // If we're skipping prompts, return the world with 0 save if there is one
-    else if( !show_prompt ) {
-        for( const auto &name : world_names ) {
-            if( get_world( name )->world_saves.empty() ) {
-                return get_world( name );
-            }
-        }
-        // if there isn't any, adhere to old logic: return the alphabetically first one
-        return get_world( world_names[0] );
+        return make_new_world( true );
     }
 
     const int iTooltipHeight = 3;

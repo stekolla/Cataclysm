@@ -79,8 +79,6 @@ void fireball( monster &z );
 // Similar to above but bigger and guaranteed.
 void conflagration( monster &z );
 
-// Game over!  Defense mode
-void gameover( monster &z );
 } //namespace mdeath
 
 void make_mon_corpse( monster &z, int damageLvl );

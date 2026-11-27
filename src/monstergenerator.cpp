@@ -563,8 +563,6 @@ void MonsterGenerator::init_death()
     death_map["JABBERWOCKY"] = &mdeath::jabberwock;
     // Take them with you
     death_map["DETONATE"] = &mdeath::detonate;
-    // Game over!  Defense mode
-    death_map["GAMEOVER"] = &mdeath::gameover;
     // Spawn some cockroach nymphs
     death_map["PREG_ROACH"] = &mdeath::preg_roach;
     // Explode in a fireball
@@ -646,7 +644,6 @@ void MonsterGenerator::init_attack()
     add_hardcoded_attack( "CHICKENBOT", mattack::chickenbot );
     add_hardcoded_attack( "MULTI_ROBOT", mattack::multi_robot );
     add_hardcoded_attack( "RATKING", mattack::ratking );
-    add_hardcoded_attack( "GENERATOR", mattack::generator );
     add_hardcoded_attack( "UPGRADE", mattack::upgrade );
     add_hardcoded_attack( "BREATHE", mattack::breathe );
     add_hardcoded_attack( "IMPALE", mattack::impale );

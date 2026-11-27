@@ -14,7 +14,6 @@
 #include "fstream_utils.h"
 #include "game.h"
 #include "game_info.h"
-#include "gamemode.h"
 #include "get_version.h"
 #include "help.h"
 #include "loading_ui.h"
@@ -220,9 +219,6 @@ void main_menu::display_sub_menu( int sel, const point &bottom_left )
                 int savegames_count = world->world_saves.size();
                 nc_color clr = c_white;
                 std::string txt = all_worldnames[i];
-                if( all_worldnames[i] == "TUTORIAL" || all_worldnames[i] == "DEFENSE" ) {
-                    clr = c_light_cyan;
-                }
                 sub_opts.push_back( colorize( string_format( "%s (%d)", txt, savegames_count ),
                                               ( sel2 == i + ( extra_opt ? 1 : 0 ) ) ? hilite( clr ) : clr ) );
                 int len = utf8_width( sub_opts.back(), true );
@@ -457,32 +453,9 @@ void main_menu::init_strings()
     // new game menu items
     vNewGameSubItems.clear();
     vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "C<u|U>stom Character" ) );
-    vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "<P|p>reset Character" ) );
-    vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "<R|r>andom Character" ) );
-    if( !MAP_SHARING::isSharing() ) {
-        // "Play Now" function doesn't play well together with shared maps
-        vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game",
-                                       "Play Now!  (<D|d>efault Scenario)" ) );
-        vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "Play N<o|O>w!" ) );
-
-        // Special games don't play well together with shared maps
-        vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "<T|t>utorial" ) );
-        vNewGameSubItems.emplace_back( pgettext( "Main Menu|New Game", "<D|d>efence mode" ) );
-    }
     vNewGameHints.clear();
     vNewGameHints.emplace_back(
         _( "Allows you to fully customize points pool, scenario, and character's profession, stats, traits, skills and other parameters." ) );
-    vNewGameHints.emplace_back( _( "Select from one of previously created character templates." ) );
-    vNewGameHints.emplace_back(
-        _( "Creates random character, but lets you preview the generated character and the scenario and change character and/or scenario if needed." ) );
-    vNewGameHints.emplace_back(
-        _( "Puts you right in the game, randomly choosing character's traits, profession, skills and other parameters.  Scenario is fixed to Evacuee." ) );
-    vNewGameHints.emplace_back(
-        _( "Puts you right in the game, randomly choosing scenario and character's traits, profession, skills and other parameters." ) );
-    vNewGameHints.emplace_back(
-        _( "Learn controls and basic game mechanics while exploring a small underground complex." ) );
-    vNewGameHints.emplace_back(
-        _( "Defend against waves of incoming enemies.  This game mode hasn't been updated in a while and may contain bugs." ) );
     vNewGameHotkeys.clear();
     vNewGameHotkeys.reserve( vNewGameSubItems.size() );
     for( const std::string &item : vNewGameSubItems ) {
@@ -499,13 +472,12 @@ void main_menu::init_strings()
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Show World Mods" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Edit World Mods" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Copy World Settings" ) );
-    vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Character to Template" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Reset World" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Delete World" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "Convert to V2 Save Format" ) );
     vWorldSubItems.emplace_back( pgettext( "Main Menu|World", "<= Return" ) );
 
-    vWorldHotkeys = { 'm', 'e', 's', 't', 'r', 'd', 'f', 'q' };
+    vWorldHotkeys = { 'm', 'e', 's', 'r', 'd', 'f', 'q' };
 
     vSettingsSubItems.clear();
     vSettingsSubItems.emplace_back( pgettext( "Main Menu|Settings", "<O|o>ptions" ) );
@@ -523,19 +495,6 @@ void main_menu::init_strings()
     vdaytip = get_random_tip_of_the_day();
 }
 
-void main_menu::load_char_templates()
-{
-    templates.clear();
-
-    for( std::string path : get_files_from_path( ".template", PATH_INFO::templatedir(), false,
-            true ) ) {
-        path.erase( path.find( ".template" ), std::string::npos );
-        path.erase( 0, path.find_last_of( "\\/" ) + 1 );
-        templates.push_back( path );
-    }
-    std::sort( templates.begin(), templates.end(), localized_compare );
-    std::reverse( templates.begin(), templates.end() );
-}
 
 bool main_menu::opening_screen()
 {
@@ -563,11 +522,6 @@ bool main_menu::opening_screen()
 
     if( !assure_dir_exist( PATH_INFO::savedir() ) ) {
         popup( _( "Unable to make save directory.  Check permissions." ) );
-        return false;
-    }
-
-    if( !assure_dir_exist( PATH_INFO::templatedir() ) ) {
-        popup( _( "Unable to make templates directory.  Check permissions." ) );
         return false;
     }
 
@@ -601,7 +555,6 @@ bool main_menu::opening_screen()
                ) );
     }
 
-    load_char_templates();
 
     ctxt.register_cardinal();
     ctxt.register_action( "NEXT_TAB" );
@@ -796,79 +749,13 @@ bool main_menu::opening_screen()
 
 bool main_menu::new_character_tab()
 {
-    std::string selected_template;
-
-    avatar &pc = get_avatar();
-    // Preset character templates
-    if( sel2 == 1 ) {
-        if( templates.empty() ) {
-            on_error();
-            popup( _( "No templates found!" ) );
-            return false;
-        }
-        while( true ) {
-            uilist mmenu( _( "Choose a preset character template" ), {} );
-            mmenu.border_color = c_light_gray;
-            mmenu.hotkey_color = c_yellow;
-            sound_on_move_uilist_callback cb( this );
-            mmenu.callback = &cb;
-
-            int opt_val = 0;
-            for( const std::string &tmpl : templates ) {
-                mmenu.entries.emplace_back( opt_val++, true, MENU_AUTOASSIGN, tmpl );
-            }
-            mmenu.entries.emplace_back( opt_val++, true, 'q', "<= Return" );
-            mmenu.query();
-            opt_val = mmenu.ret;
-            if( opt_val < 0 || static_cast<size_t>( opt_val ) >= templates.size() ) {
-                return false;
-            }
-
-            std::string res = query_popup()
-                              .context( "LOAD_DELETE_CANCEL" ).default_color( c_light_gray )
-                              .message( _( "What to do with template \"%s\"?" ), templates[opt_val] )
-                              .option( "LOAD" ).option( "DELETE" ).option( "CANCEL" ).cursor( 0 )
-                              .query().action;
-            if( res == "DELETE" &&
-                query_yn( _( "Are you sure you want to delete %s?" ), templates[opt_val] ) ) {
-                const auto path = PATH_INFO::templatedir() + templates[opt_val] + ".template";
-                if( !remove_file( path ) ) {
-                    popup( _( "Sorry, something went wrong." ) );
-                } else {
-                    templates.erase( templates.begin() + opt_val );
-                }
-            } else if( res == "LOAD" ) {
-                selected_template = templates[opt_val];
-                break;
-            }
-
-            if( templates.empty() ) {
-                return false;
-            }
-        }
-    }
-
+    auto &pc = get_avatar();
     on_out_of_scope cleanup( [&pc]() {
-        g->gamemode.reset();
         pc = avatar();
         world_generator->set_active_world( nullptr );
     } );
-    g->gamemode.reset();
 
-    WORLDINFO *world;
-    if( sel2 == 5 ) {
-        g->gamemode = get_special_game( special_game_type::TUTORIAL );
-        world = world_generator->make_new_world( special_game_type::TUTORIAL );
-    } else if( sel2 == 6 ) {
-        g->gamemode = get_special_game( special_game_type::DEFENSE );
-        world = world_generator->make_new_world( special_game_type::DEFENSE );
-    } else {
-        // Pick a world, suppressing prompts if it's "play now" mode.
-        bool empty_only = sel2 == 3 || sel2 == 4;
-        bool show_prompt = !empty_only;
-        world = world_generator->pick_world( show_prompt, empty_only );
-    }
-
+    auto *world = world_generator->pick_world();
     if( world == nullptr ) {
         return false;
     }
@@ -880,34 +767,7 @@ bool main_menu::new_character_tab()
         return false;
     }
 
-    if( g->gamemode ) {
-        bool success = g->gamemode->init();
-        if( success ) {
-            cleanup.cancel();
-        }
-        return success;
-    }
-
-    character_type play_type = character_type::CUSTOM;
-    switch( sel2 ) {
-        case 0:
-            play_type = character_type::CUSTOM;
-            break;
-        case 1:
-            play_type = character_type::TEMPLATE;
-            break;
-        case 2:
-            play_type = character_type::RANDOM;
-            break;
-        case 3:
-            play_type = character_type::NOW;
-            break;
-        case 4:
-            play_type = character_type::FULL_RANDOM;
-            break;
-    }
-    if( !pc.create( play_type, selected_template ) ) {
-        load_char_templates();
+    if( !pc.create() ) {
         MAPBUFFER.clear();
         get_primary_overmapbuffer().clear();
         return false;
@@ -961,7 +821,6 @@ bool main_menu::load_character_tab( const std::string &worldname )
         world_generator->set_active_world( nullptr );
     } );
 
-    g->gamemode = nullptr;
     world_generator->last_world_name = world->world_name;
     world_generator->last_character_name = savegames[opt_val].decoded_name();
     world_generator->save_last_world_info();
@@ -1001,7 +860,7 @@ void main_menu::world_tab( const std::string &worldname )
     sound_on_move_uilist_callback cb( this );
     mmenu.callback = &cb;
     for( size_t i = 0; i < vWorldSubItems.size(); i++ ) {
-        const auto enabled = !( i == 6 && is_v2_world );
+        const auto enabled = !( i == 5 && is_v2_world );
         mmenu.entries.emplace_back( static_cast<int>( i ), enabled, vWorldHotkeys[i], vWorldSubItems[i] );
     }
     mmenu.query();
@@ -1031,18 +890,18 @@ void main_menu::world_tab( const std::string &worldname )
     };
 
     switch( opt_val ) {
-        case 6: // Convert to V2 Save Format
+        case 5: // Convert to V2 Save Format
             if( query_yn(
                     _( "Convert to V2 Save Format? A backup will be created. Conversion may take several minutes." ) ) ) {
                 convert_v2();
             }
             break;
-        case 5: // Delete World
+        case 4: // Delete World
             if( query_yn( _( "Delete the world and all saves within?" ) ) ) {
                 clear_world( true );
             }
             break;
-        case 4: // Reset World
+        case 3: // Reset World
             if( query_yn( _( "Remove all saves and regenerate world?" ) ) ) {
                 clear_world( false );
             }
@@ -1065,18 +924,6 @@ void main_menu::world_tab( const std::string &worldname )
         case 2: // Copy World settings
             if( world_generator->make_new_world( true, worldname ) ) {
                 browser_storage::flush_with_feedback();
-            }
-            break;
-        case 3: // Character to Template
-            if( load_character_tab( worldname ) ) {
-                avatar &pc = get_avatar();
-                pc.setID( character_id(), true );
-                pc.reset_all_missions();
-                pc.character_to_template( pc.name );
-                pc = avatar();
-                MAPBUFFER.clear();
-                get_primary_overmapbuffer().clear();
-                load_char_templates();
             }
             break;
         default:

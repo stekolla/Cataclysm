@@ -3146,11 +3146,6 @@ void overmap::set_scent(const tripoint_abs_omt& loc, const scent_trace& new_scen
 void overmap::generate(
     const overmap* north, const overmap* east, const overmap* south, const overmap* west,
     overmap_special_batch& enabled_specials) {
-    if (g->gametype() == special_game_type::DEFENSE) {
-        dbg(DL::Info) << "overmap::generate skipped in Defense special game mode!";
-        return;
-    }
-
     if (const dimension_info* dim = g->get_current_dimension_info()) {
         // Bounded pocket dimensions never use full overmap generation — they
         // have pre-placed terrain via overmap specials.  Also skip if the

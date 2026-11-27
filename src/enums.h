@@ -123,13 +123,6 @@ struct enum_traits<ot_match_type> {
     static constexpr ot_match_type last = ot_match_type::num_ot_match_type;
 };
 
-enum class special_game_type : int {
-    NONE = 0,
-    TUTORIAL,
-    DEFENSE,
-    NUM_SPECIAL_GAME_TYPES
-};
-
 enum art_effect_passive : int {
     AEP_NULL = 0,
     // Good

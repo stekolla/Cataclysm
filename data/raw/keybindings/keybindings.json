@@ -1273,34 +1273,6 @@
   },
   {
     "type": "keybinding",
-    "id": "SAVE_TEMPLATE",
-    "category": "DEFENSE_SETUP",
-    "name": "Save template",
-    "bindings": [ { "input_method": "keyboard", "key": "!" } ]
-  },
-  {
-    "type": "keybinding",
-    "id": "START",
-    "category": "DEFENSE_SETUP",
-    "name": "Start",
-    "bindings": [ { "input_method": "keyboard", "key": "S" } ]
-  },
-  {
-    "type": "keybinding",
-    "id": "DELETE_TEMPLATE",
-    "category": "MAIN_MENU",
-    "name": "Delete template",
-    "bindings": [ { "input_method": "keyboard", "key": "d" } ]
-  },
-  {
-    "type": "keybinding",
-    "id": "SAVE_TEMPLATE",
-    "category": "NEW_CHAR_DESCRIPTION",
-    "name": "Save template",
-    "bindings": [ { "input_method": "keyboard", "key": "!" } ]
-  },
-  {
-    "type": "keybinding",
     "id": "REROLL_CHARACTER",
     "category": "NEW_CHAR_DESCRIPTION",
     "name": "Reroll random character",
@@ -3303,27 +3275,6 @@
       { "input_method": "keyboard", "key": "n" },
       { "input_method": "keyboard", "key": "ESC" }
     ]
-  },
-  {
-    "type": "keybinding",
-    "id": "LOAD",
-    "category": "LOAD_DELETE_CANCEL",
-    "name": "Load",
-    "bindings": [ { "input_method": "keyboard", "key": "L" } ]
-  },
-  {
-    "type": "keybinding",
-    "id": "DELETE",
-    "category": "LOAD_DELETE_CANCEL",
-    "name": "Delete",
-    "bindings": [ { "input_method": "keyboard", "key": "D" } ]
-  },
-  {
-    "type": "keybinding",
-    "id": "CANCEL",
-    "category": "LOAD_DELETE_CANCEL",
-    "name": "Cancel",
-    "bindings": [ { "input_method": "keyboard", "key": "C" } ]
   },
   {
     "type": "keybinding",

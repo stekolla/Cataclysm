@@ -2317,8 +2317,6 @@ bool ignore_action_for_quick_shortcuts( const std::string &action )
              || action == "MOVE_SINGLE_ITEM" // maps to ENTER
              || action == "MOVE_ARMOR" // maps to ENTER
              || action == "ANY_INPUT"
-             || action ==
-             "DELETE_TEMPLATE" // strictly we shouldn't have this one, but I don't like seeing the "d" on the main menu by default. :)
            );
 }
 

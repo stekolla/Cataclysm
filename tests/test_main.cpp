@@ -38,8 +38,9 @@
 #include "output.h"
 #include "overmap/overmap_special.h"
 #include "path_info.h"
-#include "pldata.h"
+#include "profession.h"
 #include "rng.h"
+#include "scenario.h"
 #include "state_helpers.h"
 #include "string_formatter.h"
 #include "string_utils.h"
@@ -208,9 +209,6 @@ static void init_global_game_state(
         assert(!"Unable to make save directory.  Check permissions.");
     }
 
-    if (!assure_dir_exist(PATH_INFO::templatedir())) {
-        assert(!"Unable to make templates directory.  Check permissions.");
-    }
 
     if (!init_locale()) { DebugLog(DL::Error, DC::Main) << "Failed to initialize process locale."; }
 
@@ -250,7 +248,16 @@ static void init_global_game_state(
     init::load_world_modfiles(ui, g->get_active_world(), SAVE_ARTIFACTS);
 
     g->u = avatar();
-    g->u.create(character_type::NOW);
+    g->u.name = "Test Avatar";
+    g->scen = scenario::generic();
+    g->u.prof = profession::generic();
+    g->u.str_max = 8;
+    g->u.dex_max = 8;
+    g->u.int_max = 8;
+    g->u.per_max = 8;
+    g->u.set_body();
+    g->u.recalc_hp();
+    g->u.reset_stats();
 
     g->m = map();
     disable_mapgen = true;

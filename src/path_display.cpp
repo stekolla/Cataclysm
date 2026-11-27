@@ -49,7 +49,6 @@ auto user_directory() -> std::string
         { _( "user graphics" ), PATH_INFO::user_gfx() },
         { _( "user fonts" ), PATH_INFO::user_fontdir() },
         { _( "user memorials" ), PATH_INFO::memorialdir() },
-        { _( "user templates" ), PATH_INFO::templatedir() },
         { _( "user graveyard" ), PATH_INFO::graveyarddir() },
     } );
 }

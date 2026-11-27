@@ -8,6 +8,34 @@
 
 #include <ostream>
 #include <string>
+#include <vector>
+
+/// Retired game modes used reserved save directories. Rediscovery must leave them on disk
+/// without making them available alongside normal worlds.
+TEST_CASE("world discovery skips retired special-mode worlds", "[world][save]") {
+    const auto original_savedir = PATH_INFO::savedir();
+    const auto test_savedir = original_savedir + "retired_modes/";
+    REQUIRE_FALSE(dir_exist(test_savedir));
+    REQUIRE(assure_dir_exist(test_savedir));
+    const auto cleanup = on_out_of_scope([&]() {
+        PATH_INFO::set_savedir(original_savedir);
+        CHECK(remove_tree(test_savedir));
+    });
+    PATH_INFO::set_savedir(test_savedir);
+
+    for (const auto* name : {"TUTORIAL", "DEFENSE", "normal_world"}) {
+        auto info = WORLDINFO{};
+        info.world_name = name;
+        info.active_mod_order = {mod_id("test_data")};
+        REQUIRE(info.save());
+    }
+
+    auto factory = worldfactory{};
+    factory.init();
+    CHECK(factory.all_worldnames() == std::vector<std::string>{"normal_world"});
+    CHECK(file_exist(test_savedir + "TUTORIAL/" + PATH_INFO::worldoptions()));
+    CHECK(file_exist(test_savedir + "DEFENSE/" + PATH_INFO::worldoptions()));
+}
 
 TEST_CASE(
     "world reset preserves the save format without retaining saved data",

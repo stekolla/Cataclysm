@@ -4545,24 +4545,6 @@ bool mattack::ratking( monster *z )
     return true;
 }
 
-bool mattack::generator( monster *z )
-{
-    sound_event se;
-    se.origin = z->bub_pos();
-    se.volume = 90;
-    se.category = sounds::sound_t::activity;
-    se.description = "hmmmm";
-    se.from_monster = true;
-    se.monfaction = z->faction.id();
-    se.faction = faction_id( "no_faction" );
-    sounds::sound( se );
-    if( action_time_scale::once_every_this_tick( 1_minutes ) && z->get_hp() < z->get_hp_max() ) {
-        z->heal( 1 );
-    }
-
-    return true;
-}
-
 bool mattack::upgrade( monster *z )
 {
     std::vector<monster *> targets;

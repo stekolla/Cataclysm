@@ -132,7 +132,6 @@ building_gen_pointer get_mapgen_cfunction(const std::string& ident) {
         {"sewer_tee", &mapgen_sewer},
         {"sewer_four_way", &mapgen_sewer},
 
-        {"tutorial", &mapgen_tutorial},
         {"lake_shore", &mapgen_lake_shore},
         {"pd_border", &mapgen_pd_border},
     }};
@@ -1875,55 +1874,6 @@ void mapgen_hellmouth(mapgendata& dat) {
                 }
             }
             break;
-    }
-}
-
-void mapgen_tutorial(mapgendata& dat) {
-    mapgen_constructor* const m = &dat.m;
-    for (int i = 0; i < SEEX * 2; i++) {
-        for (int j = 0; j < SEEY * 2; j++) {
-            if (j == 0 || j == SEEY * 2 - 1) {
-                m->ter_set(point_omt_ms(i, j), t_wall);
-            } else if (i == 0 || i == SEEX * 2 - 1) {
-                m->ter_set(point_omt_ms(i, j), t_wall);
-            } else if (j == SEEY) {
-                if (i % 4 == 2) {
-                    m->ter_set(point_omt_ms(i, j), t_door_c);
-                } else if (i % 5 == 3) {
-                    m->ter_set(point_omt_ms(i, j), t_window_domestic);
-                } else {
-                    m->ter_set(point_omt_ms(i, j), t_wall);
-                }
-            } else {
-                m->ter_set(point_omt_ms(i, j), t_floor);
-            }
-        }
-    }
-    m->furn_set(point_omt_ms(7, SEEY * 2 - 4), f_rack);
-    m->place_gas_pump(point_omt_ms(SEEX * 2 - 2, SEEY * 2 - 4), rng(500, 1000));
-    if (dat.zlevel() < 0) {
-        m->ter_set(point_omt_ms(SEEX - 2, SEEY + 2), t_stairs_up);
-        m->ter_set(point_omt_ms(2, 2), t_water_sh);
-        m->ter_set(point_omt_ms(2, 3), t_water_sh);
-        m->ter_set(point_omt_ms(3, 2), t_water_sh);
-        m->ter_set(point_omt_ms(3, 3), t_water_sh);
-    } else {
-        m->spawn_item(point_omt_ms(5, SEEY + 1), itype_id("helmet_bike"));
-        m->spawn_item(point_omt_ms(4, SEEY + 1), itype_id("backpack"));
-        m->spawn_item(point_omt_ms(3, SEEY + 1), itype_id("pants_cargo"));
-        m->spawn_item(point_omt_ms(7, SEEY * 2 - 4), itype_id("machete"));
-        m->spawn_item(point_omt_ms(7, SEEY * 2 - 4), itype_id("9mm"));
-        m->spawn_item(point_omt_ms(7, SEEY * 2 - 4), itype_id("9mmP"));
-        m->spawn_item(point_omt_ms(7, SEEY * 2 - 4), itype_id("uzi"));
-        m->spawn_item(point_omt_ms(7, SEEY * 2 - 4), itype_id("uzimag"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 2, SEEY + 5), itype_id("bubblewrap"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 2, SEEY + 6), itype_id("grenade"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 3, SEEY + 6), itype_id("flashlight"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 3, SEEY + 6), itype_id("light_disposable_cell"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 2, SEEY + 7), itype_id("cig"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 2, SEEY + 7), itype_id("codeine"));
-        m->spawn_item(point_omt_ms(SEEX * 2 - 3, SEEY + 7), itype_id("water"));
-        m->ter_set(point_omt_ms(SEEX - 2, SEEY + 2), t_stairs_down);
     }
 }
 

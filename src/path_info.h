@@ -41,7 +41,6 @@ std::string shaders();
 std::string distraction();
 std::string savedir();
 std::string sokoban();
-std::string templatedir();
 std::string user_dir();
 std::string user_keybindings();
 std::string user_moddir();

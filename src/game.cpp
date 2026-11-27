@@ -65,7 +65,6 @@
 #include "game_constants.h"
 #include "game_inventory.h"
 #include "game_ui.h"
-#include "gamemode.h"
 #include "gates.h"
 #include "harvest.h"
 #include "help.h"
@@ -760,15 +759,6 @@ void game::setup( bool load_world_modfiles )
     // back to menu for save loading, new game etc
 }
 
-bool game::has_gametype() const
-{
-    return gamemode && gamemode->id() != special_game_type::NONE;
-}
-
-special_game_type game::gametype() const
-{
-    return gamemode ? gamemode->id() : special_game_type::NONE;
-}
 
 auto game::release_active_load_regions() -> void
 {
@@ -1025,9 +1015,6 @@ auto game::suggest_auto_walk_to_stairs( Character &u, map &m, const std::string 
 // Set up all default values for a new game
 bool game::start_game()
 {
-    if( !gamemode ) {
-        gamemode = std::make_unique<special_game>();
-    }
 
     seed = rng_bits();
     new_game = true;
@@ -1907,9 +1894,6 @@ bool game::cleanup_at_end()
             }
             popup( _( "World retained.  Characters remaining:%s" ), tmpmessage );
         }
-        if( gamemode ) {
-            gamemode = std::make_unique<special_game>(); // null gamemode or something..
-        }
         browser_storage::flush_with_feedback();
     }
 
@@ -2167,10 +2151,6 @@ bool game::do_turn()
         if( new_game ) {
             new_game = false;
         } else {
-            if( !gamemode ) {
-                gamemode = std::make_unique<special_game>();
-            }
-            gamemode->per_turn();
             advance_time_action_tick();
         }
     }
@@ -2894,10 +2874,6 @@ auto game::execute_activity_fixed_window_skip( const time_duration &duration ) -
             break;
         }
 
-        if( !gamemode ) {
-            gamemode = std::make_unique<special_game>();
-        }
-        gamemode->per_turn();
         skipped_turns += advance_time_action_tick();
         swapping_dimensions = false;
         weather.clear_temp_cache();
@@ -4039,7 +4015,6 @@ bool game::is_game_over()
 
 void game::death_screen()
 {
-    gamemode->game_over();
     Messages::display_messages();
     u.get_avatar_diary()->death_entry();
     show_scores_ui( *achievements_tracker_ptr, stats(), get_kill_tracker() );
@@ -4286,9 +4261,6 @@ bool game::load( const save_t &name )
     // recalculated. (This would be cleaner if u.worn were private.)
     u.recalc_sight_limits();
 
-    if( !gamemode ) {
-        gamemode = std::make_unique<special_game>();
-    }
 
     safe_mode = get_option<bool>( "SAFEMODE" ) ? SAFE_MODE_ON : SAFE_MODE_OFF;
     manual_combat_mode = false;
