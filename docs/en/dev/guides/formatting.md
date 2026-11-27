@@ -13,17 +13,6 @@ This guide explains how to format and lint code in Cataclysm.
 | Markdown        | dprint              | `build-scripts/fmt.sh docs`  |
 | Lua             | dprint              | `build-scripts/fmt.sh lua`   |
 
-## Automated Formatting
-
-Pull requests are automatically formatted by [autofix.ci](https://autofix.ci). If your code has
-style violations, a commit will be pushed to fix them.
-
-> [!TIP]
-> To avoid merge conflicts after autofix commits, either:
->
-> 1. Run `git pull` to merge the autofix commit, then continue working
-> 2. Format locally before pushing, then `git push --force` if needed
-
 ## C++ Formatting
 
 Top-level `src/*.cpp` and `src/*.h` files use [astyle](http://astyle.sourceforge.net/). Most other C++ files use [clang-format](https://clang.llvm.org/docs/ClangFormat.html). Formatter fixtures are left unchanged.
