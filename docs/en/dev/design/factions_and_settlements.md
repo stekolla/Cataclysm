@@ -77,7 +77,7 @@ These are design directions to validate against actual gameplay, not claims that
 | Tacoma Commune | Agricultural town and growing residential community | Food production, settlement facilities, local services, useful base of operations |
 | Lumberyard | Timber production and processing | Reliable bulk lumber, logs, and specialist wood products |
 | Scrap yard | Salvage and materials recovery | Scrap metal, specialty metals, and industrial materials |
-| Cabin chemist | Specialized chemical production | Medicines, disinfectants, fungicides, and industrial chemicals |
+| Cabin chemist | Independent laboratory and specialist merchant | Chemical and medical supplies, laboratory equipment, and expeditions that introduce mutation research |
 | Old Guard | Regional security and military coordination | Security assistance, intelligence, military operations and access |
 
 Other factions, including Isherwood Farm and Hub 01, need their own design briefs before their roles are finalized.

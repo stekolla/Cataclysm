@@ -695,23 +695,42 @@
     "type": "talk_topic",
     "responses": [
       {
-        "text": "Are you interested in any chemical supplies?",
-        "topic": "TALK_EVAC_MERCHANT_DEAL_NEGOTIATE_CHEM",
-        "condition": { "u_has_mission": "MISSION_CABIN_CHEMIST_SET_TRADE_ROUTE" }
+        "text": "Know anyone who deals in chemicals or laboratory equipment?",
+        "topic": "TALK_EVAC_MERCHANT_CABIN_CHEMIST",
+        "condition": { "not": { "u_has_var": "cabin_chemist_lead", "value": "yes" } }
       }
     ]
   },
   {
-    "id": "TALK_EVAC_MERCHANT_DEAL_NEGOTIATE_CHEM",
     "type": "talk_topic",
-    "dynamic_line": [ "Chemicals?  I'm sure we could find some use for them, and we are in need of medical supplies.  What's the offer?" ],
+    "id": "TALK_EVAC_MERCHANT_CABIN_CHEMIST",
+    "dynamic_line": "I heard there's a chemist working out of a cabin in the woods.  They trade in lab supplies and medicine.  Want me to mark the cabin on your map?",
     "responses": [
       {
-        "text": "Well, how about 300 merch for 10 liters of…",
-        "effect": { "u_buy_item": "trade_writ_chemist" },
-        "topic": "TALK_DONE"
-      }
+        "text": "Yes, mark it on my map.",
+        "topic": "TALK_EVAC_MERCHANT",
+        "effect": [ { "assign_mission": "MISSION_VISIT_CABIN_CHEMIST" }, { "u_add_var": "cabin_chemist_lead", "value": "yes" } ]
+      },
+      { "text": "Not right now.", "topic": "TALK_NONE" }
     ]
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_VISIT_CABIN_CHEMIST",
+    "name": "Visit the Cabin Chemist",
+    "description": "Visit the occupied chemistry lab Owen Mercer marked on your map.  The chemist trades in laboratory and medical supplies.",
+    "goal": "MGOAL_GO_TO_TYPE",
+    "destination": "chemical_lab_ocu",
+    "difficulty": 1,
+    "value": 0,
+    "start": {
+      "assign_mission_target": {
+        "om_terrain": "chemical_lab_ocu",
+        "om_special": "Occupied Chem Lab",
+        "om_terrain_match_type": "TYPE",
+        "reveal_radius": 1
+      }
+    }
   },
   {
     "type": "talk_topic",

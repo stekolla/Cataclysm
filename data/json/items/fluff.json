@@ -1,20 +1,5 @@
 [
   {
-    "id": "trade_writ_chemist",
-    "type": "GENERIC",
-    "name": { "str": "writ of trade (chemist)", "str_pl": "writs of trade (chemist)" },
-    "description": "A few sheets of paper from the chemist living out in the wilderness listing some of the chemicals they're capable of making.",
-    "weight": "1 g",
-    "volume": "5 ml",
-    "price": "30 USD",
-    "price_postapoc": "50 cent",
-    "bashing": 1,
-    "material": [ "paper" ],
-    "symbol": "?",
-    "looks_like": "mag_glam",
-    "color": "light_cyan"
-  },
-  {
     "id": "trade_writ_scrap",
     "type": "GENERIC",
     "name": { "str": "writ of trade (scrap)", "str_pl": "writs of trade (scrap)" },

@@ -109,6 +109,39 @@ TEST_CASE("scrap_trader_recovers_railgun_once", "[npc][mission][dialogue]") {
     CHECK(trader.chatbin.missions.empty());
 }
 
+/// Run the chemist's scripted rewards against a real avatar and verify the delivered doses.
+TEST_CASE("cabin_chemist_mission_rewards", "[npc][mission][dialogue]") {
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto& chemist = spawn_npc(player.bub_pos() + point(5, 0), "NPC_cabin_chemist");
+    const auto& jobs = chemist.chatbin.missions;
+    REQUIRE(jobs.size() == 1);
+    auto* kit = jobs.front();
+    const auto records_id = kit->get_follow_up();
+    REQUIRE(records_id == mission_type_id("MISSION_CABIN_CHEMIST_STRANGE_RESEARCH"));
+    auto* records = mission::reserve_new(records_id, chemist.getID());
+    const auto alpha_id = records->get_follow_up();
+    REQUIRE(alpha_id == mission_type_id("MISSION_CABIN_CHEMIST_ALPHA_PROJECT"));
+    auto* alpha = mission::reserve_new(alpha_id, chemist.getID());
+
+    kit->get_type().end(kit);
+    CHECK(player.charges_of(itype_id("FMCNote")) == 10);
+    records->get_type().end(records);
+    CHECK(player.charges_of(itype_id("mutagen")) == 1);
+    CHECK(player.charges_of(itype_id("purifier")) == 1);
+    alpha->get_type().end(alpha);
+    const auto serums = player.items_with(
+        [](const auto& it) { return it.typeId() == itype_id("iv_mutagen_alpha"); });
+    REQUIRE(serums.size() == 2);
+    CHECK(player.charges_of(itype_id("iv_mutagen_alpha")) == 2);
+}
+
 /// Check the manager's three linked jobs and the exact turn-in thresholds for their materials.
 TEST_CASE("lumbermill_mission_progression", "[npc][mission][dialogue]") {
     clear_all_state();

@@ -372,11 +372,20 @@
   {
     "type": "item_group",
     "id": "cabin_chemist_sell",
-    "items": [
-      { "group": "chem_lab", "prob": 100 },
-      { "group": "harddrugs", "prob": 70 },
-      { "group": "tools_medical", "prob": 80 },
-      { "group": "SUS_chemistry_bookcase", "prob": 10 }
+    "subtype": "collection",
+    "entries": [
+      { "item": "bandages", "charges": [ 4, 8 ] },
+      { "item": "disinfectant", "charges": [ 6, 12 ] },
+      { "item": "aspirin", "charges": [ 6, 12 ] },
+      { "item": "ammonia", "charges": [ 8, 16 ] },
+      { "item": "bleach", "charges": [ 4, 8 ] },
+      { "item": "bottle_glass", "count": [ 2, 4 ] },
+      { "item": "iodine", "prob": 55 },
+      { "item": "syringe", "prob": 50 },
+      { "item": "hotplate", "prob": 35 },
+      { "item": "textbook_chemistry", "prob": 25 },
+      { "item": "chemistry_set", "prob": 10 },
+      { "item": "adv_chemistry", "prob": 8 }
     ]
   },
   {

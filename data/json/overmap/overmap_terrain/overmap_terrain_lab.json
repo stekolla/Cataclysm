@@ -684,7 +684,7 @@
   {
     "type": "overmap_terrain",
     "id": [ "chemical_lab_ocu", "chemical_lab_roof_ocu" ],
-    "name": "small cabin",
+    "name": "occupied chemistry lab",
     "sym": "C",
     "color": "i_green",
     "flags": [ "SOURCE_CONSTRUCTION", "SOURCE_FABRICATION", "SOURCE_PEOPLE" ]

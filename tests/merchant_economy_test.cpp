@@ -85,6 +85,34 @@ TEST_CASE("curated_stock_does_not_slow_shopkeepers", "[npc][trade][merchant]") {
     CHECK(manager.get_speed() < stocked_speed);
 }
 
+/// Quote the chemist's staple stock and specialty purchases before and after depletion.
+TEST_CASE("cabin_chemist_specialty_trade_and_restock", "[npc][trade][pricing][merchant]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto fixture = merchant_test("NPC_cabin_chemist");
+    auto& [chemist, player] = fixture;
+    calendar::turn += 1_days;
+    give(player, item::spawn("analytical_set_basic"));
+    give(player, item::spawn("9mm"));
+
+    const auto check_stock = [&] {
+        const auto state = fixture.quotes();
+        CHECK(quote_for(state.theirs, "bandages", 4) > 0);
+        CHECK(quote_for(state.yours, "analytical_set_basic") == 600);
+        CHECK(line_for(state.yours, "9mm") == state.yours.end());
+        CHECK(line_for(state.theirs, "iv_mutagen_alpha") == state.theirs.end());
+    };
+    check_stock();
+    for (auto cycle = 0; cycle < 2; ++cycle) {
+        chemist.shop_restock();
+        chemist.inv_clear();
+        auto depleted = fixture.quotes();
+        CHECK(line_for(depleted.theirs, "bandages") == depleted.theirs.end());
+        calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+        chemist.shop_restock();
+        check_stock();
+    }
+}
+
 /// Check that the scrapper buys salvage and restocks basic goods without selling the quest reward.
 TEST_CASE("scrap_trader_salvage_stock", "[npc][trade][pricing][merchant]") {
     const auto restore_turn = restore_on_out_of_scope(calendar::turn);
