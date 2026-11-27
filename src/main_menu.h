@@ -24,13 +24,10 @@ class main_menu
         std::vector<std::string> mmenu_title;
         std::vector<std::string> vMenuItems;
         std::vector<std::string> vWorldSubItems;
-        std::vector<std::string> vNewGameSubItems;
-        std::vector<std::string> vNewGameHints;
         std::vector<char> vWorldHotkeys;
         std::vector<std::string> vSettingsSubItems;
         std::vector< std::vector<std::string> > vSettingsHotkeys;
         std::vector< std::vector<std::string> > vMenuHotkeys; // hotkeys for the vMenuItems
-        std::vector< std::vector<std::string> > vNewGameHotkeys;
         std::string vdaytip; //tip of the day
 
         /**
@@ -51,8 +48,9 @@ class main_menu
         // Tab functions. They return whether a game was started or not. The ones that can never
         // start a game have a void return type.
         bool new_character_tab();
-        bool load_character_tab( const std::string &worldname );
-        void world_tab( const std::string &worldname );
+        auto load_character_tab() -> bool;
+        auto world_tab() -> void;
+        auto manage_world( const std::string &worldname ) -> void;
 
         // These variables are shared between @opening_screen and the tab functions.
         // TODO: But this is an ugly short-term solution.
@@ -63,7 +61,6 @@ class main_menu
         catacurses::window w_open;
         point menu_offset;
         int extra_w = 0;
-        std::vector<save_t> savegames;
         std::vector<std::pair<inclusive_rectangle<point>, std::pair<int, int>>> main_menu_sub_button_map;
         std::vector<std::pair<inclusive_rectangle<point>, int>> main_menu_button_map;
 

@@ -1806,18 +1806,18 @@ void options_manager::add_options_interface()
     add( "USE_CELSIUS", interface, translate_marker( "Temperature units" ),
          translate_marker( "Switch between Celsius, Fahrenheit and Kelvin." ),
     { { "celsius", translate_marker( "Celsius" ) }, { "fahrenheit", translate_marker( "Fahrenheit" ) }, { "kelvin", translate_marker( "Kelvin" ) } },
-    "celsius"
+    "fahrenheit"
        );
 
     add( "USE_METRIC_SPEEDS", interface, translate_marker( "Speed units" ),
          translate_marker( "Switch between km/h, mph and tiles/turn." ),
     { { "km/h", translate_marker( "km/h" ) }, { "mph", translate_marker( "mph" ) }, { "t/t", translate_marker( "tiles/turn" ) } },
-    "km/h"
+    "mph"
        );
 
     add( "USE_METRIC_WEIGHTS", interface, translate_marker( "Mass units" ),
          translate_marker( "Switch between kg and lbs." ),
-    {  { "kg", translate_marker( "kg" ) }, { "lbs", translate_marker( "lbs" ) } }, "kg"
+    {  { "kg", translate_marker( "kg" ) }, { "lbs", translate_marker( "lbs" ) } }, "lbs"
        );
 
     add( "VOLUME_UNITS", interface, translate_marker( "Volume units" ),
@@ -3695,7 +3695,7 @@ std::string options_manager::show( bool ingame, const bool world_options_only,
         werase( w_options );
 
         if( world_options_only ) {
-            worldfactory::draw_worldgen_tabs( w_options_border, 1 );
+            worldfactory::draw_worldgen_tabs( w_options_border, 0 );
         }
 
         draw_borders_external( w_options_border, iTooltipHeight + 1 + iWorldOffset, vert_lines,

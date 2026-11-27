@@ -85,8 +85,6 @@ class worldfactory
         std::string pick_random_name();
         int show_worldgen_tab_options( const catacurses::window &win, WORLDINFO *world,
                                        const std::function<bool()> &on_quit );
-        int show_worldgen_tab_modselection( const catacurses::window &win, WORLDINFO *world,
-                                            const std::function<bool()> &on_quit );
         int show_worldgen_tab_confirm( const catacurses::window &win, WORLDINFO *world,
                                        const std::function<bool()> &on_quit );
 

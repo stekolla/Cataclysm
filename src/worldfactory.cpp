@@ -52,7 +52,6 @@ worldfactory::worldfactory()
     , mman_ui( *mman )
 {
     // prepare tab display order
-    tabs.emplace_back( std::bind( &worldfactory::show_worldgen_tab_modselection, this, _1, _2, _3 ) );
     tabs.emplace_back( std::bind( &worldfactory::show_worldgen_tab_options, this, _1, _2, _3 ) );
     tabs.emplace_back( std::bind( &worldfactory::show_worldgen_tab_confirm, this, _1, _2, _3 ) );
 }
@@ -485,10 +484,7 @@ int worldfactory::show_worldgen_tab_options( const catacurses::window &, WORLDIN
     get_options().set_world_options( &world->WORLD_OPTIONS );
     const std::string action = get_options().show( false, true, on_quit );
     get_options().set_world_options( nullptr );
-    if( action == "PREV_TAB" ) {
-        return -1;
-
-    } else if( action == "NEXT_TAB" ) {
+    if( action == "NEXT_TAB" ) {
         return 1;
 
     } else if( action == "QUIT" ) {
@@ -723,12 +719,6 @@ void worldfactory::edit_active_world_mods( WORLDINFO *world )
         world->active_mod_order = new_mod_order;
         world->save();
     }
-}
-
-int worldfactory::show_worldgen_tab_modselection( const catacurses::window &win, WORLDINFO *world,
-        const std::function<bool()> &on_quit )
-{
-    return show_modselection_window( win, world->active_mod_order, on_quit, on_quit, false );
 }
 
 int worldfactory::show_modselection_window( const catacurses::window &win,
@@ -1258,7 +1248,7 @@ int worldfactory::show_worldgen_tab_confirm( const catacurses::window &win, WORL
     ime_sentry sentry( ime_sentry::keep );
 
     ui.on_redraw( [&]( const ui_adaptor & ) {
-        draw_worldgen_tabs( win, 2 );
+        draw_worldgen_tabs( win, 1 );
         wnoutrefresh( win );
 
         werase( w_confirmation );
@@ -1422,7 +1412,6 @@ void worldfactory::draw_worldgen_tabs( const catacurses::window &w, size_t curre
     werase( w );
 
     static const std::vector<std::string> tab_strings = { {
-            translate_marker( "World Mods" ),
             translate_marker( "World Options" ),
             translate_marker( "Finalize World" )
         }
