@@ -5,6 +5,9 @@ one. Start with what the player can do there. Factions should make the world fee
 and worth exploring, offering ways to trade, learn, build, and form relationships without
 turning the survival sandbox into a mandatory tour of quest hubs.
 
+For project-wide direction and working roles for specific locations, see
+[Factions, Settlements, and Regional Recovery](../../../dev/design/factions_and_settlements.md).
+
 ## Separate the organization, the place, and the people
 
 A **faction** is an organization or community with shared interests, capabilities, and

@@ -15,6 +15,7 @@ Start with the [development workflow](../contribute/contributing.md#quickstart) 
 
 ## Change game content
 
+- [Regional recovery and faction roles](design/factions_and_settlements.md)
 - [Start a JSON or Lua mod](../mod/index.md)
 - [Design NPC dialogue and quests](../mod/json/guides/dialogue_and_quest_design.md)
 - [Work with items](guides/items.md)
