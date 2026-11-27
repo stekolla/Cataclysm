@@ -56,19 +56,20 @@ jobs:
       - name: Build shared Linux build and test image
         run: docker build --tag cataclysm-bn-build-env:emsdk-6.0.8 --file docker/Dockerfile docker/
 
+      - name: Check build directory isolation
+        run: bash build-scripts/test-run-docker.sh
+
       - name: Run native test-only suite
         if: inputs.run-native-tests
-        run: |
-          bash build-scripts/run-docker.sh bash -lc 'set -euo pipefail; cmake --preset linux-tests; cmake --build --preset linux-tests --parallel 2; ctest --test-dir out/build/linux-tests --output-on-failure'
+        run: ./test fast
 
       - name: Configure and build browser game and tests
-        run: |
-          bash build-scripts/run-docker.sh bash -lc 'set -euo pipefail; cmake --preset wasm-tests; cmake --build --preset wasm-tests --parallel 2; ctest --test-dir out/build/wasm-tests --output-on-failure'
+        run: ./test wasm
 
       - name: Package browser build
         run: |
           archive="cataclysm-web-${{ inputs.version-label }}.zip"
-          cd out/build/wasm-tests/web
+          cd out/docker-build/wasm-tests/web
           zip -qr "${GITHUB_WORKSPACE}/${archive}" . -x 'cata_test-tiles*'
           echo "archive=${archive}" >> "$GITHUB_OUTPUT"
         id: package

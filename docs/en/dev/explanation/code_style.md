@@ -1,6 +1,6 @@
 # C++ Code Style Guide
 
-All C++ code in the project is styled. Run `just fmt` before pushing, or `just fmt-cpp` for C++-only changes. The helper uses astyle only for top-level `src/*.cpp` and `src/*.h`; most other C++ files use clang-format. Formatter fixtures are left unchanged.
+All C++ code in the project is styled. Run `build-scripts/fmt.sh` before pushing, or `build-scripts/fmt.sh cpp` for C++-only changes. The helper uses astyle only for top-level `src/*.cpp` and `src/*.h`; most other C++ files use clang-format. Formatter fixtures are left unchanged.
 
 Where astyle is still used, use version 3.1. Version 3.0.1 will disagree in only a few places, while Version 3.6.6 will disagree in nearly every file.
 

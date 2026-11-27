@@ -1,5 +1,5 @@
 > **Unstable documentation.**
->
+
 # JSON Style Guide
 
 Like in [C++ Code Style](../../../dev/explanation/code_style.md), the JSON styling policy is to
@@ -66,5 +66,4 @@ the `json_formatter` icon.
 
 ### On *nix
 
-Run `just fmt-json` in the repository root. If `just` is unavailable, run
-`build-scripts/format-json.sh` instead.
+Run `build-scripts/fmt.sh json` in the repository root.

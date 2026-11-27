@@ -4,7 +4,7 @@ set -euo pipefail
 cata_repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${cata_repo_root}"
 
-mkdir -p out/docker-cache
+mkdir -p out/docker-build out/docker-cache
 export CATA_UID="$(id -u)"
 export CATA_GID="$(id -g)"
 
@@ -19,6 +19,7 @@ cata_docker_args=(
     --init
     --user "${CATA_UID}:${CATA_GID}"
     --volume "${cata_repo_root}:/workspace"
+    --volume "${cata_repo_root}/out/docker-build:/workspace/out/build"
     --volume "${cata_repo_root}/out/docker-cache:/tmp/cata-cache"
     --volume "${cata_repo_root}/out/docker-cache/emscripten:/emsdk/upstream/emscripten/cache"
     --workdir /workspace

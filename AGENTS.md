@@ -1,6 +1,6 @@
 # Cataclysm - Agent Guidelines
 
-Read `docs/` and `justfile` first. Large legacy codebase: search for an existing solution before writing one.
+Read `docs/` first. Large legacy codebase: search for an existing solution before writing one.
 
 ## C++ Conventions (NEVER VIOLATE)
 
@@ -45,7 +45,7 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 - Modern C++23. Keep unused parameter names as comments: `bool /*is_avatar*/`.
 - Avoid modifying headers with >10 usages (SHOULD NOT); add a new header with pure functions.
 - New files go in a subdirectory so clang-format covers them.
-- After you move code into a subdirectory, run `just fmt-return <paths>` and `just fmt-auto <paths>` on the moved files.
+- After you move code into a subdirectory, run `build-scripts/format-trailing-return.sh <paths>` and `TIDY_CHECK=modernize-use-auto build-scripts/format-trailing-return.sh <paths>` on the moved files.
 - Check matcher semantics before using string prefixes: `OtMatchType.PREFIX` / `is_ot_match` take the base token without trailing `_` (`"robofachq"`); the matcher itself requires the `_`.
 - Bug fixes keep requested behavior and visible content; fix the cause instead of disabling the feature, unless the user asks to remove it.
 
@@ -58,14 +58,12 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 ## Workflow
 
 1. Issue link: fetch it with `gh`, then `git gtr new <type>/<issue-id>/<slug>` (`feat`, `fix`, `refactor`, `chore`, `build`, `ci`).
-2. Format touched files before building or testing (`just fmt-cpp <files>`, `just fmt-json <files>`, `deno fmt`, `deno task dprint fmt`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
+2. Format touched files before building or testing (`build-scripts/fmt.sh cpp <files>`, `build-scripts/fmt.sh json <files>`, `deno fmt`, `deno task dprint fmt`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
 3. Build the browser game and the test routes in the host-architecture Docker environment. The
    native runner is for non-graphical tests on Linux; it does not build the game. Tests that need
    video or GPU initialization use the `[wasm]` tag and run through the browser route.
    ```sh
-   just docker-test-fast
-   just docker-test-wasm
-   just docker-build-wasm
+   ./test all
    ```
    For Emscripten, match the setjmp/longjmp implementation of C dependencies to the game's C++ exception mode.
    With native Wasm exceptions, select FreeType's `freetype-legacysjlj` port archive.
@@ -73,8 +71,8 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    Keep unsaved moves available for a manual retry after failed autosaves, and rate-limit automatic retries.
 4. Add/update Catch2 tests in `tests/` and run native, browser, and data checks:
    ```sh
-   just docker-test-fast
-   just docker-test-wasm
+   ./test
+   ./test wasm
    ./build-scripts/lint-json.sh
    ```
    UI regression tests follow the production refresh path; do not prepare layout or paging manually.

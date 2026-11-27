@@ -381,7 +381,7 @@ matching opposite); These editors will also respect escaped characters properly.
 [Notepad++](https://notepad-plus-plus.org/) is a popular, free editor on Windows that contains this
 feature. On Linux, there are a plethora of options, and you probably already have a preferred one 🙂
 
-To format JSON files in a working copy, use `just fmt-json`. See the
+To format JSON files in a working copy, use `build-scripts/fmt.sh json`. See the
 [formatting guide](../../../dev/guides/formatting.md) for details.
 
 ## Addendum

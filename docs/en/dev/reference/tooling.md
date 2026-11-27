@@ -10,9 +10,9 @@ Use the repository helpers so each file goes through the right formatter.
 ### Invoking C++ formatting
 
 ```sh
-just fmt
+build-scripts/fmt.sh
 # or, for C++ only
-just fmt-cpp
+build-scripts/fmt.sh cpp
 ```
 
 ### Invoking C++ formatting through CMake
@@ -28,7 +28,7 @@ cmake --build <build-dir> --target format
 Install the optional hook with:
 
 ```sh
-just hooks-setup
+prek install
 ```
 
 ## JSON style

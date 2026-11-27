@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if (( $# > 0 )); then
+    echo "usage: ./play" >&2
+    exit 2
+fi
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export CATA_DOCKER_PUBLISH=1
+
+exec bash "$repo_root/build-scripts/run-docker.sh" bash -lc '
+    set -euo pipefail
+    cmake --preset wasm-tiles
+    cmake --build --preset wasm-tiles --parallel 2
+    echo "Open http://127.0.0.1:8000/cataclysm-bn-tiles.html"
+    exec python3 -m http.server 8000 --bind 0.0.0.0 --directory out/build/wasm-tiles/web
+'

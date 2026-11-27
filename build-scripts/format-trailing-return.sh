@@ -5,11 +5,11 @@ repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
 if (( $# == 0 )); then
-    echo "usage: just fmt-return|fmt-auto <files or dirs>" >&2
+    echo "usage: build-scripts/format-trailing-return.sh <files or dirs>" >&2
     exit 2
 fi
 
-# fmt-auto sets TIDY_CHECK=modernize-use-auto.
+# Set TIDY_CHECK=modernize-use-auto to use the auto check instead.
 check="${TIDY_CHECK:-modernize-use-trailing-return-type}"
 
 for tool in clang-tidy clang-apply-replacements; do

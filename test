@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+run_tests() {
+    bash "$repo_root/build-scripts/run-docker.sh" bash -lc '
+        set -euo pipefail
+        cmake --preset "$1"
+        cmake --build --preset "$1" --parallel 2
+        ctest --test-dir "out/build/$1" --output-on-failure
+    ' _ "$1"
+}
+
+if (( $# > 1 )); then
+    echo "usage: ./test [fast|wasm|all]" >&2
+    exit 2
+fi
+
+case "${1:-fast}" in
+    fast) run_tests linux-tests ;;
+    wasm) run_tests wasm-tests ;;
+    all)
+        run_tests linux-tests
+        run_tests wasm-tests
+        ;;
+    *)
+        echo "usage: ./test [fast|wasm|all]" >&2
+        exit 2
+        ;;
+esac

@@ -86,7 +86,7 @@ jobs:
 
             <details><summary>I do not want the automated commit</summary>
 
-            1. Run `just fmt` locally, then commit the formatted files.
+            1. Run `build-scripts/fmt.sh` locally, then commit the formatted files.
             2. Run `git push --force` to force push your branch. This will overwrite the automated commit on remote with your local one.
             3. Continue working.
 

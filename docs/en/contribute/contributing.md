@@ -51,7 +51,7 @@ There are a couple of guidelines we suggest sticking to:
 
 ### C++
 
-C++ style is enforced by the repository formatter helpers. Run `just fmt` before committing; see
+C++ style is enforced by the repository formatter helpers. Run `build-scripts/fmt.sh` before committing; see
 [CODE_STYLE](../dev/explanation/code_style.md) for details.
 
 ### JSON
@@ -385,7 +385,7 @@ runs the selection excluding `[slow]` and `[wasm]` tests. The tests run in one p
 route can still take a while:
 
 ```sh
-$ just docker-test-fast
+$ ./test
 ```
 
 Tests that require video or GPU initialization use the `[wasm]` tag and run in the browser suite.
@@ -393,7 +393,7 @@ Docker builds the Emscripten target and runs it in headless Chromium with a fixe
 compute:
 
 ```sh
-$ just docker-test-wasm
+$ ./test wasm
 ```
 
 See the [testing guide](../dev/guides/testing.md) for details.

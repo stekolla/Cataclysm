@@ -6,74 +6,63 @@ Linux test toolchain, Deno, and headless Chromium.
 
 ## Requirements
 
-- Docker Desktop or Docker Engine
-- [just](https://just.systems/) to run the repository's build recipes
+- Docker Desktop or Docker Engine, running
+- A desktop browser with WebAssembly JavaScript Promise Integration (JSPI)
 
 Run commands from the repository root. Docker uses the host architecture automatically: Apple
 Silicon uses `linux/arm64`, and x86-64 systems use `linux/amd64`. Do not force a platform or use
 emulation.
 
-Each `docker-*` recipe builds the Docker image automatically if it is missing. To build it ahead
-of time, run `just docker-image`.
+The launcher builds the Docker image automatically if it is missing.
 
 ## Build and Run
 
-Build the browser game, then serve it locally:
+From the repository root, build and serve the game:
 
 ```sh
-just docker-build-wasm
-just docker-serve-wasm
+./play
 ```
 
-Open <http://127.0.0.1:8000/cataclysm-bn-tiles.html> in a desktop browser with WebAssembly JavaScript
-Promise Integration (JSPI). The build output is in `out/build/wasm-tiles/web`.
+Open <http://127.0.0.1:8000/cataclysm-bn-tiles.html> when the build finishes. Leave the command
+running while you play; press Ctrl+C to stop it. The first build can take a while, but later runs
+reuse it.
+
+On the host, the build output is in `out/docker-build/wasm-tiles/web`. Inside the container, it is
+available at `out/build/wasm-tiles/web`.
+
+Docker builds use `out/docker-build` on the host, separate from host builds in `out/build`. Existing
+builds in `out/build` are not modified; the first build in Docker's new directory starts from scratch.
 
 The browser build uses the RetroDays tileset and CPU compute. It runs in English with sound disabled.
 Use **Save and Quit** (`S`) before reloading. Saves stay in that browser profile for the same site
 address and port. Use one Cataclysm tab per site to keep saves consistent.
 
-To configure and build without the `just` recipes, run these commands inside the Docker environment:
-
-```sh
-bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tiles && cmake --build --preset wasm-tiles --parallel 2'
-CATA_DOCKER_PUBLISH=1 bash build-scripts/run-docker.sh python3 -m http.server 8000 --bind 0.0.0.0 --directory out/build/wasm-tiles/web
-```
-
-The `docker-serve-wasm` recipe publishes port 8000 from the container to the host.
-
 ## Build and Run Tests
 
-Run both test routes through Docker:
+Run the fast tests or both suites through Docker:
 
 ```sh
-just docker-test-fast
-just docker-test-wasm
+./test
+./test all
 ```
 
-`docker-test-fast` builds and runs the Linux curses test-only configuration. It does not build a
+`./test` builds and runs the Linux curses test-only configuration. It does not build a
 native game. It runs the Catch2 selection excluding hidden, `[slow]`, and `[wasm]` tests in one
 process, so the suite can still take a while.
 
-`docker-test-wasm` builds the browser game and Wasm test runner, then runs the tests in headless
+`./test wasm` builds the browser game and Wasm test runner, then runs the tests in headless
 Chromium. Mark tests that need video or GPU initialization with the `[wasm]` Catch2 tag. The browser
 runner uses a fixed random seed and CPU compute.
 Both test runners load the fixtures in `tests/data/TEST_DATA` into a temporary test user directory.
 The browser game archive does not include those fixtures.
 The Wasm test runner also embeds the ASCII and isometric tilesets used by the tile-context tests.
 
-For direct CMake commands inside Docker:
-
-```sh
-bash build-scripts/run-docker.sh bash -lc 'cmake --preset linux-tests && cmake --build --preset linux-tests --parallel 2 && ctest --test-dir out/build/linux-tests --output-on-failure'
-bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tests && cmake --build --preset wasm-tests --parallel 2 && ctest --test-dir out/build/wasm-tests --output-on-failure'
-```
-
 ## Standalone JSON Formatter
 
 The JSON formatter is repository tooling separate from the game build. Run it with:
 
 ```sh
-just fmt-json
+build-scripts/fmt.sh json
 ```
 
 This tooling-only configuration cannot build the game.

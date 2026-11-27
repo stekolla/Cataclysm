@@ -4,14 +4,14 @@ This guide explains how to format and lint code in Cataclysm.
 
 ## Quick Reference
 
-| Scope           | Tool                | Command          |
-| --------------- | ------------------- | ---------------- |
-| Staged files    | all formatters      | `just fmt`       |
-| All files       | all formatters      | `just fmt --all` |
-| C++ (`.cpp/.h`) | astyle/clang-format | `just fmt-cpp`   |
-| JSON            | json_formatter      | `just fmt-json`  |
-| Markdown/TS     | deno fmt            | `just fmt-docs`  |
-| Lua             | dprint              | `just fmt-lua`   |
+| Scope           | Tool                | Command                      |
+| --------------- | ------------------- | ---------------------------- |
+| Staged files    | all formatters      | `build-scripts/fmt.sh`       |
+| All files       | all formatters      | `build-scripts/fmt.sh --all` |
+| C++ (`.cpp/.h`) | astyle/clang-format | `build-scripts/fmt.sh cpp`   |
+| JSON            | json_formatter      | `build-scripts/fmt.sh json`  |
+| Markdown/TS     | deno fmt            | `deno fmt`                   |
+| Lua             | dprint              | `deno task dprint fmt`       |
 
 ## Automated Formatting
 
@@ -42,9 +42,9 @@ brew install astyle clang-format
 ### Using the helper
 
 ```sh
-just fmt-cpp
+build-scripts/fmt.sh cpp
 # or, for all staged file types
-just fmt
+build-scripts/fmt.sh
 ```
 
 If you already have a CMake build tree with `bash` available, `cmake --build <build-dir> --target format` calls the same C++ helper. The style configurations are in `.astylerc` and `.clang-format` at the repository root.
@@ -56,7 +56,7 @@ JSON files are formatted with `json_formatter`, a custom tool built from the pro
 ### Using the script
 
 ```sh
-just fmt-json
+build-scripts/fmt.sh json
 # or
 build-scripts/format-json.sh
 ```
@@ -114,28 +114,26 @@ Install the optional pre-commit hook with [`prek`](https://github.com/j178/prek)
 
 ```sh
 prek install
-# or
-just hooks-setup
 ```
 
-When you commit, the hook runs `just fmt`: Deno and dprint run normally, while C++ and JSON formatters
+When you commit, the hook runs `build-scripts/fmt.sh`: Deno and dprint run normally, while C++ and JSON formatters
 run only on staged created/updated files. Formatted staged files are re-added so the commit includes
 the formatted result.
 
 To run the same formatting manually against staged files:
 
 ```sh
-just fmt
+build-scripts/fmt.sh
 ```
 
 Before committing without the hook, run these checks:
 
 ```sh
 # Format staged files
-just fmt
+build-scripts/fmt.sh
 
 # Format all formattable files
-just fmt --all
+build-scripts/fmt.sh --all
 ```
 
 ## CI Integration
@@ -155,7 +153,7 @@ pushing.
 
 Use the repository helper for C++ and the Deno extension for Markdown/TypeScript:
 
-- **C++**: run `just fmt-cpp`
+- **C++**: run `build-scripts/fmt.sh cpp`
 - **Deno**: [Deno](https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno)
 
 ### Vim/Neovim
@@ -163,7 +161,7 @@ Use the repository helper for C++ and the Deno extension for Markdown/TypeScript
 Use the helper instead of calling astyle or clang-format directly:
 
 ```vim
-autocmd BufWritePre *.cpp,*.h !just fmt-cpp %
+autocmd BufWritePre *.cpp,*.h !build-scripts/fmt.sh cpp %
 autocmd BufWritePre *.md,*.ts !deno fmt %
 ```
 
@@ -201,5 +199,5 @@ build-scripts/format-cpp.sh
 Use the repository helper from the repository root so each file goes through the right formatter:
 
 ```sh
-just fmt-cpp
+build-scripts/fmt.sh cpp
 ```

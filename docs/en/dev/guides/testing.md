@@ -4,20 +4,16 @@ The test cases in `tests/` use the [Catch2 framework](https://github.com/catchor
 Linux test-only route and browser route through the repository's Docker environment:
 
 ```sh
-just docker-test-fast
-just docker-test-wasm
+./test       # Linux tests
+./test wasm  # Browser tests
+./test all   # Both
 ```
 
 The Linux route builds the curses test executable without building a native game. It runs the
 Catch2 selection that excludes `[slow]` and `[wasm]` tests in one process, so it can still take a
-while despite the `docker-test-fast` recipe name. Tests that require video or GPU initialization
+while. Tests that require video or GPU initialization
 must have the `[wasm]` tag and run through the browser route. The browser route builds the Wasm game
-and test runner, then runs the tests in headless Chromium:
-
-```sh
-bash build-scripts/run-docker.sh bash -lc 'cmake --preset linux-tests && cmake --build --preset linux-tests --parallel 2 && ctest --test-dir out/build/linux-tests --output-on-failure'
-bash build-scripts/run-docker.sh bash -lc 'cmake --preset wasm-tests && cmake --build --preset wasm-tests --parallel 2 && ctest --test-dir out/build/wasm-tests --output-on-failure'
-```
+and test runner, then runs the tests in headless Chromium.
 
 The browser runner uses a fixed random seed and CPU compute. Run
 `ctest --test-dir out/build/wasm-tests --show-only` inside the container to list its tests. See the
