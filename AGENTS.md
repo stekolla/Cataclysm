@@ -78,6 +78,8 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    UI regression tests follow the production refresh path; do not prepare layout or paging manually.
    For browser canvas changes, verify the running game's CSS size, backing pixels, and terminal size
    on resize and high-DPI displays; SDL may overwrite canvas styles during startup.
+   Mission tests that assign work must give the avatar a valid ID and restore it afterward.
+   Count stackable currency by charges when checking payments.
    Each new test needs a short `///` comment that a developer new to that code can follow: what it checks, why, and how.
 4. Commit atomically with [Conventional Commits](./docs/en/contribute/pr_title_guidelines.md); no body/footer unless critical.
 5. Follow the [PR skill](.agents/skills/pr/SKILL.md) and [PR template](.github/pull_request_template.md). Prefer ASD-STE100 Simplified Technical English. Track `gh pr checks` until done; fix branch-owned failures, rerun or report transient ones with the failing job.

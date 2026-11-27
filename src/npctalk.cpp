@@ -1959,6 +1959,55 @@ int topic_category( const talk_topic &the_topic )
     return -1; // Not grouped with other topics
 }
 
+namespace
+{
+struct bulk_sale_quote {
+    int quantity;
+    itype_id currency;
+    int payment;
+    int credit;
+    int currency_value;
+};
+
+auto quote_bulk_sale( const Character &seller, const npc &buyer,
+                      const itype_id &item_type ) -> bulk_sale_quote
+{
+    const auto by_charges = item::count_by_charges( item_type );
+    const auto quantity = by_charges ? seller.charges_of( item_type ) : seller.amount_of( item_type );
+    auto *sample = item::spawn_temporary( item_type );
+    if( by_charges ) {
+        sample->charges = quantity;
+    }
+    const auto price = static_cast<int>( sample->price( true ) * ( by_charges ? 1 : quantity ) );
+    const auto *fac = buyer.get_faction();
+    const auto currency = fac ? fac->currency : itype_id::NULL_ID();
+    const auto currency_value = currency.is_empty() ? 0 :
+                                buyer.value( *item::spawn_temporary( currency ) );
+    const auto total = price + buyer.op_of_u.owed;
+    const auto payment = currency_value > 0 ? std::max( 0, total / currency_value ) : 0;
+    return { .quantity = quantity, .currency = currency, .payment = payment,
+             .credit = total - payment * currency_value, .currency_value = currency_value };
+}
+
+auto accept_bulk_sale( const dialogue &d ) -> void
+{
+    const auto quote = quote_bulk_sale( *d.alpha, *d.beta, d.cur_item );
+    if( quote.quantity <= 0 || quote.currency_value <= 0 ) {
+        return;
+    }
+    auto sold = item::count_by_charges( d.cur_item ) ?
+                d.alpha->use_charges( d.cur_item, quote.quantity ) :
+                d.alpha->use_amount( d.cur_item, quote.quantity );
+    for( auto &it : sold ) {
+        d.beta->i_add( std::move( it ) );
+    }
+    for( auto i = 0; i < quote.payment; ++i ) {
+        d.alpha->i_add( item::spawn( quote.currency ) );
+    }
+    d.beta->op_of_u.owed = quote.credit;
+}
+} // namespace
+
 void parse_tags( std::string &phrase, const Character &u, const Character &me,
                  const itype_id &item_type )
 {
@@ -2041,6 +2090,18 @@ void parse_tags( std::string &phrase, const Character &u, const Character &me,
             phrase.replace( fa, l, npcstr );
         } else if( tag == "<topic_item>" ) {
             phrase.replace( fa, l, item::nname( item_type, 2 ) );
+        } else if( tag == "<bulk_sale_quote>" ) {
+            const auto quote = quote_bulk_sale( u, *me.as_npc(), item_type );
+            //~ %1$d: units sold, %2$s: item name, %3$d: payment, %4$s: currency name
+            auto line = string_format( _( "For your entire stock of %2$s (%1$d), I'll pay you %3$d %4$s." ),
+                                       quote.quantity, item::nname( item_type, quote.quantity ),
+                                       quote.payment, item::nname( quote.currency ) );
+            if( quote.credit > 0 ) {
+                //~ %1$d and %2$d form a fraction of one unit of currency (%3$s).
+                line += " " + string_format( _( "You'll have %1$d/%2$d of a %3$s left as credit." ),
+                                             quote.credit, quote.currency_value, item::nname( quote.currency ) );
+            }
+            phrase.replace( fa, l, line );
         } else if( tag == "<topic_item_price>" ) {
             item *tmp = item::spawn_temporary( item_type );
             phrase.replace( fa, l, format_money( tmp->price( true ) ) );
@@ -3219,6 +3280,10 @@ void talk_effect_t::parse_string_effect( const std::string &effect_id, const Jso
     }
 
     talk_effect_fun_t subeffect_fun;
+    if( effect_id == "u_bulk_sale_accept" ) {
+        set_effect( talk_effect_fun_t( accept_bulk_sale ) );
+        return;
+    }
     if( effect_id == "u_bulk_trade_accept" || effect_id == "npc_bulk_trade_accept" ||
         effect_id == "u_bulk_donate" || effect_id == "npc_bulk_donate" ) {
         bool is_npc = effect_id == "npc_bulk_trade_accept" || effect_id == "npc_bulk_donate";

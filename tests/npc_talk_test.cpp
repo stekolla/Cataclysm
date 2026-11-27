@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 static const efftype_id effect_gave_quest_item("gave_quest_item");
@@ -141,8 +142,10 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         staff_missions{
             .npc_id = "evac_broker",
             .name = "Ruth Calder, Quartermaster",
-            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_5",
-            .follow_up = mission_type_id("MISSION_BROKER_1")},
+            .first_offer = "MISSION_BROKER_CANNING_POT",
+            .follow_up = mission_type_id("MISSION_FREE_MERCHANTS_EVAC_5"),
+            .side_offer = "MISSION_BROKER_COFFEE",
+            .final_offer = mission_type_id("MISSION_BROKER_1")},
         staff_missions{
             .npc_id = "evac_security_chief",
             .name = "Milton Lang, Security Chief",
@@ -197,6 +200,181 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         CHECK(expected.follow_up->follow_up == expected.final_offer);
         CHECK(expected.final_offer->follow_up.is_null());
     }
+}
+
+/// Turn in coffee before the canning chain and check each reward and the final jar-buyback unlock.
+TEST_CASE("ruth_calder_completes_supply_missions", "[npc_talk][mission][quartermaster]") {
+    auto& u = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(u, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(u, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    u.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    const auto ruth_id = get_map().place_npc(
+        u.bub_pos() + point(5, 0), string_id<npc_template>("evac_broker"), true);
+    g->load_npcs();
+    auto* ruth = g->find_npc(ruth_id);
+    REQUIRE(ruth != nullptr);
+    auto d = dialogue();
+    d.alpha = &u;
+    d.beta = ruth;
+    const auto merch = itype_id("FMCNote");
+
+    const auto complete =
+        [&](const auto& mission_id, const auto& item_id, const auto count, const auto reward) {
+            CAPTURE(mission_id);
+            const auto offer =
+                std::ranges::find_if(ruth->chatbin.missions, [&](const auto* candidate) {
+                    return candidate->get_type().id == mission_type_id(mission_id);
+                });
+            REQUIRE(offer != ruth->chatbin.missions.end());
+            auto* job = *offer;
+            ruth->chatbin.mission_selected = job;
+            talk_function::assign_mission(*ruth);
+            const auto supply = itype_id(item_id);
+            const auto by_charges = item::count_by_charges(supply);
+            const auto add_supply = [&](const auto quantity) {
+                if (quantity == 0) { return; }
+                if (by_charges) {
+                    u.i_add(item::spawn(supply, calendar::turn, quantity));
+                } else {
+                    for (auto i = 0; i < quantity; ++i) { u.i_add(item::spawn(supply)); }
+                }
+                u.invalidate_crafting_inventory();
+            };
+            add_supply(count - 1);
+            CHECK_FALSE(job->is_complete(ruth_id));
+            add_supply(1);
+            REQUIRE(job->is_complete(ruth_id));
+            const auto before = u.charges_of(merch);
+            job->wrap_up();
+            CHECK(u.charges_of(merch) == before + reward);
+            CHECK(u.amount_of(supply) == 0);
+            talk_function::clear_mission(*ruth);
+        };
+
+    complete("MISSION_BROKER_COFFEE", "coffee_raw", 20, 3);
+    REQUIRE(ruth->chatbin.missions.size() == 1);
+    complete("MISSION_BROKER_CANNING_POT", "pot_canning", 1, 10);
+    REQUIRE(ruth->chatbin.missions.size() == 1);
+    complete("MISSION_FREE_MERCHANTS_EVAC_5", "jar_glass", 25, 20);
+    REQUIRE(ruth->chatbin.missions.size() == 1);
+    d.gen_responses(talk_topic("TALK_FREE_MERCHANT_STOCKS"));
+    CHECK_FALSE(std::ranges::any_of(d.responses, [](const auto& response) {
+        return response.success.next_topic.id == "TALK_FREE_MERCHANT_STOCKS_JARS";
+    }));
+    complete("MISSION_BROKER_1", "jar_3l_glass", 20, 25);
+    CHECK(ruth->chatbin.missions.empty());
+    d.gen_responses(talk_topic("TALK_FREE_MERCHANT_STOCKS"));
+    CHECK(std::ranges::any_of(d.responses, [](const auto& response) {
+        return response.success.next_topic.id == "TALK_FREE_MERCHANT_STOCKS_JARS";
+    }));
+}
+
+/// Use Ruth's delivery and confirmation topics to verify that every food can be sold at its quote.
+TEST_CASE("ruth_calder_quotes_and_transfers_bulk_food", "[npc_talk][quartermaster]") {
+    const auto food = itype_id(GENERATE(
+        "jerky", "meat_smoked", "fish_smoked", "dry_veggy", "dry_fruit", "cooking_oil",
+        "cooking_oil2", "cornmeal", "flour", "fruit_wine", "beer", "sugar", "salt", "vinegar"));
+    CAPTURE(food.str());
+    g->faction_manager_ptr->create_if_needed();
+    auto ruth = npc();
+    ruth.set_fac(faction_id("free_merchants"));
+    const auto cleanup = on_out_of_scope([&] { ruth.get_faction()->remove_member(ruth.getID()); });
+    auto u = avatar();
+    auto d = dialogue();
+    d.alpha = &u;
+    d.beta = &ruth;
+    const auto merch = itype_id("FMCNote");
+    const auto currency_value = static_cast<int>(item::spawn_temporary(merch)->price(true));
+    const auto credit = GENERATE(0, 225);
+    ruth.op_of_u.owed = credit;
+
+    for (auto sale = 0; sale < 2; ++sale) {
+        auto stock = item::spawn(food);
+        const auto value = static_cast<int>(stock->price(true));
+        const auto by_charges = stock->count_by_charges();
+        const auto quantity = by_charges ? stock->charges : 1;
+        const auto carried = [&](const auto& actor) {
+            return by_charges ? actor.charges_of(food) : actor.amount_of(food);
+        };
+        if (stock->made_of(LIQUID)) {
+            auto container = item::spawn(itype_id("jug_plastic"));
+            container->put_in(std::move(stock));
+            stock = std::move(container);
+        }
+        u.i_add(std::move(stock));
+        REQUIRE(carried(u) == quantity);
+
+        d.gen_responses(talk_topic("TALK_FREE_MERCHANT_STOCKS_DELIVER"));
+        const auto option = std::ranges::find_if(d.responses, [&](const auto& response) {
+            return response.success.next_topic.item_type == food;
+        });
+        REQUIRE(option != d.responses.end());
+        const auto topic = option->success.next_topic;
+        auto line = d.dynamic_line(topic);
+        parse_tags(line, u, ruth, topic.item_type);
+        const auto before_credit = ruth.op_of_u.owed;
+        const auto before_currency = u.charges_of(merch);
+        const auto before_stock = carried(ruth);
+        const auto payment = (value + before_credit) / currency_value;
+        const auto remaining = (value + before_credit) % currency_value;
+        CHECK(line.find(string_format(" (%d),", quantity)) != std::string::npos);
+        CHECK(line.find(string_format("I'll pay you %d Merch", payment)) != std::string::npos);
+        if (remaining > 0) {
+            CHECK(line.find(string_format("%d/%d of a Merch", remaining, currency_value))
+                  != std::string::npos);
+        }
+        d.gen_responses(topic);
+        REQUIRE(d.responses.size() == 2);
+        CHECK(d.responses[1].success.apply(d).id == "TALK_NONE");
+        CHECK(carried(u) == quantity);
+        CHECK(carried(ruth) == before_stock);
+        CHECK(ruth.op_of_u.owed == before_credit);
+
+        d.responses[0].success.apply(d);
+        CHECK(carried(u) == 0);
+        CHECK(carried(ruth) == before_stock + quantity);
+        CHECK(u.charges_of(merch) == before_currency + payment);
+        CHECK(ruth.op_of_u.owed == remaining);
+        d.responses[0].success.apply(d);
+        CHECK(carried(ruth) == before_stock + quantity);
+        CHECK(u.charges_of(merch) == before_currency + payment);
+        CHECK(ruth.op_of_u.owed == remaining);
+    }
+}
+
+/// Offer fewer than two batches of each jar size and verify that each accepted sale pays one Merch.
+TEST_CASE("ruth_calder_buys_fixed_batches_of_jars", "[npc_talk][quartermaster]") {
+    const auto large = GENERATE(false, true);
+    const auto jar = itype_id(large ? "jar_3l_glass" : "jar_glass");
+    const auto batch = large ? 5 : 10;
+    auto ruth = npc();
+    auto u = avatar();
+    auto d = dialogue();
+    d.alpha = &u;
+    d.beta = &ruth;
+    const auto merch = itype_id("FMCNote");
+    const auto topic = talk_topic("TALK_FREE_MERCHANT_STOCKS_JARS");
+    const auto is_sale = [&](const auto& response) {
+        return response.success.next_topic.id == topic.id;
+    };
+    for (auto i = 0; i < batch - 1; ++i) { u.i_add(item::spawn(jar)); }
+    d.gen_responses(topic);
+    CHECK_FALSE(std::ranges::any_of(d.responses, is_sale));
+    for (auto i = 0; i <= batch + 1; ++i) { u.i_add(item::spawn(jar)); }
+    for (auto remaining = 1; remaining >= 0; --remaining) {
+        d.gen_responses(topic);
+        const auto sale = std::ranges::find_if(d.responses, is_sale);
+        REQUIRE(sale != d.responses.end());
+        sale->success.apply(d);
+        CHECK(u.amount_of(jar) == remaining * batch + 1);
+        CHECK(u.charges_of(merch) == 2 - remaining);
+    }
+    d.gen_responses(topic);
+    CHECK_FALSE(std::ranges::any_of(d.responses, is_sale));
 }
 
 /// Check Milton's dialogue before and after the Back Bay turn-in, and after accepting the pen job.
