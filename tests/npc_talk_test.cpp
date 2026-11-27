@@ -261,6 +261,34 @@ TEST_CASE("tacoma_lumbermill_discovery", "[npc][mission][dialogue]") {
     d.gen_responses(lead_topic);
     CHECK(find_reply("TALK_RANCH_FOREMAN") == d.responses.end());
 }
+/// Check the seed delivery against real inventories so loose nails, other seeds, and mixed
+/// crops cannot satisfy the foreman's request for 40 units of one staple crop.
+TEST_CASE("tacoma_field_seed_delivery", "[npc][mission]") {
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    const auto giver = g->assign_npc_id();
+    auto* job = mission::reserve_new(mission_type_id("MISSION_RANCH_FOREMAN_3"), giver);
+    job->assign(player);
+
+    const auto give = [&](const char* id, const int quantity) {
+        player.i_add(item::spawn(id, calendar::turn, quantity));
+        player.invalidate_crafting_inventory();
+    };
+    give("nail", 2500);
+    give("seed_tomato", 40);
+    give("seed_corn", 1);
+    give("seed_wheat", 39);
+    CHECK_FALSE(job->is_complete(giver));
+    give("seed_wheat", 1);
+    CHECK(job->is_complete(giver));
+    CHECK(job->get_follow_up() == mission_type_id("MISSION_RANCH_FOREMAN_4"));
+}
+
 static const efftype_id effect_gave_quest_item("gave_quest_item");
 static const efftype_id effect_currently_busy("currently_busy");
 static const efftype_id effect_infection("infection");

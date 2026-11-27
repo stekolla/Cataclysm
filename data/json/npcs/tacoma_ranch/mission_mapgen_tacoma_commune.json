@@ -2,6 +2,36 @@
   {
     "type": "mapgen",
     "method": "json",
+    "update_mapgen_id": "tacoma_field_rows_46",
+    "object": {
+      "set": [
+        { "square": "terrain", "id": "t_dirtmound", "x": 14, "y": 5, "x2": 15, "y2": 22 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 17, "y": 5, "x2": 18, "y2": 22 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 20, "y": 5, "x2": 21, "y2": 22 }
+      ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_field_rows_55",
+    "object": {
+      "set": [
+        { "square": "terrain", "id": "t_dirtmound", "x": 14, "y": 2, "x2": 15, "y2": 17 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 17, "y": 2, "x2": 18, "y2": 17 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 20, "y": 2, "x2": 21, "y2": 17 }
+      ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_spawn_crop_overseer",
+    "object": { "place_npcs": [ { "class": "ranch_crop_overseer", "x": 12, "y": 7 } ] }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
     "nested_mapgen_id": "tacoma_commune_west_wall_door",
     "object": { "mapgensize": [ 2, 1 ], "rows": [ "q+" ], "terrain": { "q": "t_wall_wood", "+": "t_door_c" } }
   },

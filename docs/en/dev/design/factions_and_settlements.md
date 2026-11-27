@@ -176,6 +176,7 @@ faction.
 ## Related design guidance
 
 - [Faction and settlement design guide](../../mod/json/guides/faction_and_settlement_design.md)
+- [Tacoma progression and save compatibility](tacoma_progression.md)
   for designing or reviewing individual locations
 - [General game design principles](../explanation/design_document.md)
 - [NPC dialogue and quest design](../../mod/json/guides/dialogue_and_quest_design.md)

@@ -19,6 +19,25 @@
       "yes": "Can I help you, marshal?",
       "no": { "u_male": true, "yes": "Morning sir, how can I help you?", "no": "Morning ma'am, how can I help you?" }
     },
+    "speaker_effect": {
+      "condition": {
+        "and": [
+          {
+            "or": [
+              { "u_has_mission": "MISSION_RANCH_FOREMAN_4" },
+              { "npc_has_var": "salt_delivered", "type": "settlement", "context": "tacoma", "value": "yes" }
+            ]
+          },
+          { "not": { "npc_has_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" } }
+        ]
+      },
+      "effect": [
+        { "mapgen_update": "tacoma_field_rows_46", "om_terrain": "ranch_camp_46", "origin_npc": true },
+        { "mapgen_update": "tacoma_field_rows_55", "om_terrain": "ranch_camp_55", "origin_npc": true },
+        { "mapgen_update": "tacoma_spawn_crop_overseer", "om_terrain": "ranch_camp_57", "origin_npc": true },
+        { "npc_add_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" }
+      ]
+    },
     "responses": [
       {
         "text": "[MISSION] The merchant at the Refugee Center sent me to get a prospectus from you.",
@@ -114,6 +133,7 @@
     "id": "MISSION_RANCH_FOREMAN_1",
     "type": "mission_definition",
     "name": { "str": "Cut 200 planks" },
+    "description": "Bring 200 planks to Tacoma's foreman to enclose the barn.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
     "value": 50000,
@@ -123,16 +143,17 @@
     "followup": "MISSION_RANCH_FOREMAN_2",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "Our first project is to enclose the barn so that new refugees have a safe place to sleep.  Before we can begin serious improvements we need lumber to work with.  Enclosing the four barn entrances will take nearly 400 planks… if you could provide half of that we should be able to take care of the other half and construction.  If you don't have a truck, I'd make finding one your first priority.",
+      "offer": "We need to enclose the barn before the new arrivals move in.  Bring us 200 planks and we'll supply the rest and do the work.  I can pay you 40 Merch.",
       "accepted": "The more men we can bring to the camp the quicker improvements can be made.",
       "rejected": "Come back when you get a chance.  We need skilled survivors.",
       "advice": "Avoid destroying the furniture, we'll be needing it.",
       "inquire": "Do you have them?",
-      "success": "Great, I'll send word that we could use another set of hands or two to help out here.",
+      "success": "That closes off the barn entrances.  Now we can make room for people to sleep inside.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     },
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 40 },
       "update_mapgen": [
         {
           "om_terrain": "ranch_camp_65",
@@ -175,16 +196,17 @@
     "followup": "MISSION_RANCH_FOREMAN_3",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "With the barn entrances enclosed the refugees moving into there should feel safer but the weather can be bitter here.  We're going to need to build makeshift beds in the stalls to ward off disease and frostbite.  We can take care of the frames but will need your help looting blankets.  We'd need 25 blankets to provide the most basic sleeping accommodations.",
+      "offer": "The barn is enclosed, but it's still cold inside.  We'll build bed frames in the stalls.  Bring us 25 blankets or equivalent bedding and I'll pay you 25 Merch.",
       "accepted": "I'd start with looting hotels or you could sew them together… but that would be a last resort.",
       "rejected": "Come back when you get a chance.  We need skilled survivors.",
       "advice": "Avoid destroying the furniture here, we'll be needing it.",
       "inquire": "Do you have them?",
-      "success": "Your assistance is always appreciated.",
+      "success": "The beds are ready.  The new arrivals have a safer, warmer place to sleep now.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     },
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 25 },
       "update_mapgen": [
         {
           "om_terrain": "ranch_camp_65",
@@ -229,26 +251,31 @@
   {
     "id": "MISSION_RANCH_FOREMAN_3",
     "type": "mission_definition",
-    "name": { "str": "Gather 2500 Nails" },
-    "goal": "MGOAL_FIND_ITEM",
+    "name": { "str": "Prepare the Fields" },
+    "description": "Bring Tacoma's foreman 40 seeds of one crop: wheat, corn, barley, beans, potatoes, or carrots.",
+    "goal": "MGOAL_FIND_ITEM_GROUP",
     "difficulty": 5,
     "value": 50000,
-    "item": "nail",
-    "count": 2500,
+    "item_group": "tacoma_staple_seeds",
+    "count": 40,
     "origins": [ "ORIGIN_SECONDARY" ],
     "followup": "MISSION_RANCH_FOREMAN_4",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "Our supply of nails has been depleted.  I'm going to have to ask you to get us a few more boxes.  Hardware stores should have a few if they haven't been looted.  I suppose you may be able to find handfuls of them in building rubble.  We'd need 2500 to have enough that we won't be sending you back out too soon.",
-      "accepted": "Deconstructing furniture isn't going to be efficient, try looking for boxes or grabbing any sitting on top of rubble piles.",
+      "offer": "We have beds for the workers and land to grow on, but not enough seed to plant a field.  Bring 40 seeds of one crop: wheat, corn, barley, beans, potatoes, or carrots.  I'll pay you 10 Merch.",
+      "accepted": "One crop will give us enough for a proper planting.",
       "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Avoid destroying the furniture here, we'll be needing it.",
-      "inquire": "Do you have them?",
-      "success": "Your assistance is always appreciated.",
+      "advice": "Try farm sheds and gardening stores, or prepare seed from produce.  Raw potatoes can be cut into seed pieces.",
+      "inquire": "Do you have the seeds?",
+      "success": "The fields are ready for planting.  Look for the Crop Overseer if you want to trade for seed or tools.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     },
     "end": {
+      "effect": [
+        { "u_buy_item": "FMCNote", "count": 10 },
+        { "npc_add_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" }
+      ],
       "update_mapgen": [
         {
           "om_terrain": "ranch_camp_46",
@@ -277,7 +304,10 @@
           "place_furniture": [ { "furn": "f_bookcase", "x": 17, "y": 11 } ],
           "place_npcs": [ { "class": "ranch_farmer_1", "x": 19, "y": 20 } ]
         },
-        { "om_terrain": "ranch_camp_66", "place_npcs": [ { "class": "ranch_woodcutter_1", "x": 4, "y": 11 } ] }
+        { "om_terrain": "ranch_camp_66", "place_npcs": [ { "class": "ranch_woodcutter_1", "x": 4, "y": 11 } ] },
+        { "om_terrain": "ranch_camp_46", "mapgen_update_id": "tacoma_field_rows_46" },
+        { "om_terrain": "ranch_camp_55", "mapgen_update_id": "tacoma_field_rows_55" },
+        { "om_terrain": "ranch_camp_57", "mapgen_update_id": "tacoma_spawn_crop_overseer" }
       ]
     }
   },
@@ -294,40 +324,22 @@
     "followup": "MISSION_RANCH_FOREMAN_5",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "I'm sure you've noticed the new workers that have started trickling in.  The Free Merchant counsel is demanding that we immediately begin projects to become self-sufficient due to limited supplies.  We are going to need to rapidly setup an agricultural industry before winter and starvation catches us unprepared and unsupported.  In order to get a half dozen shovels and a couple of bags of seeds, we are going to have to trade for it.  I've already got the deal lined up but the only thing they are willing to trade it for is salt.  I negotiated them down from 500 units to 300… we were hoping you might have access to a source.",
+      "offer": "We're ready to start work on the sawmill.  I've arranged a trade for supplies, but the merchants want 300 units of salt.  Can you find that much?",
       "accepted": "Salt is key to preserving meat and other perishables… without any excess food it wouldn't do us much good now but I imagine we'll need to send you out to get more in the future.  ",
       "rejected": "Come back when you get a chance.  We need skilled survivors.",
       "advice": "If you can find a source of salt water you should be able to boil it down.",
       "inquire": "Do you have the salt?",
-      "success": "We are going to begin preparing our fields immediately.",
+      "success": "That covers the trade.  We can start work on the sawmill now.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     },
     "end": {
+      "effect": { "npc_add_var": "salt_delivered", "type": "settlement", "context": "tacoma", "value": "yes" },
       "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_46",
-          "//": "tilled soil in the fields",
-          "set": [
-            { "square": "terrain", "id": "t_dirtmound", "x": 14, "y": 5, "x2": 15, "y2": 22 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 17, "y": 5, "x2": 18, "y2": 22 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 20, "y": 5, "x2": 21, "y2": 22 }
-          ]
-        },
-        {
-          "om_terrain": "ranch_camp_55",
-          "//": "tilled soil in the fields",
-          "set": [
-            { "square": "terrain", "id": "t_dirtmound", "x": 14, "y": 2, "x2": 15, "y2": 17 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 17, "y": 2, "x2": 18, "y2": 17 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 20, "y": 2, "x2": 21, "y2": 17 }
-          ]
-        },
         {
           "om_terrain": "ranch_camp_56",
           "place_vehicles": [ { "vehicle": "flatbed_truck", "x": 18, "y": 3, "rotation": 0, "chance": 100 } ]
         },
-        { "om_terrain": "ranch_camp_57", "place_npcs": [ { "class": "ranch_crop_overseer", "x": 12, "y": 7 } ] },
         {
           "om_terrain": "ranch_camp_58",
           "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_4" ], "x": 0, "y": 0 } ]
@@ -352,7 +364,7 @@
     "followup": "MISSION_RANCH_FOREMAN_6",
     "dialogue": {
       "describe": "We need help…",
-      "offer": "Well, our first crop will be planted shortly but I'm starting to suspect that our profit margin is going to be much smaller than we expect.  With limited seed for our original crop our next course of action is to increase the soil's fertility.  Is there any way you could find or produce a basic liquid fertilizer for us?  We'd need at least 30 units to make a significant improvement in our output. ",
+      "offer": "We've got seed and the fields are ready, but better soil would help us get more from each row.  Could you bring us 30 units of liquid fertilizer?",
       "accepted": "I don't know the exact recipe but I'm sure you could make it from a commercial fertilizer or produce it from bonemeal.",
       "rejected": "Come back when you get a chance.  We need skilled survivors.",
       "advice": "I'd look through a few basic chemistry books to find a simple recipe.",

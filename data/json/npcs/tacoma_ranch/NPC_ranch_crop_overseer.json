@@ -2,28 +2,96 @@
   {
     "type": "npc",
     "id": "ranch_crop_overseer",
-    "//": "Flavor",
     "name_suffix": "Crop Overseer",
-    "class": "NC_BOUNTY_HUNTER",
+    "class": "NC_TACOMA_CROP_MERCHANT",
     "attitude": 0,
     "mission": 7,
     "chat": "TALK_RANCH_CROP_OVERSEER",
     "faction": "tacoma_commune"
   },
   {
+    "type": "npc_class",
+    "id": "NC_TACOMA_CROP_MERCHANT",
+    "name": { "str": "Crop Overseer" },
+    "job_description": "I manage Tacoma's fields.",
+    "common": false,
+    "shopkeeper_item_group": "tacoma_crop_overseer_sell",
+    "trade_pricing": {
+      "curated_stock": true,
+      "retail_percent": 140,
+      "purchase_percent": 40,
+      "categories": {
+        "seeds": { "purchase_percent": 60 },
+        "tools_farming": { "purchase_percent": 60 },
+        "guns": { "purchase_percent": 0 },
+        "ammo": { "purchase_percent": 0 },
+        "bionics": { "purchase_percent": 0 },
+        "mutagen": { "purchase_percent": 0 }
+      },
+      "items": {
+        "fertilizer_commercial": { "purchase_percent": 60 },
+        "fertilizer_liquid": { "purchase_percent": 60 },
+        "barley": { "purchase_percent": 60 },
+        "carrot": { "purchase_percent": 60 },
+        "corn": { "purchase_percent": 60 },
+        "potato": { "purchase_percent": 60 },
+        "raw_beans": { "purchase_percent": 60 },
+        "tomato": { "purchase_percent": 60 },
+        "wheat": { "purchase_percent": 60 },
+        "dry_beans": { "purchase_percent": 60 }
+      }
+    }
+  },
+  {
+    "type": "item_group",
+    "id": "tacoma_staple_seeds",
+    "subtype": "collection",
+    "items": [ "seed_wheat", "seed_corn", "seed_barley", "seed_beans", "seed_potato_raw", "seed_carrot" ]
+  },
+  {
+    "type": "item_group",
+    "id": "tacoma_crop_overseer_sell",
+    "subtype": "collection",
+    "entries": [
+      { "item": "seed_wheat", "charges": [ 24, 40 ] },
+      { "item": "seed_corn", "charges": [ 24, 40 ] },
+      { "item": "seed_beans", "charges": [ 24, 40 ] },
+      { "item": "seed_potato_raw", "charges": [ 16, 24 ] },
+      { "item": "hoe" },
+      { "item": "shovel" },
+      { "item": "dry_beans", "charges": [ 4, 8 ] },
+      { "item": "flour", "charges": [ 4, 8 ] },
+      { "item": "fertilizer_commercial", "prob": 60, "charges": [ 3, 6 ] },
+      { "item": "seed_barley", "prob": 60, "charges": [ 12, 24 ] },
+      { "item": "seed_carrot", "prob": 60, "charges": [ 12, 24 ] },
+      { "item": "seed_tomato", "prob": 40, "charges": [ 8, 16 ] },
+      { "item": "seed_cucumber", "prob": 30, "charges": [ 8, 16 ] },
+      { "item": "potato", "prob": 50, "count": [ 2, 4 ] },
+      { "item": "carrot", "prob": 35, "count": [ 2, 4 ] }
+    ]
+  },
+  {
     "id": "TALK_RANCH_CROP_OVERSEER",
     "type": "talk_topic",
-    "dynamic_line": "I hope you are here to do business.",
+    "dynamic_line": "Need something for your garden?",
+    "speaker_effect": { "condition": { "npc_has_class": "NC_BOUNTY_HUNTER" }, "effect": { "npc_change_class": "NC_TACOMA_CROP_MERCHANT" } },
     "responses": [
-      { "text": "What are you doing here?", "topic": "TALK_RANCH_CROP_OVERSEER_JOB" },
-      { "text": "What do you need done?", "topic": "TALK_MISSION_LIST" },
+      { "text": "What do you do here?", "topic": "TALK_RANCH_CROP_OVERSEER_JOB" },
+      { "text": "What do you have for sale?", "effect": "start_trade", "topic": "TALK_RANCH_CROP_OVERSEER" },
+      { "text": "Are you buying agricultural supplies?", "topic": "TALK_RANCH_CROP_OVERSEER_BUYING" },
       { "text": "I've got to go…", "topic": "TALK_DONE" }
     ]
   },
   {
     "type": "talk_topic",
     "id": "TALK_RANCH_CROP_OVERSEER_JOB",
-    "dynamic_line": "My job is to manage our outpost's agricultural production.  I'm constantly searching for trade partners and investors to increase our capacity.  If you are interested I typically have tasks that I need assistance with.",
+    "dynamic_line": "I manage the fields and make sure Tacoma has enough seed and food.  I also sell seed, tools, and whatever we can spare.",
+    "responses": [ { "text": "Good to know.", "topic": "TALK_RANCH_CROP_OVERSEER" } ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_RANCH_CROP_OVERSEER_BUYING",
+    "dynamic_line": "I'll pay more for seed, fertilizer, farm tools, and staple crops.  If you've got a surplus, let me see what you brought.",
     "responses": [ { "text": "I'll keep that in mind.", "topic": "TALK_RANCH_CROP_OVERSEER" } ]
   }
 ]

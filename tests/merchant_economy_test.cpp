@@ -170,6 +170,34 @@ TEST_CASE("lumbermill_bulk_stock_and_restock", "[npc][trade][pricing][merchant]"
     check_stock();
 }
 
+/// A player can buy enough seed for a small field after each restock, but cannot resell it
+/// to the Overseer for a profit even with better Barter.
+TEST_CASE("tacoma_crop_overseer_seed_stock", "[npc][trade][pricing][merchant]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto fixture = merchant_test("ranch_crop_overseer");
+    auto& [overseer, player] = fixture;
+    REQUIRE(overseer.is_shopkeeper());
+    give(player, item::spawn("seed_wheat", calendar::turn, 24));
+
+    const auto check_stock = [&] {
+        const auto state = fixture.quotes();
+        const auto retail = quote_for(state.theirs, "seed_wheat", 24);
+        CHECK(quote_for(state.theirs, "seed_corn", 24) > 0);
+        CHECK(quote_for(state.theirs, "hoe") > 0);
+        const auto buyback = quote_for(state.yours, "seed_wheat", 24);
+        CHECK(buyback > 0);
+        CHECK(buyback < retail);
+    };
+
+    check_stock();
+    player.set_skill_level(barter, 8);
+    for (auto cycle = 0; cycle < 2; ++cycle) {
+        calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+        overseer.shop_restock();
+        check_stock();
+    }
+}
+
 /// Check the live quote in each direction and immediately resell an actual purchase.
 TEST_CASE("owen_merchandise_spread_and_currency", "[npc][trade][pricing][merchant]") {
     auto fixture = merchant_test();
