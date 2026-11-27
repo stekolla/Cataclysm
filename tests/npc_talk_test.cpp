@@ -129,6 +129,7 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         const char* name;
         const char* first_offer;
         mission_type_id follow_up = mission_type_id::NULL_ID();
+        const char* side_offer = nullptr;
     };
     const auto expected = GENERATE(
         staff_missions{
@@ -148,7 +149,9 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
         staff_missions{
             .npc_id = "evac_maintenance_lead",
             .name = "Mara Velez, Maintenance Lead",
-            .first_offer = "MISSION_FREE_MERCHANTS_EVAC_4"});
+            .first_offer = "MISSION_EVAC_MAINTENANCE_SUPPLIES",
+            .follow_up = mission_type_id("MISSION_EVAC_MAINTENANCE_PUMP"),
+            .side_offer = "MISSION_EVAC_MAINTENANCE_KETTLE"});
     CAPTURE(expected.npc_id);
     g->faction_manager_ptr->create_if_needed();
     auto staff = npc();
@@ -169,13 +172,23 @@ TEST_CASE("refugee_center_staff_offer_their_own_work", "[npc_talk][mission]") {
     }));
 
     d.gen_responses(talk_topic("TALK_MISSION_LIST"));
-    REQUIRE_FALSE(d.responses.empty());
-    REQUIRE(d.responses.front().mission_selected != nullptr);
-    const auto& offered = *d.responses.front().mission_selected;
-    REQUIRE(staff.chatbin.missions.size() == 1);
-    CHECK(offered.get_npc_id() == staff.getID());
-    CHECK(offered.get_type().id == mission_type_id(expected.first_offer));
-    CHECK(offered.get_follow_up() == expected.follow_up);
+    REQUIRE(staff.chatbin.missions.size() == (expected.side_offer == nullptr ? 1 : 2));
+    const auto check_offer = [&](const auto& id, const auto& follow_up) {
+        const auto response = std::ranges::find_if(d.responses, [&](const auto& candidate) {
+            return candidate.mission_selected != nullptr
+                && candidate.mission_selected->get_type().id == id;
+        });
+        REQUIRE(response != d.responses.end());
+        const auto& offered = *response->mission_selected;
+        CHECK(offered.get_npc_id() == staff.getID());
+        CHECK(offered.get_follow_up() == follow_up);
+    };
+    check_offer(mission_type_id(expected.first_offer), expected.follow_up);
+    if (expected.side_offer != nullptr) {
+        check_offer(mission_type_id(expected.side_offer), mission_type_id::NULL_ID());
+        REQUIRE(expected.follow_up.is_valid());
+        CHECK(expected.follow_up->follow_up == mission_type_id("MISSION_FREE_MERCHANTS_EVAC_4"));
+    }
 }
 
 /// Ask a generic guard for work to check that their referral names all four staff members.

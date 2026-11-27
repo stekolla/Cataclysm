@@ -10,7 +10,7 @@
     "mission": 7,
     "chat": "TALK_EVAC_MAINTENANCE_LEAD",
     "faction": "free_merchants",
-    "mission_offered": "MISSION_FREE_MERCHANTS_EVAC_4"
+    "mission_offered": [ "MISSION_EVAC_MAINTENANCE_SUPPLIES", "MISSION_EVAC_MAINTENANCE_KETTLE" ]
   },
   {
     "type": "talk_topic",
@@ -23,7 +23,7 @@
         "condition": { "not": "has_no_available_mission" }
       },
       {
-        "text": "About those solar panels you need…",
+        "text": "About that maintenance work…",
         "topic": "TALK_MISSION_LIST_ASSIGNED",
         "condition": "has_assigned_mission"
       },
@@ -41,23 +41,137 @@
   {
     "type": "talk_topic",
     "id": "TALK_EVAC_MAINTENANCE_REPAIRS",
-    "dynamic_line": "The plumbing.  A blown light can wait.  A leak in a washroom turns into a line down the hall by breakfast.  If you see water where it doesn't belong, I'd rather hear about it early.",
+    "dynamic_line": {
+      "u_has_var": "FMShopkeep_Mission4",
+      "type": "mission",
+      "context": "flag",
+      "value": "yes",
+      "yes": "The plumbing still keeps me busy, but the roof panels are taking some of the load off the RTGs.  If you want another engineering project, talk to Jenny Forcette.  She's got a few of her own.",
+      "no": {
+        "u_has_var": "evac_maintenance_pump",
+        "type": "mission",
+        "context": "flag",
+        "value": "yes",
+        "yes": "The new pump is holding.  Now I'd like to give the RTGs a little help.  There's a whole roof up there doing nothing.",
+        "no": {
+          "u_has_var": "evac_maintenance_supplies",
+          "type": "mission",
+          "context": "flag",
+          "value": "yes",
+          "yes": "The plumbing.  A blown light can wait.  A leak in a washroom turns into a line down the hall by breakfast.  Right now I'm watching the pump.",
+          "no": "This week it's the wiring.  I can trace a bad connection, but I've about run out of good wire and boards to replace it with."
+        }
+      }
+    },
     "responses": [ { "text": "I'll keep an eye out.", "topic": "TALK_EVAC_MAINTENANCE_LEAD" } ]
+  },
+  {
+    "id": "MISSION_EVAC_MAINTENANCE_SUPPLIES",
+    "type": "mission_definition",
+    "name": { "str": "Keeping Things Together" },
+    "description": "Bring Mara Velez five wire and two circuit boards to repair the Refugee Center's electrical system.",
+    "goal": "MGOAL_CONDITION",
+    "goal_condition": { "and": [ { "u_has_items": { "item": "wire", "count": 5 } }, { "u_has_items": { "item": "circuit", "count": 2 } } ] },
+    "difficulty": 1,
+    "value": 0,
+    "has_generic_rewards": false,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_EVAC_MAINTENANCE_PUMP",
+    "end": {
+      "effect": [
+        { "u_consume_item": "wire", "count": 5 },
+        { "u_consume_item": "circuit", "count": 2 },
+        { "u_buy_item": "FMCNote", "count": 5 },
+        { "u_add_var": "evac_maintenance_supplies", "type": "mission", "context": "flag", "value": "yes" }
+      ]
+    },
+    "dialogue": {
+      "describe": "I need wire and circuit boards.",
+      "offer": "The lights keep cutting out in the hall.  Bring me five lengths of wire and two circuit boards and I can patch the worst of it.  I've got five Certified Notes for the lot.",
+      "accepted": "Thanks.  I'll trace the bad connections while you're gone.",
+      "rejected": "All right.  I'll keep the flashlights handy.",
+      "advice": "Try stripping old electronics for the boards.  Wire turns up in garages and workshops.",
+      "inquire": "Did you find the wire and boards?",
+      "success": "That's everything.  I can get the hall lights to stay on now.",
+      "success_lie": "I need both the wire and the boards.",
+      "failure": "I'll see how much I can salvage here."
+    }
+  },
+  {
+    "id": "MISSION_EVAC_MAINTENANCE_PUMP",
+    "type": "mission_definition",
+    "name": { "str": "Under Pressure" },
+    "description": "Recover a mechanical pump from the marked hardware store and bring it to Mara Velez.",
+    "goal": "MGOAL_FIND_ITEM",
+    "difficulty": 3,
+    "value": 0,
+    "has_generic_rewards": false,
+    "item": "well_pump",
+    "count": 1,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_FREE_MERCHANTS_EVAC_4",
+    "start": {
+      "assign_mission_target": { "om_terrain": "home_improvement", "om_special": "home_improvement", "reveal_radius": 1, "z": 0 },
+      "update_mapgen": { "place_item": [ { "item": "well_pump", "x": 8, "y": 17 } ] }
+    },
+    "end": {
+      "effect": [
+        { "u_buy_item": "FMCNote", "count": 15 },
+        { "u_add_var": "evac_maintenance_pump", "type": "mission", "context": "flag", "value": "yes" }
+      ]
+    },
+    "dialogue": {
+      "describe": "The water pump is giving out.",
+      "offer": "The washrooms lose pressure every morning now.  There's a hardware store that stocked mechanical pumps.  I'll mark it on your map.  Bring me one and I'll pay you fifteen Certified Notes.",
+      "accepted": "Check the counters toward the back.  Watch for trouble in the aisles.",
+      "rejected": "I'll keep coaxing the old one along.",
+      "advice": "I need the mechanical pump itself.  If the store's a bust, any working one will do.",
+      "inquire": "Did you find a pump?",
+      "success": "That'll fit.  With any luck, nobody will have to wait for the taps to come back on tomorrow.",
+      "success_lie": "Let me see the pump first.",
+      "failure": "I'll see how long the old pump can hold."
+    }
+  },
+  {
+    "id": "MISSION_EVAC_MAINTENANCE_KETTLE",
+    "type": "mission_definition",
+    "name": { "str": "The Kettle Incident" },
+    "description": "Bring Mara Velez a kettle to replace the Refugee Center's broken communal one.",
+    "goal": "MGOAL_FIND_ITEM",
+    "difficulty": 1,
+    "value": 0,
+    "has_generic_rewards": false,
+    "item": "kettle",
+    "count": 1,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "end": { "effect": { "u_buy_item": "FMCNote", "count": 2 } },
+    "dialogue": {
+      "describe": "Apparently we're having a kettle emergency.",
+      "offer": "The communal kettle broke.  Three people have reported it, one in writing.  Bring me a replacement and I'll give you two Certified Notes.",
+      "accepted": "Any kettle will do.  I'd like to close the file before someone starts a petition.",
+      "rejected": "I suppose they could use a saucepan.",
+      "advice": "Try a kitchen.  It just needs to hold water.",
+      "inquire": "Any news for the tea committee?",
+      "success": "Good.  I'll put it out before anybody schedules a meeting.",
+      "success_lie": "I'm going to need an actual kettle.",
+      "failure": "I'll tell them about the saucepan."
+    }
   },
   {
     "id": "MISSION_FREE_MERCHANTS_EVAC_4",
     "type": "mission_definition",
     "name": { "str": "Solar Power" },
-    "description": "Deliver 10 solar panels to help the Free Merchants set up a renewable power grid, in exchange for a handsome reward.",
+    "description": "Deliver 10 solar panels to help the Free Merchants set up a renewable power grid, in exchange for <reward_count:FMCNote> Certified Notes.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
     "value": 400000,
+    "has_generic_rewards": false,
     "item": "solar_panel",
     "count": 10,
     "origins": [ "ORIGIN_SECONDARY" ],
     "end": {
       "effect": [
-        { "u_buy_item": "FMCNote", "count": 100 },
+        { "u_buy_item": "FMCNote", "count": 60 },
         { "u_add_var": "FMShopkeep_Mission4", "type": "mission", "context": "flag", "value": "yes" }
       ],
       "update_mapgen": [
@@ -81,12 +195,12 @@
     },
     "dialogue": {
       "describe": "We need help…",
-      "offer": "Our power comes from RTGs, and we can't run generators underground.  We've got plenty of space on the roof, though.  Bring me ten solar panels and I can hook them up to cover some of what we use.  The center can pay you 100 Certified Notes.",
+      "offer": "Our power comes from RTGs, and we can't run generators underground.  We've got plenty of space on the roof, though.  Bring me ten solar panels and I can hook them up to cover some of what we use.  The center can pay you 60 Certified Notes.",
       "accepted": "If you can do this for us our survival options would vastly increase.",
       "rejected": "Let me know if you change your mind.  I still have to figure out where to run the cables.",
       "advice": "Solar panels are pretty common on electric cars and on rooftops.",
       "inquire": "How is the search going?",
-      "success": "You got them!  I'll get these up on the roof.  Here's what the center owes you.",
+      "success": "You got them!  I'll get these up on the roof.  Here's what the center owes you.  If you're looking for another engineering project, talk to Jenny Forcette.",
       "success_lie": "What good does this do us?",
       "failure": "It was a lost cause anyways…"
     }
