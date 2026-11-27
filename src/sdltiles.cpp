@@ -78,6 +78,21 @@
 #   include <cstdlib> // getenv()/setenv()
 #endif
 
+#if defined(__EMSCRIPTEN__)
+#   include <emscripten.h>
+
+namespace
+{
+EM_JS( void, set_browser_canvas_minimum_size, ( int width, int height ), {
+    const canvas = Module.canvas;
+    canvas.style.removeProperty( "width" );
+    canvas.style.removeProperty( "height" );
+    canvas.style.setProperty( "--game-min-width", width + "px" );
+    canvas.style.setProperty( "--game-min-height", height + "px" );
+} );
+} // namespace
+#endif
+
 #if defined(_WIN32)
 #   if 1 // HACK: Hack to prevent reordering of #include "platform_win.h" by IWYU
 #       include "platform_win.h"
@@ -260,8 +275,20 @@ static void WinCreate()
     SDL_SetHint( SDL_HINT_TOUCH_MOUSE_EVENTS, "0" );
 #endif
 
+#if defined(__EMSCRIPTEN__)
+    set_browser_canvas_minimum_size( fontwidth * FULL_SCREEN_WIDTH * scaling_factor,
+                                     fontheight * FULL_SCREEN_HEIGHT * scaling_factor );
+#endif
     ::window.reset( SDL_CreateWindow( version.c_str(), WindowWidth, WindowHeight, window_flags ) );
     throwErrorIf( !::window, "SDL_CreateWindow failed" );
+#if defined(__EMSCRIPTEN__)
+    throwErrorIf( !SDL_GetWindowSize( ::window.get(), &WindowWidth, &WindowHeight ),
+                  "SDL_GetWindowSize failed" );
+    throwErrorIf( !SDL_SetWindowSize( ::window.get(), WindowWidth, WindowHeight ),
+                  "SDL_SetWindowSize failed" );
+    TERMINAL_WIDTH = WindowWidth / fontwidth / scaling_factor;
+    TERMINAL_HEIGHT = WindowHeight / fontheight / scaling_factor;
+#endif
     SDL_SetWindowPosition( ::window.get(), SDL_WINDOWPOS_CENTERED_DISPLAY( display ),
                            SDL_WINDOWPOS_CENTERED_DISPLAY( display ) );
     SDL_StartTextInput( ::window.get() );

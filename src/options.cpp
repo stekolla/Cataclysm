@@ -2323,11 +2323,7 @@ void options_manager::add_options_graphics()
        );
     get_option( "COLORED_LIGHTING" ).setPrerequisite( "USE_TILES" );
 
-#if defined(__EMSCRIPTEN__)
-    const auto default_tileset = "retrodays";
-#else
     const auto default_tileset = "UNDEAD_PEOPLE_BASE";
-#endif
     add( "TILES", graphics, translate_marker( "Choose tileset" ),
          translate_marker( "Choose the tileset you want to use." ),
          build_tilesets_list(), default_tileset, COPT_CURSES_HIDE

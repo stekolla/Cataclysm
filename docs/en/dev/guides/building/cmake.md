@@ -33,7 +33,10 @@ available at `out/build/wasm-tiles/web`.
 Docker builds use `out/docker-build` on the host, separate from host builds in `out/build`. Existing
 builds in `out/build` are not modified; the first build in Docker's new directory starts from scratch.
 
-The browser build uses the RetroDays tileset and CPU compute. It runs in English with sound disabled.
+The browser build uses the Undead People tileset, matching the upstream desktop default, and CPU
+compute. It fills the browser viewport and resizes with it. If the viewport is smaller than the
+game's minimum UI size, scroll to reach the rest of the game. Existing settings that name an
+unavailable tileset fall back to Undead People. It runs in English with sound disabled.
 Use **Save and Quit** (`S`) before reloading. Saves stay in that browser profile for the same site
 address and port. Use one Cataclysm tab per site to keep saves consistent.
 
@@ -56,6 +59,7 @@ runner uses a fixed random seed and CPU compute.
 Both test runners load the fixtures in `tests/data/TEST_DATA` into a temporary test user directory.
 The browser game archive does not include those fixtures.
 The Wasm test runner also embeds the ASCII and isometric tilesets used by the tile-context tests.
+The browser suite also checks the game canvas, viewport resizing, default tileset, and saved settings.
 
 ## Standalone JSON Formatter
 

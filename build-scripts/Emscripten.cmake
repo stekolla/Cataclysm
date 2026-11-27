@@ -24,7 +24,7 @@ function(cata_configure_web_target target)
     endif()
     set(storage "${CMAKE_SOURCE_DIR}/build-data/web/storage.js")
     set(data "${CMAKE_SOURCE_DIR}/data")
-    set(tiles "${CMAKE_SOURCE_DIR}/gfx/RetroDaysTileset")
+    set(tiles "${CMAKE_SOURCE_DIR}/gfx/MSX++UnDeadPeopleEdition")
     file(GLOB_RECURSE assets CONFIGURE_DEPENDS "${data}/*" "${tiles}/*")
     set(test_exit_runtime)
     if (is_test_runner)
@@ -60,6 +60,6 @@ function(cata_configure_web_target target)
         "SHELL:--pre-js '${storage}'"
         "SHELL:--shell-file '${shell}'"
         "SHELL:--preload-file '${data}@/data'"
-        "SHELL:--preload-file '${tiles}@/gfx/RetroDaysTileset'"
+        "SHELL:--preload-file '${tiles}@/gfx/MSX++UnDeadPeopleEdition'"
     )
 endfunction()

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write --allow-run --allow-env --allow-net
 /**
  * @module
- * Run the browser test page in headless Chromium and report its result.
+ * Run the browser test page and check the game in headless Chromium.
  */
 async function removeProfile(profile: string): Promise<void> {
   for (let attempt = 0;; ++attempt) {
@@ -79,7 +79,10 @@ if (import.meta.main) {
     type Response = {
       id?: number
       error?: { message: string }
-      result?: { result?: { value?: { code?: string; output: string } } }
+      result?: {
+        exceptionDetails?: { text: string }
+        result?: { value?: { code?: string; output: string } }
+      }
     }
     const pending = new Map<number, (value: Response) => void>()
     socket.onmessage = (event) => {
@@ -92,7 +95,9 @@ if (import.meta.main) {
         pending.set(id, (response) => {
           pending.delete(id)
           if (response.error) reject(new Error(response.error.message))
-          else resolve(response)
+          else if (response.result?.exceptionDetails) {
+            reject(new Error(response.result.exceptionDetails.text))
+          } else resolve(response)
         })
         socket.send(JSON.stringify({ id, method, params }))
       })
@@ -115,13 +120,106 @@ if (import.meta.main) {
         outputLength = value.output.length
       }
       if (value?.code !== undefined) {
-        socket.close()
         if (value.code !== "0") throw new Error(`Wasm tests failed with exit code ${value.code}.`)
         break
       }
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
     if (Date.now() >= testDeadline) throw new Error("Wasm tests timed out after 15 minutes.")
+
+    /// Check the real game after startup and each browser resize: the backing canvas and the
+    /// game terminal must both follow the viewport, including high DPI and minimum-size windows.
+    const checkGameSize = async (width: number, height: number, scale: number) => {
+      await send("Emulation.setDeviceMetricsOverride", {
+        width,
+        height,
+        deviceScaleFactor: scale,
+        mobile: false,
+      })
+      const deadline = Date.now() + 180_000
+      let lastState = ""
+      while (Date.now() < deadline) {
+        const result = await send("Runtime.evaluate", {
+          expression: `(() => {
+            const canvas = document.querySelector("#canvas");
+            if (typeof FS === "undefined" || !FS.analyzePath("/userdata/config/options.json").exists) {
+              return {output: "waiting for game options"};
+            }
+            const options = JSON.parse(FS.readFile("/userdata/config/options.json", {encoding: "utf8"}));
+            const option = name => options.find(entry => entry.name === name)?.value;
+            const rect = canvas.getBoundingClientRect();
+            return {output: JSON.stringify({
+              width: rect.width, height: rect.height,
+              pixelWidth: canvas.width, pixelHeight: canvas.height,
+              terminalWidth: Number(option("TERMINAL_X")), terminalHeight: Number(option("TERMINAL_Y")),
+              fontWidth: Number(option("FONT_WIDTH")), fontHeight: Number(option("FONT_HEIGHT")),
+              tiles: option("TILES"), overmapTiles: option("OVERMAP_TILES"),
+              bundledTiles: FS.readdir("/gfx").filter(name => name !== "." && name !== ".."),
+              status: document.querySelector("#status").textContent
+            })};
+          })()`,
+          returnByValue: true,
+        })
+        lastState = result.result?.result?.value?.output ?? "no browser state"
+        if (lastState.startsWith("{")) {
+          const state = JSON.parse(lastState)
+          const expectedWidth = Math.max(width, state.fontWidth * 80)
+          const expectedHeight = Math.max(height, state.fontHeight * 24)
+          if (
+            state.width === expectedWidth && state.height === expectedHeight &&
+            state.pixelWidth === expectedWidth * scale &&
+            state.pixelHeight === expectedHeight * scale &&
+            state.terminalWidth === Math.floor(expectedWidth / state.fontWidth) &&
+            state.terminalHeight === Math.floor(expectedHeight / state.fontHeight) &&
+            state.tiles === "UNDEAD_PEOPLE_BASE" && state.overmapTiles === "UNDEAD_PEOPLE_BASE" &&
+            state.bundledTiles.length === 1 && state.bundledTiles[0] === "MSX++UnDeadPeopleEdition"
+          ) return
+          if (state.status.startsWith("Cataclysm stopped:")) throw new Error(state.status)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
+      throw new Error(`Game did not resize to ${width}x${height} at ${scale}x: ${lastState}`)
+    }
+
+    await send("Emulation.setDeviceMetricsOverride", {
+      width: 1280,
+      height: 720,
+      deviceScaleFactor: 2,
+      mobile: false,
+    })
+    await send("Page.navigate", { url: `http://127.0.0.1:${port}/cataclysm-bn-tiles.html` })
+    await checkGameSize(1280, 720, 2)
+    await checkGameSize(1024, 640, 2)
+    await checkGameSize(500, 300, 2)
+
+    /// A legacy browser profile must retain unrelated files and replace unavailable RetroDays
+    /// selections with the only bundled tileset after a reload.
+    await send("Runtime.evaluate", {
+      expression: `(async () => {
+        const path = "/userdata/config/options.json";
+        const options = JSON.parse(FS.readFile(path, {encoding: "utf8"}));
+        for (const option of options) {
+          if (option.name === "TILES" || option.name === "OVERMAP_TILES") option.value = "retrodays";
+        }
+        FS.writeFile(path, JSON.stringify(options));
+        FS.writeFile("/userdata/resize-test-preserved", "preserved");
+        if (!await flushBrowserSaves()) throw new Error("Could not save legacy test profile");
+        return {output: "saved"};
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
+    })
+    await send("Page.reload")
+    await checkGameSize(500, 300, 2)
+    const preserved = await send("Runtime.evaluate", {
+      expression: `({output: FS.readFile("/userdata/resize-test-preserved", {encoding: "utf8"})})`,
+      returnByValue: true,
+    })
+    if (preserved.result?.result?.value?.output !== "preserved") {
+      throw new Error("Reload did not preserve the browser profile")
+    }
+    console.log("Browser game sizing, tileset, and saved-profile checks passed.")
+    socket.close()
   } finally {
     browser.kill("SIGTERM")
     server.kill("SIGTERM")

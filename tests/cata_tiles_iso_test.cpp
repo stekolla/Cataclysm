@@ -48,4 +48,23 @@ TEST_CASE("iso_tile_context_keeps_iso_after_ortho_context_loads", "[tiles][iso][
     CHECK(ortho_east.y == ortho_origin.y);
 }
 
+#    if defined(__EMSCRIPTEN__)
+/// The browser must load the complete bundled desktop tileset, not just its metadata.
+/// Load it through a real SDL tile context to catch missing sprites or texture errors.
+TEST_CASE("browser_default_tileset_loads", "[tiles][wasm]") {
+    const auto saved_tile_iso = tile_iso;
+    const on_out_of_scope restore_tile_iso([&] { tile_iso = saved_tile_iso; });
+    tile_context_fixture fixture(/*alias_overmap_context=*/true);
+    REQUIRE(fixture.valid());
+    const auto no_mods = std::vector<mod_id>();
+    tilecontext->load_tileset(
+        "UNDEAD_PEOPLE_BASE", no_mods, /*precheck=*/false, /*force=*/true,
+        /*pump_events=*/false);
+    REQUIRE(tilecontext->current_tileset());
+    CHECK(tilecontext->current_tileset()->get_tileset_id() == "UNDEAD_PEOPLE_BASE");
+    CHECK(tilecontext->get_tile_width() > 0);
+    CHECK(tilecontext->get_tile_height() > 0);
+}
+#    endif
+
 #endif // TILES
