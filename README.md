@@ -20,19 +20,13 @@ from Cataclysm: Dark Days Ahead. It is no longer part of or maintained by the Br
 
 ## Browser game
 
-Cataclysm runs in a desktop browser with WebAssembly JavaScript Promise Integration (JSPI).
-With Docker running, start the game from the repository root:
-
-```sh
-./play
-```
-
-Open <http://127.0.0.1:8000/cataclysm-bn-tiles.html> when the build finishes. Press Ctrl+C to stop.
-See the [browser build guide](docs/en/dev/guides/building/cmake.md) for details.
-
-To run tests, use `./test` for the fast suite or `./test all` for both test suites.
+Cataclysm runs in a desktop browser that supports WebAssembly JavaScript Promise Integration (JSPI).
+The browser version runs in English with sound disabled. Saves stay in the browser profile where
+you played.
 
 ## Contributing
+
+See the [developer build guide](docs/en/dev/guides/building/cmake.md) for local setup and validation.
 
 > Cataclysm and its inherited content are developed under the Creative Commons Attribution-ShareAlike 3.0 license. The
 > code and content of the game is free to use, modify, and redistribute for any purpose whatsoever.

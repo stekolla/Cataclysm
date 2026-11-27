@@ -1,6 +1,6 @@
 ---
 name: add-lua-binding-simple
-description: Add simple Cataclysm-BN Lua bindings for string_id types, enums, and basic read-only C++ types. Use when exposing straightforward C++ types to Lua.
+description: Add simple Cataclysm Lua bindings for string_id types, enums, and basic read-only C++ types. Use when exposing straightforward C++ types to Lua.
 metadata:
   argument-hint: TypeName [output-file]
 ---
@@ -97,13 +97,10 @@ DOC( "Additional details about usage" );
 
 ## Testing
 
-After adding bindings:
+Follow the [testing guide](../../../docs/en/dev/guides/testing.md). Use real bound objects to test
+the binding. For a supplementary manual check, open the Lua console from the debug menu:
 
-```sh
-# Build
-cmake --build --preset linux-full --target cataclysm-bn-tiles
-
-# Test in Lua console (debug menu -> Lua console)
+```lua
 local my_id = MyTypeId.new("some_id")
 print(my_id:str())
 print(my_id:is_valid())

@@ -9,15 +9,33 @@ Linux test-only route and browser route through the repository's Docker environm
 ./test all   # Both
 ```
 
+Use `./test` for non-graphical gameplay checks and `./test wasm` for changes that need the
+browser, video, or GPU. `./test all` already runs both routes; don't repeat them afterward.
+For visible changes such as a main-menu edit, check the running browser game as well: the
+automated suites do not verify every screen. See the [build guide](building/cmake.md#testing-and-reusing-a-browser-build)
+to serve the Wasm test build without rebuilding it.
+
 The Linux route builds the curses test executable without building a native game. It runs the
 Catch2 selection that excludes `[slow]` and `[wasm]` tests in one process, so it can still take a
 while. Tests that require video or GPU initialization
 must have the `[wasm]` tag and run through the browser route. The browser route builds the Wasm game
 and test runner, then runs the tests in headless Chromium.
 
-The browser runner uses a fixed random seed and CPU compute. Run
-`ctest --test-dir out/build/wasm-tests --show-only` inside the container to list its tests. See the
-[browser build guide](building/cmake.md) for the container setup.
+The browser runner uses a fixed random seed and CPU compute. It also checks the canvas, viewport
+resizing, default tileset, and saved settings. Both runners use fixtures from `tests/data/TEST_DATA`
+in temporary user directories; the player-facing browser archive excludes those fixtures. The Wasm
+test runner embeds the ASCII and isometric tilesets used by tile-context tests.
+
+After building a suite, list the registered CTest checks or rerun a named check without rebuilding:
+
+```sh
+bash build-scripts/run-docker.sh ctest --test-dir out/build/wasm-tests --show-only
+bash build-scripts/run-docker.sh ctest --test-dir out/build/wasm-tests \
+    --output-on-failure --no-tests=error -R '<CTest test name regex>'
+```
+
+Use `out/build/linux-tests` for the fast suite. `-R` selects CTest checks, not Catch2 case names
+or tags.
 
 ## Guidelines
 

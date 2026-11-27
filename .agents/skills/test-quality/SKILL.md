@@ -1,11 +1,12 @@
 ---
 name: test-quality
-description: Write or review Cataclysm-BN tests that avoid flakes, use deterministic fixtures, and clean up global state.
+description: Write or review Cataclysm tests that avoid flakes, use deterministic fixtures, and clean up global state.
 ---
 
 # Test Quality
 
-Use when adding or changing automated tests.
+Use when adding or changing automated tests. See the [testing guide](../../../docs/en/dev/guides/testing.md)
+to select a runner.
 
 ## Gates
 
@@ -13,7 +14,7 @@ Use when adding or changing automated tests.
 - Use deterministic fixtures from `tests/data/TEST_DATA` for data with random, balance, or evolving behavior.
 - Avoid assertions that rely on probability, wall-clock time, locale, file order, or current global options unless the test pins them.
 - Reproduce reported flakes with the failing `--rng-seed` before accepting the fix.
-- When CI test jobs fail, inspect the job log for the exact test command, filters, shard split, user-dir, order-sensitive included tests, `--rng-seed`, and backend flags. Run that same shard command on the final rebased HEAD before declaring the fix validated; do not substitute a narrower tag filter or a different full-test command.
+- When a CI test job fails, inspect its exact invocation. Reproduce it on the final revision with the same filters, ordering, seed, user directory, backend, and shard if applicable. A narrower tag filter or a different suite does not replace that check.
 - Before pushing test fixes that touch global state, NPCs, maps, overmaps, player position, RNG, options, or fixtures, run both the relevant focused test and the CI-equivalent shard/full command that can expose state bleed from earlier tests.
 - Keep Lua/C++ integration tests on real bound objects when the binding behavior is under test.
 - Expected `DebugLog(DL::Error, ...)` still makes the test process fail even when assertions pass. Use

@@ -40,26 +40,29 @@ unavailable tileset fall back to Undead People. It runs in English with sound di
 Use **Save and Quit** (`S`) before reloading. Saves stay in that browser profile for the same site
 address and port. Use one Cataclysm tab per site to keep saves consistent.
 
-## Build and Run Tests
+## Testing and Reusing a Browser Build
 
-Run the fast tests or both suites through Docker:
+See the [testing guide](../testing.md) to choose a suite. If you already built the game with
+`./test wasm` or `./test all`, serve that output without rebuilding. From the repository root,
+with port 8000 free:
 
 ```sh
-./test
-./test all
+CATA_DOCKER_PUBLISH=1 bash build-scripts/run-docker.sh \
+    python3 -m http.server 8000 --bind 0.0.0.0 --directory out/build/wasm-tests/web
 ```
 
-`./test` builds and runs the Linux curses test-only configuration. It does not build a
-native game. It runs the Catch2 selection excluding hidden, `[slow]`, and `[wasm]` tests in one
-process, so the suite can still take a while.
+Open the same URL as for `./play`.
 
-`./test wasm` builds the browser game and Wasm test runner, then runs the tests in headless
-Chromium. Mark tests that need video or GPU initialization with the `[wasm]` Catch2 tag. The browser
-runner uses a fixed random seed and CPU compute.
-Both test runners load the fixtures in `tests/data/TEST_DATA` into a temporary test user directory.
-The browser game archive does not include those fixtures.
-The Wasm test runner also embeds the ASCII and isometric tilesets used by the tile-context tests.
-The browser suite also checks the game canvas, viewport resizing, default tileset, and saved settings.
+## Troubleshooting
+
+If a host CMake command reports a missing Emscripten toolchain or Ninja, use `./play` or the test
+wrapper instead. The presets run inside the Docker environment, which supplies those tools. If
+the wrapper cannot connect to Docker, start Docker and check that `docker info` succeeds.
+
+When modifying the Wasm toolchain, match the `setjmp`/`longjmp` implementation of C dependencies
+to the game's C++ exception mode. With native Wasm exceptions, use FreeType's
+`freetype-legacysjlj` port archive and JSPI for browser waits. Asyncify's Wasm rewriting cannot
+reliably combine those waits with native Wasm exceptions.
 
 ## Standalone JSON Formatter
 

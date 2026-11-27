@@ -1,6 +1,6 @@
 ---
 name: add-lua-binding-api
-description: Add Cataclysm-BN Lua API bindings for global game functions, utility libraries, constants, callbacks, and domain-specific Lua namespaces.
+description: Add Cataclysm Lua API bindings for global game functions, utility libraries, constants, callbacks, and domain-specific Lua namespaces.
 metadata:
   argument-hint: api-domain
 ---
@@ -383,6 +383,9 @@ luna::set_fx( lib, "risky_operation",
 
 ## Testing Your API
 
+Follow the [testing guide](../../../docs/en/dev/guides/testing.md). Test the binding with real
+bound objects; use the Lua console for supplementary checks.
+
 ```lua
 -- In Lua console
 
@@ -426,10 +429,9 @@ luna::set_fx( lib, "create_item_builder",
 
 ## File Organization
 
-- `catalua_bindings_game.cpp` - Game state, player, time
-- `catalua_bindings_map.cpp` - Map operations
-- `catalua_bindings_ui.cpp` - UI and messages
-- Create new file for new API domain
+- Check `src/catalua_bindings/core_api.cpp` and the domain-specific registration modules under
+  `src/catalua_bindings/` before adding a new file.
+- Extend the existing registration for the relevant domain when possible.
 
 ## References
 

@@ -1,11 +1,11 @@
 ---
 name: lua-binding-reference
-description: Quick reference for Cataclysm-BN Lua binding macros, Luna usertypes, libraries, documentation, type patterns, build steps, and common errors.
+description: Quick reference for Cataclysm Lua binding macros, Luna usertypes, libraries, documentation, type patterns, and common errors.
 ---
 
 # Lua Binding Quick Reference
 
-Comprehensive reference for adding Lua bindings to Cataclysm: Bright Nights.
+Quick reference for adding Lua bindings to Cataclysm.
 
 ## Luna Documentation Macros
 
@@ -398,17 +398,9 @@ src/
 
 ## Build and Test
 
-```sh
-# Build
-cmake --build --preset linux-full --target cataclysm-bn-tiles
-
-# Format C++
-cmake --build build --target format
-
-# Test in Lua console
-# Debug menu -> Lua console
-# Or: Debug menu -> Info -> Submit bug report (U)
-```
+Follow the [formatting guide](../../../docs/en/dev/guides/formatting.md) and
+[testing guide](../../../docs/en/dev/guides/testing.md). Use the debug menu's Lua console for
+supplementary manual checks.
 
 ## Lua Testing Patterns
 
@@ -455,12 +447,12 @@ player:add_msg("Hello from Lua!")
 | Ambiguous function call           | Use `sol::resolve<signature>()`                 |
 | Type not copyable                 | Use `luna::no_constructor` and provide factory  |
 | Comparison operators missing      | Implement `operator==` and `operator<` for type |
-| Build error with `// *NOPAD*`     | Only use for reference/pointer returns          |
+| Formatter changes `// *NOPAD*`    | Follow [AGENTS.md](../../../AGENTS.md) for astyle and clang-format rules |
 
 ## Key References
 
 - **Integration Docs**: `docs/en/mod/lua/explanation/lua_integration.md`
 - **Style Guide**: `docs/en/mod/lua/explanation/lua_style.md`
 - **Luna System**: `src/catalua_luna.h`
-- **Examples**: `src/catalua_bindings_creature.cpp`, `src/catalua_bindings_item.cpp`
+- **Examples**: `src/catalua_bindings/creature.cpp`, `src/catalua_bindings/item.cpp`
 - **Sol2 Docs**: https://sol2.readthedocs.io/

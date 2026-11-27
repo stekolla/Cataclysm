@@ -1,6 +1,6 @@
 ---
 name: add-lua-binding-complex
-description: Add comprehensive Cataclysm-BN Lua bindings for complex C++ classes with methods, inheritance, constructors, properties, operators, and ownership rules.
+description: Add comprehensive Cataclysm Lua bindings for complex C++ classes with methods, inheritance, constructors, properties, operators, and ownership rules.
 metadata:
   argument-hint: ClassName [binding-file]
 ---
@@ -300,16 +300,9 @@ derived:base_method()  -- Should work if inheritance correct
 
 ## Build and Verify
 
-```sh
-# Build
-cmake --build --preset linux-full --target cataclysm-bn-tiles cata_test-tiles
-
-# Format
-cmake --build build --target format
-
-# Test
-./out/build/linux-full/tests/cata_test-tiles "[lua]"
-```
+Follow the [formatting guide](../../../docs/en/dev/guides/formatting.md) and
+[testing guide](../../../docs/en/dev/guides/testing.md). Test the binding with real bound objects;
+the console examples supplement automated coverage.
 
 ## Common Patterns Reference
 
@@ -364,8 +357,8 @@ luna::set_fx( ut, "to_gram", &units::to_gram<std::int64_t> );
 
 ## Reference Files
 
-- Example complex class: `src/catalua_bindings_creature.cpp` (Character, Creature)
-- Example with items: `src/catalua_bindings_item.cpp`
+- Character and Creature: `src/catalua_bindings/character.cpp` and `src/catalua_bindings/creature.cpp`
+- Items: `src/catalua_bindings/item.cpp` and its domain-specific modules
 - Luna system: `src/catalua_luna.h`
 - Utility macros: `src/catalua_bindings_utils.h`
 - Integration docs: `docs/en/mod/lua/explanation/lua_integration.md`

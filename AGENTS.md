@@ -1,6 +1,18 @@
 # Cataclysm - Agent Guidelines
 
-Read `docs/` first. Large legacy codebase: search for an existing solution before writing one.
+Search for existing solutions before writing new code.
+
+## Building and Testing
+
+This project ships a browser game, not a native game. Run the repository's Docker wrappers from
+the repository root, not CMake on the host. Start with the
+[build guide](docs/en/dev/guides/building/cmake.md), [testing guide](docs/en/dev/guides/testing.md),
+and [formatting guide](docs/en/dev/guides/formatting.md).
+
+Choose the smallest relevant validation route. Run one build at a time and rebuild only when
+inputs change or a failure requires it. Reuse the browser game built by the Wasm test suite for
+manual checks. If the user objects to waiting, ask before starting another long build and report
+what remains unverified.
 
 ## C++ Conventions (NEVER VIOLATE)
 
@@ -58,23 +70,8 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
 ## Workflow
 
 1. Issue link: fetch it with `gh`, then `git gtr new <type>/<issue-id>/<slug>` (`feat`, `fix`, `refactor`, `chore`, `build`, `ci`).
-2. Format touched files before building or testing (`build-scripts/fmt.sh cpp <files>`, `build-scripts/fmt.sh json <files>`, `build-scripts/fmt.sh docs`, `build-scripts/fmt.sh lua`). If only a broad target fits (`cmake --build build --target format` / `style-json-parallel`), revert unrelated formatter changes.
-3. Before building, finish and format related changes, then choose the smallest relevant validation
-   route. Run one build at a time; do not start another build for the same change while one is
-   running. Rebuild only when subsequent changes affect build inputs or a failure requires it.
-   If the user objects to waiting for builds, do not start another long build without their approval;
-   report what remains unverified instead.
-
-   `./test wasm` builds both the browser game and its test runner in `wasm-tests`; use that game
-   output for browser checks instead of also building `wasm-tiles` with `./play`. `./test all`
-   already runs both `./test` and `./test wasm`, so do not repeat those commands afterward. The
-   native runner is for non-graphical tests on Linux; it does not build the game. Tests that need
-   video or GPU initialization use the `[wasm]` tag and run through the browser route.
-   For Emscripten, match the setjmp/longjmp implementation of C dependencies to the game's C++ exception mode.
-   With native Wasm exceptions, select FreeType's `freetype-legacysjlj` port archive.
-   Use JSPI for browser waits with native Wasm exceptions. Asyncify's Wasm rewriting cannot reliably combine the two.
-   Keep unsaved moves available for a manual retry after failed autosaves, and rate-limit automatic retries.
-4. Check migrated scripts against the original CLI output and fixtures before switching their callers.
+2. Format touched files before building or testing. Do not retain unrelated formatter changes.
+3. Check migrated scripts against the original CLI output and fixtures before switching their callers.
    Exercise staged formatting with the system Bash on macOS when changing the formatter wrapper.
    Add/update focused Catch2 tests in `tests/` for changed behavior. Run the relevant test route and
    `./build-scripts/lint-json.sh` when JSON changes require it; do not run unrelated suites by default.
@@ -82,12 +79,14 @@ auto print_button( const catacurses::window &w, const button_options &opts ) -> 
    For browser canvas changes, verify the running game's CSS size, backing pixels, and terminal size
    on resize and high-DPI displays; SDL may overwrite canvas styles during startup.
    Each new test needs a short `///` comment that a developer new to that code can follow: what it checks, why, and how.
-5. Commit atomically with [Conventional Commits](./docs/en/contribute/pr_title_guidelines.md); no body/footer unless critical.
-6. PR: [template](./.github/pull_request_template.md), no fluff, **SHOULD** use ASD-STE100 Simplified Technical English. `git push && gh pr create --web --fill`. Track `gh pr checks` until done; fix branch-owned failures, rerun or report transient ones with the failing job.
+4. Commit atomically with [Conventional Commits](./docs/en/contribute/pr_title_guidelines.md); no body/footer unless critical.
+5. Follow the [PR skill](.agents/skills/pr/SKILL.md) and [PR template](.github/pull_request_template.md). Prefer ASD-STE100 Simplified Technical English. Track `gh pr checks` until done; fix branch-owned failures, rerun or report transient ones with the failing job.
 
 If a mistake is found during a task, update AGENTS.md or the skill and fix the current branch before summarizing.
 
 ## Data and Review
+
+- Keep unsaved moves available for manual retry after failed autosaves, and rate-limit automatic retries.
 
 - Digital files keep at least 1 ml volume; zero-volume items are rejected, including scanned books.
 - When generated or pulled files stop being tracked, verify ignore rules (`git status --ignored` or run the generator) and that every CI and release consumer still gets them.

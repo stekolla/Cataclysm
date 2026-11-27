@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Create or update Cataclysm-BN PRs with validated titles, terse bodies, related links, and reviewer-useful evidence.
+description: Create or update Cataclysm PRs with validated titles, terse bodies, related links, and reviewer-useful evidence.
 compatibility: git, gh, conventional-prs
 ---
 
@@ -29,9 +29,9 @@ Use before `gh pr create`, `gh pr edit`, PR body edits, or PR title edits.
 - Keep the body terse. Include only reviewer-useful context.
 - Purpose: state the bug/need and the relevant evidence. Paste the key log/screenshot/result snippet when it proves the issue.
 - Solution: concise bullets for what changed.
-- Testing: do not dump CI-equivalent command lists. State target/manual validations and results; include commands only when local-only, non-obvious, or useful for reproduction.
+- Testing: state what ran and the result, and note relevant checks that were not run. Include exact commands when the template requests them or they help reproduce the result.
 - Preserve human content, artifacts, screenshots, checklist state, and generated artifact blocks when editing.
-- Remove irrelevant optional checklist items; keep applicable required/template items concrete.
+- Preserve the template's headings, comments, checklist items, and order. Replace placeholders with concrete details.
 
 ## Workflow
 
