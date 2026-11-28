@@ -547,7 +547,7 @@
   {
     "id": "first_aid_kits_any",
     "type": "item_group",
-    "//": "Used for the MISSION_RANCH_FOREMAN_10 quest",
+    "//": "Used for the Open the Clinic mission.",
     "items": [ [ "1st_aid", 100 ], [ "1st_aid_deluxe", 100 ], [ "1st_aid_ifak", 100 ] ]
   },
   {

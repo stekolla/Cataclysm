@@ -384,6 +384,106 @@ TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma
     CHECK(find_response(offer) == d.responses.end());
 }
 
+/// Check the opening delivery against real inventories: a different kind of kit does not
+/// count toward the six matching kits, and the next foreman job is the workshop.
+TEST_CASE("tacoma_clinic_opening_delivery", "[npc][mission][tacoma]") {
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    const auto giver = g->assign_npc_id();
+    auto* job = mission::reserve_new(mission_type_id("MISSION_TACOMA_OPEN_CLINIC"), giver);
+    job->assign(player);
+
+    for (auto i = 0; i < 5; ++i) { player.i_add(item::spawn("1st_aid_ifak")); }
+    player.i_add(item::spawn("1st_aid"));
+    player.invalidate_crafting_inventory();
+    CHECK_FALSE(job->is_complete(giver));
+    player.i_add(item::spawn("1st_aid_ifak"));
+    player.invalidate_crafting_inventory();
+    CHECK(job->is_complete(giver));
+    CHECK(job->get_follow_up() == mission_type_id("MISSION_RANCH_FOREMAN_12"));
+}
+
+/// Complete the nurse's two projects on a loaded clinic tile, without taking a workshop job.
+/// Check the exact payments, restock transition, and one physician spawn.
+TEST_CASE("tacoma_nurse_projects", "[npc][mission][tacoma]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto& nurse = spawn_npc(player.bub_pos() + point(2, 0), "ranch_nurse_1");
+    auto& overmap = ACTIVE_OVERMAP_BUFFER;
+    const auto clinic = player.abs_omt_pos();
+    const auto roof = clinic + tripoint_rel_omt(0, 0, 1);
+    const auto previous_clinic = overmap.ter(clinic);
+    const auto previous_roof = overmap.ter(roof);
+    auto visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
+    for (auto z = 0; z <= 1; ++z) {
+        for (auto y = -1; y <= 1; ++y) {
+            for (auto x = -1; x <= 1; ++x) {
+                const auto tile = clinic + tripoint_rel_omt(x, y, z);
+                visibility.emplace_back(tile, overmap.seen(tile));
+            }
+        }
+    }
+    const auto restore_overmap = on_out_of_scope([&] {
+        overmap.ter_set(clinic, previous_clinic);
+        overmap.ter_set(roof, previous_roof);
+        for (const auto& [tile, seen] : visibility) { overmap.set_seen(tile, seen); }
+    });
+    overmap.ter_set(clinic, oter_id("ranch_camp_50_north"));
+    overmap.ter_set(roof, oter_id("ranch_camp_50_z1_north"));
+
+    const auto complete = [&](const char* mission_id, const char* item_id, const int quantity) {
+        REQUIRE(nurse.chatbin.missions.size() == 1);
+        auto* job = nurse.chatbin.missions.front();
+        REQUIRE(job->get_type().id == mission_type_id(mission_id));
+        nurse.chatbin.mission_selected = job;
+        talk_function::assign_mission(nurse);
+        CHECK_FALSE(job->is_complete(nurse.getID()));
+        for (auto i = 0; i < quantity; ++i) { player.i_add(item::spawn(item_id)); }
+        player.invalidate_crafting_inventory();
+        REQUIRE(job->is_complete(nurse.getID()));
+        job->wrap_up();
+        job->wrap_up();
+        CHECK_FALSE(player.has_amount(itype_id(item_id), 1));
+        talk_function::clear_mission(nurse);
+    };
+
+    const auto bandages = itype_id("bandages");
+    const auto merch = itype_id("FMCNote");
+    nurse.shop_restock();
+    const auto initial_stock = nurse.charges_of(bandages);
+    REQUIRE(initial_stock >= 6);
+    complete("MISSION_TACOMA_EXPAND_CLINIC", "hotplate", 3);
+    CHECK(player.charges_of(merch) == 5);
+    nurse.shop_restock();
+    CHECK(nurse.charges_of(bandages) == initial_stock);
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    nurse.shop_restock();
+    CHECK(nurse.charges_of(bandages) >= 14);
+    CHECK(nurse.has_amount(itype_id("1st_aid"), 1));
+
+    complete("MISSION_TACOMA_RECRUIT_PHYSICIAN", "anesthetic_kit", 1);
+    CHECK(player.charges_of(merch) == 29);
+    CHECK(nurse.chatbin.missions.empty());
+    g->load_npcs();
+    auto doctors = 0;
+    for (auto& resident : g->all_npcs()) {
+        if (resident.chatbin.first_topic == "TALK_RANCH_DOCTOR") { ++doctors; }
+    }
+    CHECK(doctors == 1);
+}
+
 static const efftype_id effect_gave_quest_item("gave_quest_item");
 static const efftype_id effect_currently_busy("currently_busy");
 static const efftype_id effect_infection("infection");

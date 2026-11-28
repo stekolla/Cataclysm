@@ -13,9 +13,9 @@
   {
     "type": "talk_topic",
     "id": "TALK_RANCH_DOCTOR",
-    "dynamic_line": "I'm sorry, I don't have time to see you at the moment.",
+    "dynamic_line": "Thanks for helping set up the clinic. If you need help with an implant, we can talk.",
     "responses": [
-      { "text": "For the right price could I borrow your services?", "topic": "TALK_RANCH_DOCTOR_BIONICS" },
+      { "text": "Can you help me with an implant?", "topic": "TALK_RANCH_DOCTOR_BIONICS" },
       { "text": "…", "topic": "TALK_DONE" }
     ]
   },

@@ -15,8 +15,8 @@ normal restock.
 
 After Prepare the Fields the foreman requests 50 steel pipes for a well and clean-water pump
 (24 Merch), then two motors to complete the sawmill (18 Merch). The sawmill supports Tacoma
-itself; the lumberjack's existing service is unchanged. The next foreman mission remains
-stage 9. In parallel, the Crop Overseer requests 30 units of liquid fertilizer (5 Merch).
+itself; the lumberjack's existing service is unchanged. The foreman then opens the clinic.
+In parallel, the Crop Overseer requests 30 units of liquid fertilizer (5 Merch).
 The expanded stock uses the same prices and appears at the next normal restock.
 
 | Legacy stages | New owner and location |
@@ -28,13 +28,30 @@ The expanded stock uses the same prices and appears at the next normal restock.
 
 The former stages 4–8 are removed. Only the new project route is supported.
 
+## Phase 3: Medical care
+
+- **Open the Clinic:** Six matching first-aid kits, of any of the three accepted kinds,
+  earn 72 Merch. The foreman opens the furnished southern clinic and its roof on tile 50.
+  The nurse offers paid treatment at the existing 80/200 Merch rates and trades in
+  routine medical supplies.
+- **Expand Medical Care:** Three hotplates earn 5 Merch. The nurse opens the furnished
+  northern ward and its roof, and the dispensary gets more supplies at the next restock.
+- **Recruit a Physician:** One anesthesia kit earns 24 Merch. Kits are found in doctors'
+  offices and labs, or can be crafted at first aid 3. The physician provides the existing
+  implant installation and removal services.
+
+The foreman can offer stage 12 immediately after opening the clinic, regardless of the nurse's
+quests. Opening the clinic temporarily retains the old tool shed and outhouse finishes,
+the vehicle workshop shell and roof, and nearby parked vehicles. Reassign these supporting
+updates during the workshop rework.
+
+The old foreman stages 9–11 and ten nurse deliveries are retired. As in Phase 2, saves on
+the superseded Tacoma routes are not migrated.
+
 ## Remaining foreman work
 
 | Stage | Delivery | Existing effects to preserve in later restructuring |
 | --- | --- | --- |
-| 9 | Bleach | Finish tool shed and outhouse, start clinic |
-| 10 | First aid kits | Clinic and roof, start vehicle workshop |
-| 11 | Arc welders | Finish clinic, workshop and roof, supporting site work |
 | 12 | Car batteries | Finish vehicle workshop, start scavenger shop, supporting site work |
 | 13 | Two-way radios | Scavenger shop and roof, barber, supporting site work |
 | 14 | Backpacks | Finish scavenger shop, start bar, supporting site work |
@@ -42,5 +59,5 @@ The former stages 4–8 are removed. Only the new project route is supported.
 | 16 | Sugar | Finish bar, start greenhouse |
 | 17 | Glass sheets | Finish greenhouse and roof |
 
-Clinic, workshop, commerce, and greenhouse development still follow the existing linear
-chain. Their quest ownership and greenhouse stock upgrades are follow-up work.
+Workshop, commerce, and greenhouse development still follow the existing linear chain.
+Their quest ownership and greenhouse stock upgrades are follow-up work.

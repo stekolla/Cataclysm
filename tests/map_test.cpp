@@ -208,6 +208,33 @@ TEST_CASE("tacoma_phase_two_map_updates", "[mapgen][tacoma]") {
     CHECK(fields.furn(existing_crop) == furn_id("f_plant_seed"));
 }
 
+/// The finished ward and physician furnishings must not replace the original dispensary.
+TEST_CASE("tacoma_clinic_map_updates", "[mapgen][tacoma]") {
+    const auto static_npcs = override_option("STATIC_NPC", "false");
+    auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());
+    auto clinic = mapgen_constructor(buffer);
+    clinic.reset_scratch_omt(
+        tripoint_abs_omt(11, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto site = mapgendata(clinic, mapgendata::dummy_settings);
+    const auto counter = point_omt_ms(4, 17);
+    const auto entrance = point_omt_ms(10, 17);
+    const auto bed = point_omt_ms(3, 5);
+    const auto dresser = point_omt_ms(2, 5);
+
+    REQUIRE(run_mapgen_update_func("tacoma_open_clinic", site));
+    CHECK(clinic.ter(entrance) == ter_id("t_door_c"));
+    REQUIRE(clinic.furn(counter) == furn_id("f_counter"));
+    clinic.spawn_item(counter, itype_id("hammer"));
+    REQUIRE(run_mapgen_update_func("tacoma_expand_clinic", site));
+    REQUIRE(clinic.furn(bed) == furn_id("f_makeshift_bed"));
+    REQUIRE(run_mapgen_update_func("tacoma_recruit_physician", site));
+    CHECK(clinic.furn(dresser) == furn_id("f_dresser"));
+    CHECK(clinic.furn(bed) == furn_id("f_makeshift_bed"));
+    CHECK(clinic.furn(counter) == furn_id("f_counter"));
+    REQUIRE(clinic.i_at(counter).size() == 1);
+    CHECK(clinic.i_at(counter).only_item().typeId() == itype_id("hammer"));
+}
+
 TEST_CASE("mapgen_items_stay_on_sealed_container_tiles", "[mapgen][item][regression]") {
     clear_all_state();
     auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());
