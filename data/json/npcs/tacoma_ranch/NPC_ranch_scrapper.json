@@ -2,13 +2,57 @@
   {
     "type": "npc",
     "id": "ranch_scrapper_1",
-    "//": "Flavor",
     "name_suffix": "Scrapper",
-    "class": "NC_HUNTER",
+    "class": "NC_TACOMA_WORKSHOP_MERCHANT",
     "attitude": 0,
     "mission": 7,
     "chat": "TALK_RANCH_SCRAPPER",
     "faction": "tacoma_commune"
+  },
+  {
+    "type": "npc_class",
+    "id": "NC_TACOMA_WORKSHOP_MERCHANT",
+    "name": "Workshop Scrapper",
+    "job_description": "I salvage parts and keep Tacoma's machines running.",
+    "common": false,
+    "shopkeeper_item_group": "tacoma_workshop_sell",
+    "trade_pricing": {
+      "curated_stock": true,
+      "retail_percent": 140,
+      "purchase_percent": 40,
+      "categories": {
+        "guns": { "purchase_percent": 0 },
+        "ammo": { "purchase_percent": 0 },
+        "bionics": { "purchase_percent": 0 },
+        "clothing": { "purchase_percent": 10 },
+        "food": { "purchase_percent": 10 },
+        "tools_workshop": { "purchase_percent": 60 }
+      },
+      "items": {
+        "light_battery_cell": { "purchase_percent": 60 },
+        "jumper_cable": { "purchase_percent": 60 },
+        "scrap": { "purchase_percent": 20 }
+      }
+    }
+  },
+  {
+    "type": "item_group",
+    "id": "tacoma_workshop_sell",
+    "subtype": "collection",
+    "entries": [
+      { "item": "scrap", "count": [ 3, 6 ] },
+      { "item": "steel_chunk", "count": [ 1, 3 ] },
+      { "item": "duct_tape", "charges": [ 20, 40 ] },
+      { "item": "light_battery_cell" },
+      { "item": "hose", "prob": 60 },
+      { "item": "wrench", "prob": 65 },
+      { "item": "jack", "prob": 40 },
+      { "item": "jumper_cable", "prob": 50 },
+      { "item": "goggles_welding", "prob": 30 },
+      { "item": "solder_wire", "prob": 50 },
+      { "item": "welder", "prob": 15 },
+      { "item": "battery_car", "prob": 20 }
+    ]
   },
   {
     "type": "talk_topic",
@@ -16,7 +60,8 @@
     "dynamic_line": "Don't mind me.",
     "responses": [
       { "text": "What is your job here?", "topic": "TALK_RANCH_SCRAPPER_JOB" },
-      { "text": "Do you need any help?", "topic": "TALK_RANCH_SCRAPPER_HIRE" },
+      { "text": "Have any spare parts or tools for sale?", "topic": "TALK_RANCH_SCRAPPER", "effect": "start_trade" },
+      { "text": "What kinds of parts are you looking for?", "topic": "TALK_RANCH_SCRAPPER_HIRE" },
       { "text": "I've got to go…", "topic": "TALK_DONE" }
     ]
   },
@@ -29,7 +74,7 @@
   {
     "type": "talk_topic",
     "id": "TALK_RANCH_SCRAPPER_HIRE",
-    "dynamic_line": "I don't personally, the teams we send out to recover the vehicles usually need a hand but can be hard to catch since they spend most of their time outside the outpost.",
+    "dynamic_line": "Working tools, batteries, and anything that keeps a truck on the road.  We only need a little scrap for patching things up.",
     "responses": [ { "text": "OK.", "topic": "TALK_RANCH_SCRAPPER" } ]
   }
 ]

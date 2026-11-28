@@ -2,6 +2,18 @@
   {
     "type": "mapgen",
     "method": "json",
+    "update_mapgen_id": "tacoma_equip_workshop",
+    "object": { "place_nested": [ { "chunks": [ "tacoma_commune_chopshop_12_done" ], "x": 0, "y": 0 } ] }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_open_scavenger_depot",
+    "object": { "place_nested": [ { "chunks": [ "tacoma_commune_junk_shop_14_done" ], "x": 0, "y": 0 } ] }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
     "update_mapgen_id": "tacoma_open_clinic",
     "object": { "place_nested": [ { "chunks": [ "tacoma_commune_clinic_11" ], "x": 0, "y": 0 } ] }
   },
@@ -541,41 +553,6 @@
   {
     "type": "mapgen",
     "method": "json",
-    "nested_mapgen_id": "tacoma_commune_chopshop_11",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "  wwwwwwwwwwwwwwwwwwww  ",
-        "  w..................w  ",
-        "  ....................  ",
-        "  ....................  ",
-        "  ....................  ",
-        "  ....................  ",
-        "  ....................  ",
-        "  ....................  ",
-        "  w..................w  ",
-        "  wwwwwww+www+wwwwwwww  ",
-        "       w...w...w        ",
-        "       w...w...w        ",
-        "       wwwwww+ww        ",
-        "                        ",
-        "                        "
-      ],
-      "terrain": { ".": "t_dirtfloor", "w": "t_wall_wood", "+": "t_door_c" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
     "nested_mapgen_id": "tacoma_commune_chopshop_12_done",
     "object": {
       "mapgensize": [ 24, 24 ],
@@ -620,7 +597,7 @@
         "R": { "item": "supplies_mechanics", "chance": 100, "repeat": [ 3, 6 ] },
         "r": { "item": "tools_mechanic", "chance": 100, "repeat": [ 2, 4 ] }
       },
-      "place_vehicles": [ { "vehicle": "armored_car", "chance": 100, "rotation": 0, "x": 15, "y": 12 } ],
+      "place_vehicles": [ { "vehicle": "armored_car", "chance": 100, "rotation": 0, "x": 15, "y": 12, "merge_wrecks": false } ],
       "place_npcs": [ { "class": "ranch_scrapper_1", "x": 11, "y": 17 } ]
     }
   },
@@ -998,76 +975,6 @@
         "                        "
       ],
       "terrain": { ".": "t_glass_roof" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_junk_shop_12",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        " wwwwww                 ",
-        " w....wwww[[[wwww       ",
-        " [....w.........w       ",
-        " [....f.........w       ",
-        " w....w.........w       ",
-        " wwwwww.........[       ",
-        "      w.........w       ",
-        "      f.........w       ",
-        "      w.........w       ",
-        "      www.....www       ",
-        "        w.....w         ",
-        "        w.....w         ",
-        "        [.....f         ",
-        "        w.....w         ",
-        "        wwwwwww         ",
-        "                        "
-      ],
-      "terrain": { ".": "t_region_soil", "w": "t_wall_half", "f": "t_door_frame", "[": "t_window_empty" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_junk_shop_13",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        " wwwwww                 ",
-        " w....wwww[[[wwww       ",
-        " [....w.........w       ",
-        " [....+.........w       ",
-        " w....w.........w       ",
-        " wwwwww.........[       ",
-        "      w.........w       ",
-        "      +.........w       ",
-        "      w.........w       ",
-        "      www.....www       ",
-        "        w.....w         ",
-        "        w.....w         ",
-        "        [.....+         ",
-        "        w.....w         ",
-        "        wwwwwww         ",
-        "                        "
-      ],
-      "terrain": { ".": "t_dirtfloor", "w": "t_wall_wood", "+": "t_door_c", "[": "t_window_boarded_noglass" }
     }
   },
   {

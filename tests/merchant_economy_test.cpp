@@ -357,8 +357,9 @@ TEST_CASE("owen_crafting_and_unprofiled_merchants", "[npc][trade][pricing][merch
         CHECK(quote_for(state.yours, "nailboard")
               < quote_for(state.theirs, "2x4") + quote_for(state.theirs, "nail", 6));
     }
-    SECTION("A Tacoma scavenger still uses personal valuation and honors faction currency") {
-        auto fixture = merchant_test("ranch_scavenger_1");
+    SECTION(
+        "An unprofiled Tacoma resident still uses personal valuation and honors faction currency") {
+        auto fixture = merchant_test("ranch_barber");
         auto& [trader, player] = fixture;
         trader.inv_clear();
         auto& gun = give(player, item::spawn("glock_19"));
@@ -366,5 +367,29 @@ TEST_CASE("owen_crafting_and_unprofiled_merchants", "[npc][trade][pricing][merch
         auto state = fixture.quotes();
         CHECK(quote_for(state.yours, "glock_19") == trader.value(gun));
         CHECK(quote_for(state.theirs, "FMCNote") == 250);
+    }
+}
+
+/// Check that Tacoma's two merchants bid more on their own specialty and don't buy back stock
+/// at a profit.
+TEST_CASE("tacoma_commerce_specialties", "[npc][trade][pricing][merchant]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    const auto workshop = GENERATE(false, true);
+    auto fixture = merchant_test(workshop ? "ranch_scrapper_1" : "ranch_scavenger_1");
+    auto& [trader, player] = fixture;
+    trader.shop_restock();
+    const auto staple = workshop ? "light_battery_cell" : "backpack";
+    give(player, item::spawn(staple));
+    give(player, item::spawn("wrench"));
+    give(player, item::spawn("jeans"));
+    give(player, item::spawn("glock_19"));
+    const auto matched = fixture.quotes();
+    CHECK(quote_for(matched.yours, "wrench") == (workshop ? 60 : 40));
+    CHECK(quote_for(matched.yours, "jeans") == (workshop ? 15 : 90));
+    for (const auto level : {0, 4, 10}) {
+        player.set_skill_level(barter, level);
+        const auto state = fixture.quotes();
+        CHECK(line_for(state.yours, "glock_19") == state.yours.end());
+        CHECK(quote_for(state.yours, staple) < quote_for(state.theirs, staple));
     }
 }

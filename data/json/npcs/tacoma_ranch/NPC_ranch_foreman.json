@@ -395,7 +395,7 @@
     "item_group": "first_aid_kits_any",
     "count": 6,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_12",
+    "followup": "MISSION_TACOMA_EQUIP_WORKSHOP",
     "dialogue": {
       "describe": "We need to open a clinic.",
       "offer": "The crew can build a clinic, but the nurse needs supplies to open it. Bring me six first-aid kits of the same kind: compact kits, individual kits, or full kits. I'll pay you 72 Merch.",
@@ -414,7 +414,36 @@
         {
           "om_terrain": "ranch_camp_50_z1",
           "place_nested": [ { "chunks": [ "tacoma_commune_clinic_roof_1" ], "x": 0, "y": 0 } ]
-        },
+        }
+      ]
+    }
+  },
+  {
+    "id": "MISSION_TACOMA_EQUIP_WORKSHOP",
+    "type": "mission_definition",
+    "name": "Equip the Vehicle Workshop",
+    "description": "Deliver two arc welders to Tacoma's foreman to finish the vehicle workshop. Payment: <reward_count:FMCNote> Merch.",
+    "goal": "MGOAL_FIND_ITEM",
+    "difficulty": 5,
+    "value": 6000,
+    "item": "welder",
+    "count": 2,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_TACOMA_ESTABLISH_SCAVENGERS",
+    "dialogue": {
+      "describe": "We need welding equipment for the workshop.",
+      "offer": "We're bringing in more vehicles than we can keep running.  Bring me two arc welders and we'll finish setting up the workshop.  I'll pay 24 Merch.",
+      "accepted": "The Scrapper can put them to work right away.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Try garages and mechanics' shops.  The welders don't need batteries.",
+      "inquire": "Have you found both welders?",
+      "success": "The workshop is open.  The Scrapper has spare tools and parts to trade.",
+      "success_lie": "I still need two arc welders.",
+      "failure": "The workshop will have to wait."
+    },
+    "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 24 },
+      "update_mapgen": [
         {
           "om_terrain": "ranch_camp_59",
           "place_nested": [ { "chunks": [ "tacoma_commune_toolshed_9_done" ], "x": 13, "y": 16 } ]
@@ -431,10 +460,7 @@
           "om_terrain": "ranch_camp_68_roof",
           "place_nested": [ { "chunks": [ "tacoma_commune_outhouse_roof_1" ], "x": 16, "y": 0 } ]
         },
-        {
-          "om_terrain": "ranch_camp_60",
-          "place_nested": [ { "chunks": [ "tacoma_commune_chopshop_11" ], "x": 0, "y": 0 } ]
-        },
+        { "om_terrain": "ranch_camp_60", "mapgen_update_id": "tacoma_equip_workshop" },
         {
           "om_terrain": "ranch_camp_60_z1",
           "place_nested": [ { "chunks": [ "tacoma_commune_chopshop_roof_1" ], "x": 0, "y": 0 } ]
@@ -454,118 +480,53 @@
             { "vehicle": "pickup", "chance": 100, "rotation": 270, "x": 8, "y": 15, "merge_wrecks": false },
             { "vehicle": "schoolbus", "chance": 100, "rotation": 180, "x": 7, "y": 5, "merge_wrecks": false }
           ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_12",
-    "type": "mission_definition",
-    "name": { "str": "Find 12 Car Batteries" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "battery_car",
-    "count": 12,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_13",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "We have the basic equipment that we need but without a functioning power grid we are forced to rely on the readily available vehicle batteries.  This is going to be a chore but I'll need twelve car batteries to swap between charging and powering our equipment.  The good news is that they don't need to be charged, we can take care of that.",
-      "accepted": "I'm counting on you.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Cars can be found in traffic jams along roads or in parking lots…  I'm sure you can find a few.",
-      "inquire": "Do you have the car batteries?",
-      "success": "I'm impressed with your abilities.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        { "om_terrain": "ranch_camp_49", "place_nested": [ { "chunks": [ "tacoma_commune_junk_shop_12" ], "x": 0, "y": 0 } ] },
-        {
-          "om_terrain": "ranch_camp_60",
-          "place_nested": [ { "chunks": [ "tacoma_commune_chopshop_12_done" ], "x": 0, "y": 0 } ]
         },
         {
           "om_terrain": "ranch_camp_69",
-          "place_vehicles": [ { "vehicle": "cube_van", "chance": 100, "rotation": 270, "x": 16, "y": 12 } ]
+          "place_vehicles": [ { "vehicle": "cube_van", "chance": 100, "rotation": 270, "x": 16, "y": 12, "merge_wrecks": false } ]
         }
       ]
     }
   },
   {
-    "id": "MISSION_RANCH_FOREMAN_13",
+    "id": "MISSION_TACOMA_ESTABLISH_SCAVENGERS",
     "type": "mission_definition",
-    "name": { "str": "Find 2 Two-Way Radios" },
+    "name": "Establish Scavenger Operations",
+    "description": "Deliver two two-way radios to Tacoma's foreman so the scavenging teams can open their depot. Payment: <reward_count:FMCNote> Merch.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
-    "value": 50000,
+    "value": 2000,
     "item": "two_way_radio",
     "count": 2,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_14",
+    "followup": "MISSION_RANCH_FOREMAN_15",
     "dialogue": {
-      "describe": "We need help…",
-      "offer": "Check with the nurse when you get a chance, I know she will need help setting up our clinic.  On the construction front, we are going to need to get dedicated scavenger teams setup to bring in the miscellaneous supplies that we use in small quantities.  We are going to start setting up a junk shop for them in the North end of the outpost so we could use your help with that.  Communication is the biggest obstacle for the teams… could you bring in a pair of two-way radios?",
-      "accepted": "Organizing the scavenging missions is difficult enough without communication.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "You should be able to find them in electronics stores or at a police station.",
+      "describe": "Our scavenging teams need radios.",
+      "offer": "We can grow food here, but we still rely on scavengers for supplies.  We're putting a depot at the north end of the settlement.  Bring me two two-way radios so the teams can stay in touch out there.  I'll pay 8 Merch.",
+      "accepted": "We'll get the depot ready while you're out.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Try electronics stores or police stations.",
       "inquire": "Do you have the two-way radios?",
-      "success": "I'm sure the scavengers will find these useful.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
+      "success": "The depot is open.  Talk to the Scavenger Boss if you want to trade for what the teams bring back.",
+      "success_lie": "I still need two radios.",
+      "failure": "The teams will have to make do without radios."
     },
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 8 },
       "update_mapgen": [
-        { "om_terrain": "ranch_camp_49", "place_nested": [ { "chunks": [ "tacoma_commune_junk_shop_13" ], "x": 0, "y": 0 } ] },
+        { "om_terrain": "ranch_camp_49", "mapgen_update_id": "tacoma_open_scavenger_depot" },
         {
           "om_terrain": "ranch_camp_49_z1",
           "place_nested": [ { "chunks": [ "tacoma_commune_junk_shop_roof_1" ], "x": 0, "y": 0 } ]
         },
         {
           "om_terrain": "ranch_camp_61",
-          "place_vehicles": [ { "vehicle": "car_mini", "chance": 100, "rotation": 270, "x": 12, "y": 18 } ]
+          "place_vehicles": [ { "vehicle": "car_mini", "chance": 100, "rotation": 270, "x": 12, "y": 18, "merge_wrecks": false } ]
         },
-        { "om_terrain": "ranch_camp_66", "place_npcs": [ { "class": "ranch_barber", "x": 5, "y": 3 } ] }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_14",
-    "type": "mission_definition",
-    "name": { "str": "Gather 5 Backpacks" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "backpack",
-    "count": 5,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_15",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "The volunteers for the scavenging teams will need to be issued some basic equipment.  When the boss sets up shop in the junk shed you should ask him what else he needs for his teams.  In the meantime we can provide a few backpacks to get them started.  Could you find five backpacks to give to the initial team?",
-      "accepted": "I'm counting on you.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "It may be easier to make them if you can't find a school or something.",
-      "inquire": "Do you have the backpacks?",
-      "success": "Having at least basic equipment greatly increases survivability.  Thanks.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_49",
-          "place_nested": [ { "chunks": [ "tacoma_commune_junk_shop_14_done" ], "x": 0, "y": 0 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_51",
-          "place_nested": [ { "chunks": [ "tacoma_commune_bar_14" ], "x": 0, "y": 0 } ]
-        },
+        { "om_terrain": "ranch_camp_66", "place_npcs": [ { "class": "ranch_barber", "x": 5, "y": 3 } ] },
         {
           "om_terrain": "ranch_camp_70",
-          "place_vehicles": [ { "vehicle": "ambulance", "chance": 100, "rotation": 270, "x": 9, "y": 3 } ]
+          "place_vehicles": [ { "vehicle": "ambulance", "chance": 100, "rotation": 270, "x": 9, "y": 3, "merge_wrecks": false } ]
         }
       ]
     }
@@ -594,7 +555,11 @@
     },
     "end": {
       "update_mapgen": [
-        { "om_terrain": "ranch_camp_51", "place_nested": [ { "chunks": [ "tacoma_commune_bar_15" ], "x": 0, "y": 0 } ] },
+        { "om_terrain": "ranch_camp_51", "place_nested": [ { "chunks": [ "tacoma_commune_bar_14" ], "x": 0, "y": 0 } ] },
+        {
+          "om_terrain": "ranch_camp_51",
+          "place_nested": [ { "chunks": [ "tacoma_commune_bar_15" ], "x": 0, "y": 0 } ]
+        },
         {
           "om_terrain": "ranch_camp_51_z1",
           "place_nested": [ { "chunks": [ "tacoma_commune_bar_roof_1" ], "x": 0, "y": 0 } ]

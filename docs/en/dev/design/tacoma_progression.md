@@ -40,24 +40,40 @@ The former stages 4–8 are removed. Only the new project route is supported.
   offices and labs, or can be crafted at first aid 3. The physician provides the existing
   implant installation and removal services.
 
-The foreman can offer stage 12 immediately after opening the clinic, regardless of the nurse's
-quests. Opening the clinic temporarily retains the old tool shed and outhouse finishes,
-the vehicle workshop shell and roof, and nearby parked vehicles. Reassign these supporting
-updates during the workshop rework.
+The foreman can offer the workshop project immediately after opening the clinic, regardless
+of the nurse's quests.
 
 The old foreman stages 9–11 and ten nurse deliveries are retired. As in Phase 2, saves on
 the superseded Tacoma routes are not migrated.
+
+## Phase 4: Workshops and commerce
+
+- **Equip the Vehicle Workshop:** Two arc welders earn 24 Merch. The project finishes the
+  workshop and its roof, supplies the work area, and brings in the Scrapper. The Scrapper
+  trades in ordinary mechanical parts and tools; there is no NPC repair service.
+- **Establish Scavenger Operations:** Two two-way radios earn 8 Merch. The foreman opens
+  the furnished depot and its roof. The Scavenger Boss trades in practical secondhand goods
+  immediately and the foreman can move on to the bar.
+- **Equip the Scavenging Teams:** Five wearable flashlights earn 3 Merch. This optional
+  delivery adds stock at the depot's next normal restock, without affecting foreman quests.
+
+| Former owner | New owner |
+| --- | --- |
+| Open the Clinic: workshop shell and roof, tool shed, outhouse, parked vehicles | Workshop project; completed workshop replaces the intermediate shell |
+| Foreman 12: completed workshop and van | Workshop project |
+| Foreman 12–14: depot construction, roof, barber and remaining parked vehicles | Scavenger operations project |
+| Foreman 14: initial bar construction | Foreman 15, before its existing bar and roof updates |
+
+Phase 4 supports fresh games only. Old Tacoma routes and already-spawned merchants are not
+migrated, including saves at the previous clinic, workshop, shop, or bar handoffs.
 
 ## Remaining foreman work
 
 | Stage | Delivery | Existing effects to preserve in later restructuring |
 | --- | --- | --- |
-| 12 | Car batteries | Finish vehicle workshop, start scavenger shop, supporting site work |
-| 13 | Two-way radios | Scavenger shop and roof, barber, supporting site work |
-| 14 | Backpacks | Finish scavenger shop, start bar, supporting site work |
 | 15 | Homebrewer's Bible | Bar and roof |
 | 16 | Sugar | Finish bar, start greenhouse |
 | 17 | Glass sheets | Finish greenhouse and roof |
 
-Workshop, commerce, and greenhouse development still follow the existing linear chain.
-Their quest ownership and greenhouse stock upgrades are follow-up work.
+Phase 5 can replace the existing bar and greenhouse sequence and reassign its construction
+updates. The scavenger stock upgrade is independent.

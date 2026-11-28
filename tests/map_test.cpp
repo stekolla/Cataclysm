@@ -235,6 +235,28 @@ TEST_CASE("tacoma_clinic_map_updates", "[mapgen][tacoma]") {
     CHECK(clinic.i_at(counter).only_item().typeId() == itype_id("hammer"));
 }
 
+/// Build both completed sites on bare terrain to catch reliance on retired construction stages.
+TEST_CASE("tacoma_commerce_map_updates", "[mapgen][tacoma]") {
+    const auto static_npcs = override_option("STATIC_NPC", "false");
+    auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());
+    auto site = mapgen_constructor(buffer);
+    site.reset_scratch_omt(
+        tripoint_abs_omt(11, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto data = mapgendata(site, mapgendata::dummy_settings);
+    REQUIRE(run_mapgen_update_func("tacoma_equip_workshop", data));
+    CHECK(site.ter(point_omt_ms(13, 21)) == ter_id("t_door_c"));
+    CHECK(site.furn(point_omt_ms(12, 19)) == furn_id("f_rack"));
+    CHECK(site.furn(point_omt_ms(15, 17)) == furn_id("f_table"));
+
+    site.reset_scratch_omt(
+        tripoint_abs_omt(12, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto depot = mapgendata(site, mapgendata::dummy_settings);
+    REQUIRE(run_mapgen_update_func("tacoma_open_scavenger_depot", depot));
+    CHECK(site.ter(point_omt_ms(14, 20)) == ter_id("t_door_c"));
+    CHECK(site.furn(point_omt_ms(11, 19)) == furn_id("f_counter"));
+    CHECK(site.furn(point_omt_ms(15, 10)) == furn_id("f_rack"));
+}
+
 TEST_CASE("mapgen_items_stay_on_sealed_container_tiles", "[mapgen][item][regression]") {
     clear_all_state();
     auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());

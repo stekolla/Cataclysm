@@ -405,7 +405,48 @@ TEST_CASE("tacoma_clinic_opening_delivery", "[npc][mission][tacoma]") {
     player.i_add(item::spawn("1st_aid_ifak"));
     player.invalidate_crafting_inventory();
     CHECK(job->is_complete(giver));
-    CHECK(job->get_follow_up() == mission_type_id("MISSION_RANCH_FOREMAN_12"));
+    CHECK(job->get_follow_up() == mission_type_id("MISSION_TACOMA_EQUIP_WORKSHOP"));
+}
+
+/// Complete the depot's optional delivery and check that better stock arrives only at restock.
+TEST_CASE("tacoma_scavenger_stock_upgrade", "[npc][mission][tacoma]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto& boss = spawn_npc(player.bub_pos() + point(2, 0), "ranch_scavenger_1");
+    const auto sewing_kit = itype_id("sewing_kit");
+    boss.shop_restock();
+    CHECK(boss.has_amount(itype_id("backpack"), 1));
+    CHECK_FALSE(boss.has_amount(sewing_kit, 1));
+    REQUIRE(boss.chatbin.missions.size() == 1);
+    auto* job = boss.chatbin.missions.front();
+    REQUIRE(job->get_type().id == mission_type_id("MISSION_TACOMA_EQUIP_SCAVENGERS"));
+    boss.chatbin.mission_selected = job;
+    talk_function::assign_mission(boss);
+    for (auto i = 0; i < 4; ++i) { player.i_add(item::spawn("wearable_light")); }
+    player.invalidate_crafting_inventory();
+    CHECK_FALSE(job->is_complete(boss.getID()));
+    player.i_add(item::spawn("wearable_light"));
+    player.invalidate_crafting_inventory();
+    REQUIRE(job->is_complete(boss.getID()));
+    job->wrap_up();
+    job->wrap_up();
+    CHECK_FALSE(player.has_amount(itype_id("wearable_light"), 1));
+    CHECK(player.charges_of(itype_id("FMCNote")) == 3);
+    talk_function::clear_mission(boss);
+    CHECK(boss.chatbin.missions.empty());
+    boss.shop_restock();
+    CHECK_FALSE(boss.has_amount(sewing_kit, 1));
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    boss.shop_restock();
+    CHECK(boss.has_amount(sewing_kit, 1));
+    CHECK(boss.has_amount(itype_id("backpack"), 2));
 }
 
 /// Complete the nurse's two projects on a loaded clinic tile, without taking a workshop job.
