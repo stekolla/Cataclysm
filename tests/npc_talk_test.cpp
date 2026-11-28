@@ -10,6 +10,7 @@
 #include "dialogue.h"
 #include "effect.h"
 #include "faction.h"
+#include "fluid_grid.h"
 #include "game.h"
 #include "inventory.h"
 #include "item.h"
@@ -292,7 +293,7 @@ TEST_CASE("tacoma_field_seed_delivery", "[npc][mission]") {
 }
 
 /// Take the Overseer's offer before any foreman infrastructure job, then turn in an exact
-/// fertilizer delivery to check the reward, stock upgrade, and one-time offer.
+/// fertilizer delivery, then build the greenhouse without taking a foreman job.
 TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma]") {
     const auto restore_turn = restore_on_out_of_scope(calendar::turn);
     auto& player = get_avatar();
@@ -300,7 +301,11 @@ TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma
     std::swap(player, previous_avatar);
     const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
     clear_all_state();
-    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    fluid_grid::load(get_map());
+    const auto cleanup = on_out_of_scope([] {
+        clear_all_state();
+        fluid_grid::clear();
+    });
     player.setID(g->assign_npc_id(), true);
     g->faction_manager_ptr->create_if_needed();
     const auto npc_id = get_map().place_npc(
@@ -349,22 +354,32 @@ TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma
     auto& overmap = ACTIVE_OVERMAP_BUFFER;
     const auto fields = player.abs_omt_pos();
     const auto barn = fields + point_rel_omt(1, 0);
+    const auto greenhouse = fields + point_rel_omt(0, 1);
+    const auto roof = greenhouse + tripoint_rel_omt(0, 0, 1);
     const auto previous_fields = overmap.ter(fields);
     const auto previous_barn = overmap.ter(barn);
+    const auto previous_greenhouse = overmap.ter(greenhouse);
+    const auto previous_roof = overmap.ter(roof);
     auto previous_visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
-    for (auto y = -1; y <= 1; ++y) {
-        for (auto x = -1; x <= 2; ++x) {
-            const auto tile = fields + point_rel_omt(x, y);
-            previous_visibility.emplace_back(tile, overmap.seen(tile));
+    for (auto z = 0; z <= 1; ++z) {
+        for (auto y = -1; y <= 2; ++y) {
+            for (auto x = -1; x <= 2; ++x) {
+                const auto tile = fields + tripoint_rel_omt(x, y, z);
+                previous_visibility.emplace_back(tile, overmap.seen(tile));
+            }
         }
     }
     const auto restore_overmap = on_out_of_scope([&] {
         overmap.ter_set(fields, previous_fields);
         overmap.ter_set(barn, previous_barn);
+        overmap.ter_set(greenhouse, previous_greenhouse);
+        overmap.ter_set(roof, previous_roof);
         for (const auto& [tile, seen] : previous_visibility) { overmap.set_seen(tile, seen); }
     });
     overmap.ter_set(fields, oter_id("ranch_camp_65_north"));
     overmap.ter_set(barn, oter_id("ranch_camp_66_north"));
+    overmap.ter_set(greenhouse, oter_id("ranch_camp_52_north"));
+    overmap.ter_set(roof, oter_id("ranch_camp_52_z1_north"));
 
     const auto wheat = itype_id("seed_wheat");
     overseer->shop_restock();
@@ -380,6 +395,31 @@ TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma
     calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
     overseer->shop_restock();
     CHECK(overseer->charges_of(wheat) >= 56);
+    const auto tomato = itype_id("tomato");
+    CHECK(overseer->charges_of(tomato) == 0);
+    talk_function::clear_mission(*overseer);
+    REQUIRE(overseer->chatbin.missions.size() == 1);
+    auto* greenhouse_job = overseer->chatbin.missions.front();
+    REQUIRE(greenhouse_job->get_type().id == mission_type_id("MISSION_TACOMA_BUILD_GREENHOUSE"));
+    overseer->chatbin.mission_selected = greenhouse_job;
+    talk_function::assign_mission(*overseer);
+    for (auto i = 0; i < 29; ++i) { player.i_add(item::spawn("glass_sheet")); }
+    player.invalidate_crafting_inventory();
+    CHECK_FALSE(greenhouse_job->is_complete(npc_id));
+    player.i_add(item::spawn("glass_sheet"));
+    player.invalidate_crafting_inventory();
+    REQUIRE(greenhouse_job->is_complete(npc_id));
+    greenhouse_job->wrap_up();
+    greenhouse_job->wrap_up();
+    CHECK(player.charges_of(itype_id("FMCNote")) == 21);
+    CHECK_FALSE(player.has_amount(itype_id("glass_sheet"), 1));
+    overseer->shop_restock();
+    CHECK(overseer->charges_of(tomato) == 0);
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    overseer->shop_restock();
+    CHECK(overseer->charges_of(tomato) >= 2);
+    CHECK(overseer->charges_of(wheat) >= 56);
+    talk_function::clear_mission(*overseer);
     d.gen_responses(greeting);
     CHECK(find_response(offer) == d.responses.end());
 }
@@ -406,6 +446,105 @@ TEST_CASE("tacoma_clinic_opening_delivery", "[npc][mission][tacoma]") {
     player.invalidate_crafting_inventory();
     CHECK(job->is_complete(giver));
     CHECK(job->get_follow_up() == mission_type_id("MISSION_TACOMA_EQUIP_WORKSHOP"));
+}
+
+/// Open the bar via a still delivery, then expand it through the spawned bartender's only quest.
+TEST_CASE("tacoma_bar_and_brewery_projects", "[npc][mission][tacoma]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    fluid_grid::load(get_map());
+    const auto cleanup = on_out_of_scope([] {
+        clear_all_state();
+        fluid_grid::clear();
+    });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    auto& foreman = spawn_npc(player.bub_pos() + point(2, 0), "ranch_foreman");
+    auto& overmap = ACTIVE_OVERMAP_BUFFER;
+    const auto bar = player.abs_omt_pos();
+    const auto roof = bar + tripoint_rel_omt(0, 0, 1);
+    const auto previous_bar = overmap.ter(bar);
+    const auto previous_roof = overmap.ter(roof);
+    auto visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
+    for (auto z = 0; z <= 1; ++z) {
+        for (auto y = -1; y <= 1; ++y) {
+            for (auto x = -1; x <= 1; ++x) {
+                const auto tile = bar + tripoint_rel_omt(x, y, z);
+                visibility.emplace_back(tile, overmap.seen(tile));
+            }
+        }
+    }
+    const auto restore_overmap = on_out_of_scope([&] {
+        overmap.ter_set(bar, previous_bar);
+        overmap.ter_set(roof, previous_roof);
+        for (const auto& [tile, seen] : visibility) { overmap.set_seen(tile, seen); }
+    });
+    overmap.ter_set(bar, oter_id("ranch_camp_51_north"));
+    overmap.ter_set(roof, oter_id("ranch_camp_51_z1_north"));
+
+    const auto bar_id = mission_type_id("MISSION_TACOMA_OPEN_BAR");
+    auto* depot = mission::
+        reserve_new(mission_type_id("MISSION_TACOMA_ESTABLISH_SCAVENGERS"), foreman.getID());
+    CHECK(depot->get_follow_up() == bar_id);
+    auto* opening = mission::reserve_new(bar_id, foreman.getID());
+    opening->assign(player);
+    CHECK(opening->get_follow_up().is_null());
+    CHECK_FALSE(opening->is_complete(foreman.getID()));
+    player.i_add(item::spawn("still"));
+    player.invalidate_crafting_inventory();
+    REQUIRE(opening->is_complete(foreman.getID()));
+    opening->wrap_up();
+    opening->wrap_up();
+    const auto merch = itype_id("FMCNote");
+    CHECK(player.charges_of(merch) == 2);
+    const auto find_bartenders = [] {
+        auto bartenders = std::vector<npc*>();
+        g->load_npcs();
+        for (auto& resident : g->all_npcs()) {
+            if (resident.chatbin.first_topic == "TALK_RANCH_BARKEEP") {
+                bartenders.push_back(&resident);
+            }
+        }
+        return bartenders;
+    };
+    const auto bartenders = find_bartenders();
+    REQUIRE(bartenders.size() == 1);
+    auto& bartender = *bartenders.front();
+    bartender.shop_restock();
+    const auto beer = itype_id("hb_beer");
+    const auto brandy = itype_id("brandy");
+    const auto original_beer = bartender.charges_of(beer);
+    CHECK(original_beer >= 3);
+    CHECK(bartender.charges_of(brandy) == 0);
+
+    REQUIRE(bartender.chatbin.missions.size() == 1);
+    auto* expansion = bartender.chatbin.missions.front();
+    REQUIRE(expansion->get_type().id == mission_type_id("MISSION_TACOMA_EXPAND_BREWERY"));
+    bartender.chatbin.mission_selected = expansion;
+    talk_function::assign_mission(bartender);
+    player.i_add(item::spawn("yeast", calendar::turn, 19));
+    player.invalidate_crafting_inventory();
+    CHECK_FALSE(expansion->is_complete(bartender.getID()));
+    player.i_add(item::spawn("yeast", calendar::turn, 1));
+    player.invalidate_crafting_inventory();
+    REQUIRE(expansion->is_complete(bartender.getID()));
+    expansion->wrap_up();
+    expansion->wrap_up();
+    CHECK(player.charges_of(merch) == 8);
+    CHECK(player.charges_of(itype_id("yeast")) == 0);
+    CHECK(find_bartenders().size() == 1);
+    talk_function::clear_mission(bartender);
+    CHECK(bartender.chatbin.missions.empty());
+    bartender.shop_restock();
+    CHECK(bartender.charges_of(beer) == original_beer);
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    bartender.shop_restock();
+    CHECK(bartender.charges_of(beer) >= 7);
+    CHECK(bartender.charges_of(brandy) >= 1);
 }
 
 /// Complete the depot's optional delivery and check that better stock arrives only at restock.

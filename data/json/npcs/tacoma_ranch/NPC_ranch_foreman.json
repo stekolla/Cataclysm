@@ -88,7 +88,12 @@
   {
     "type": "talk_topic",
     "id": "TALK_RANCH_FOREMAN_OUTPOST",
-    "dynamic_line": "Ya, that representative from the Old Guard asked the two of us to come out here and begin fortifying this place as a refugee camp.  I'm not sure how fast he expects the two of us to get setup but we were assured additional men were coming out here to assist us. ",
+    "dynamic_line": {
+      "npc_has_var": "tacoma_bar_open",
+      "value": "yes",
+      "yes": "We started with a barn and a fence.  Now we've got beds, fields, clean water, a clinic, a workshop, and people to trade with.  There's even somewhere to sit down after a shift.  We've still got mouths to feed and fences to mend, but this feels like a town.",
+      "no": "Ya, that representative from the Old Guard asked the two of us to come out here and begin fortifying this place as a refugee camp.  I'm not sure how fast he expects the two of us to get setup but we were assured additional men were coming out here to assist us. "
+    },
     "responses": [ { "text": "How many refugees are you expecting?", "topic": "TALK_RANCH_FOREMAN_REFUGEES" } ]
   },
   {
@@ -100,7 +105,12 @@
   {
     "type": "talk_topic",
     "id": "TALK_RANCH_FOREMAN_JOB",
-    "dynamic_line": "I'm the engineer in charge of turning this place into a working camp.  This is going to be an uphill battle, we used most of our initial supplies getting here and boarding up the windows.  I've got a huge list of tasks that need to get done so if you could help us keep supplied I'd appreciate it.  If you have material to drop off you can just back your vehicle into here and dump it on the ground, we'll sort it.",
+    "dynamic_line": {
+      "npc_has_var": "tacoma_bar_open",
+      "value": "yes",
+      "yes": "I drew up the plans and kept the crews supplied.  These days it's more about looking after what we've built than starting something new.  The Crop Overseer and the other crews handle their own projects.",
+      "no": "I'm the engineer in charge of turning this place into a working camp.  This is going to be an uphill battle, we used most of our initial supplies getting here and boarding up the windows.  I've got a huge list of tasks that need to get done so if you could help us keep supplied I'd appreciate it.  If you have material to drop off you can just back your vehicle into here and dump it on the ground, we'll sort it."
+    },
     "responses": [ { "text": "I'll keep that in mind.", "topic": "TALK_RANCH_FOREMAN" } ]
   },
   {
@@ -499,7 +509,7 @@
     "item": "two_way_radio",
     "count": 2,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_15",
+    "followup": "MISSION_TACOMA_OPEN_BAR",
     "dialogue": {
       "describe": "Our scavenging teams need radios.",
       "offer": "We can grow food here, but we still rely on scavengers for supplies.  We're putting a depot at the north end of the settlement.  Bring me two two-way radios so the teams can stay in touch out there.  I'll pay 8 Merch.",
@@ -532,104 +542,34 @@
     }
   },
   {
-    "id": "MISSION_RANCH_FOREMAN_15",
     "type": "mission_definition",
-    "name": { "str": "Find Homebrewer's Bible" },
+    "id": "MISSION_TACOMA_OPEN_BAR",
+    "name": "Open the Bar",
+    "description": "Deliver a brewing still to Tacoma's foreman to open a bar and meeting place. Payment: <reward_count:FMCNote> Merch.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
-    "value": 50000,
-    "item": "brewing_cookbook",
+    "value": 500,
+    "item": "still",
     "count": 1,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_16",
     "dialogue": {
-      "describe": "We need help…",
-      "offer": "Growth has lately begun to stall, we have individuals passing through the outpost but the prospect of hard labor just to eke out an existence is driving them away.  We've asked around and decided that, despite our pressing needs, building a bar ought to draw some of the less committed individuals to the outpost.  Unlike other settlements, the more hands we have to more food we can produce… at least in the long term.  Unfortunately, no one here has brewed alcoholic drinks before so we are going to need you to find a book called the 'Homebrewer's Bible' or something along those lines.",
-      "accepted": "I'm counting on you.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "I guess you should search homes or libraries?",
-      "inquire": "Do you have the book?",
-      "success": "I guarantee we will toast to your name when the bar is finished.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
+      "describe": "We need a still for the bar.",
+      "offer": "We've got places to sleep and work.  It's about time we had a place to sit and talk after a shift.  Bring me a brewing still and we'll open the bar.  I'll pay 2 Merch.",
+      "accepted": "The crew can handle the building.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Try farms or look for a still design in a homebrewing book.",
+      "inquire": "Have you found a still?",
+      "success": "The bar is open.  That was the last big job on my list.  We've still got work to do, but Tacoma feels like a place people might want to stay.",
+      "success_lie": "I still need a brewing still.",
+      "failure": "The bar can wait."
     },
     "end": {
+      "effect": [ { "u_buy_item": "FMCNote", "count": 2 }, { "npc_add_var": "tacoma_bar_open", "value": "yes" } ],
       "update_mapgen": [
-        { "om_terrain": "ranch_camp_51", "place_nested": [ { "chunks": [ "tacoma_commune_bar_14" ], "x": 0, "y": 0 } ] },
-        {
-          "om_terrain": "ranch_camp_51",
-          "place_nested": [ { "chunks": [ "tacoma_commune_bar_15" ], "x": 0, "y": 0 } ]
-        },
+        { "om_terrain": "ranch_camp_51", "mapgen_update_id": "tacoma_open_bar" },
         {
           "om_terrain": "ranch_camp_51_z1",
           "place_nested": [ { "chunks": [ "tacoma_commune_bar_roof_1" ], "x": 0, "y": 0 } ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_16",
-    "type": "mission_definition",
-    "name": { "str": "Gather 80 Sugar" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "sugar",
-    "count": 80,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_17",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "Just flipping through the book I can tell that one ingredient in most of the alcoholic drinks that we don't have a large supply of is sugar.  What alcohol we have been able to loot isn't going to last us long so starting our first large batch is a priority.  Could you bring in 80 units of sugar?  That should last us until we can start producing our own supply.",
-      "accepted": "I'm counting on you.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "You might get lucky finding it but you could always boil it out of fruit if you are familiar with the process.",
-      "inquire": "Do you have the sugar?",
-      "success": "There is a large group of thirsty individuals in our outpost that are truly thankful for your work.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        { "om_terrain": "ranch_camp_51", "place_nested": [ { "chunks": [ "tacoma_commune_bar_16_done" ], "x": 0, "y": 0 } ] },
-        {
-          "om_terrain": "ranch_camp_52",
-          "place_nested": [ { "chunks": [ "tacoma_commune_greenhouse_16" ], "x": 0, "y": 0 } ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_17",
-    "type": "mission_definition",
-    "name": { "str": "Collect 30 Glass Sheets" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "glass_sheet",
-    "count": 30,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_NULL",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "Although we are an agricultural outpost, we are restricted to growing plants that are compatible with the New England climate during the warmer months.  The easiest way to work around that is to build green houses to supplement our external fields.  There isn't going to be an easy way to build these, we are going to need a massive number of glass sheets to enclose the frames.  The first house will need 30 sheets of glass if you are still interested.",
-      "accepted": "I'm counting on you.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Deconstructing existing windows is the only way I know of to keep the sheets intact.",
-      "inquire": "Do you have the glass sheets?",
-      "success": "We'll begin planting our first seeds as soon as we can get these installed.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_52",
-          "place_nested": [ { "chunks": [ "tacoma_commune_greenhouse_17_done" ], "x": 0, "y": 0 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_52_z1",
-          "place_nested": [ { "chunks": [ "tacoma_commune_greenhouse_roof_1" ], "x": 0, "y": 0 } ]
         }
       ]
     }

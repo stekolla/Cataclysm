@@ -2,6 +2,33 @@
   {
     "type": "mapgen",
     "method": "json",
+    "update_mapgen_id": "tacoma_open_bar",
+    "object": {
+      "place_nested": [ { "chunks": [ "tacoma_commune_bar_16_done" ], "x": 0, "y": 0 } ],
+      "place_furniture": [ { "furn": "f_still", "x": 16, "y": 11 } ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_expand_brewery",
+    "object": {
+      "place_nested": [
+        { "chunks": [ "tacoma_commune_bar_bartender_2" ], "x": 0, "y": 0 },
+        { "chunks": [ "tacoma_commune_bar_bartender_3" ], "x": 0, "y": 0 },
+        { "chunks": [ "tacoma_commune_bar_bartender_4" ], "x": 0, "y": 0 }
+      ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_build_greenhouse",
+    "object": { "place_nested": [ { "chunks": [ "tacoma_commune_greenhouse_17_done" ], "x": 0, "y": 0 } ] }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
     "update_mapgen_id": "tacoma_equip_workshop",
     "object": { "place_nested": [ { "chunks": [ "tacoma_commune_chopshop_12_done" ], "x": 0, "y": 0 } ] }
   },
@@ -156,76 +183,6 @@
   {
     "type": "mapgen",
     "method": "json",
-    "nested_mapgen_id": "tacoma_commune_bar_14",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "        wffwwwww        ",
-        "        w..w...w        ",
-        "        w..w...w        ",
-        " www[[wwwffwwfwwwffww   ",
-        " w.............w....w   ",
-        " w.............f....w   ",
-        " [.............w....w   ",
-        " [.............wwwwww   ",
-        " w.............w        ",
-        " w.............w        ",
-        " wwww........www        ",
-        "    f........w          ",
-        "    f........w          ",
-        "    wwww[[wwww          ",
-        "                        ",
-        "                        ",
-        "                        "
-      ],
-      "terrain": { ".": "t_region_soil", "w": "t_wall_half", "f": "t_door_frame", "[": "t_window_empty" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_bar_15",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "        w++wwwww        ",
-        "        w..w...w        ",
-        "        w..w...w        ",
-        " www[[www++ww+www++ww   ",
-        " w.............w....w   ",
-        " w.............+....w   ",
-        " [.............w....w   ",
-        " [.............wwwwww   ",
-        " w.............w        ",
-        " w.............w        ",
-        " wwww........www        ",
-        "    +........w          ",
-        "    +........w          ",
-        "    wwww[[wwww          ",
-        "                        ",
-        "                        ",
-        "                        "
-      ],
-      "terrain": { ".": "t_dirtfloor", "w": "t_wall_wood", "+": "t_door_c", "[": "t_window_boarded_noglass" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
     "nested_mapgen_id": "tacoma_commune_bar_16_done",
     "object": {
       "mapgensize": [ 24, 24 ],
@@ -292,42 +249,6 @@
         { "item": "rag", "x": 14, "y": 16, "repeat": [ 2, 4 ] }
       ],
       "place_npcs": [ { "class": "ranch_bartender", "x": 13, "y": 13 }, { "class": "scavenger_merc", "x": 6, "y": 12 } ]
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_bar_bartender_1",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        " qqqq[[qqq[[qqqq        ",
-        " f,,,,,,,,,,,,,q        ",
-        " f,,,,,,,,,,,,,q        ",
-        " q,,,,,,,,,,,,,q        ",
-        " [,,,,,,,,,,,,,q        ",
-        " q,,,,,,,,,,,,,q        ",
-        " qqqqqqq                ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                i       ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        "
-      ],
-      "terrain": { ",": "t_region_soil", "q": "t_wall_half", "f": "t_door_frame", "[": "t_window_empty" },
-      "furniture": { "i": "f_still" }
     }
   },
   {
@@ -859,41 +780,6 @@
         "                     "
       ],
       "terrain": { ".": "t_flat_roof" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_greenhouse_16",
-    "object": {
-      "mapgensize": [ 24, 24 ],
-      "rows": [
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        "                        ",
-        " wwwwwfwwwww            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " w.........w            ",
-        " wwwwwfwwwww            ",
-        "                        "
-      ],
-      "terrain": { ".": "t_region_soil", "w": "t_window_empty", "f": "t_door_frame" }
     }
   },
   {

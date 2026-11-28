@@ -62,18 +62,25 @@ the superseded Tacoma routes are not migrated.
 | Open the Clinic: workshop shell and roof, tool shed, outhouse, parked vehicles | Workshop project; completed workshop replaces the intermediate shell |
 | Foreman 12: completed workshop and van | Workshop project |
 | Foreman 12–14: depot construction, roof, barber and remaining parked vehicles | Scavenger operations project |
-| Foreman 14: initial bar construction | Foreman 15, before its existing bar and roof updates |
+| Foreman 14: initial bar construction | Open the Bar places the finished building directly |
 
 Phase 4 supports fresh games only. Old Tacoma routes and already-spawned merchants are not
 migrated, including saves at the previous clinic, workshop, shop, or bar handoffs.
 
-## Remaining foreman work
+## Phase 5: Community and greenhouse
 
-| Stage | Delivery | Existing effects to preserve in later restructuring |
-| --- | --- | --- |
-| 15 | Homebrewer's Bible | Bar and roof |
-| 16 | Sugar | Finish bar, start greenhouse |
-| 17 | Glass sheets | Finish greenhouse and roof |
+- **Open the Bar:** After opening the scavenger depot, the foreman pays 2 Merch for a
+  brewing still. Look on farms or craft one using a pot and hose. The completed bar and
+  roof on tile 51 include the still, bartender, and existing patron. The bartender sells
+  drinks immediately. This ends the foreman's development chain.
+- **Expand the Brewery:** The bartender pays 6 Merch for 20 units of yeast. One ordinary
+  packet holds 25 units. The optional project finishes the north extensions and their
+  roofs without rebuilding the public bar. Additional drinks arrive at the next restock.
+- **Build the Greenhouse:** After Improve the Fields, the Crop Overseer pays 16 Merch
+  for 30 glass sheets. The finished greenhouse and glass roof on tile 52 add tomatoes,
+  more seed varieties, and fertilizer to the Overseer's normal restock. This project
+  does not depend on the bar, workshop, clinic upgrades, or scavenger equipment.
 
-Phase 5 can replace the existing bar and greenhouse sequence and reassign its construction
-updates. The scavenger stock upgrade is independent.
+The old Foreman 15–17 and five bartender missions are retired. Phase 5 supports fresh
+games only: prior Tacoma routes, partially built sites, already-spawned bartenders, and
+completed field improvements from older saves are not migrated.

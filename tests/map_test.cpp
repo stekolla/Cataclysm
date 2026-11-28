@@ -257,6 +257,38 @@ TEST_CASE("tacoma_commerce_map_updates", "[mapgen][tacoma]") {
     CHECK(site.furn(point_omt_ms(15, 10)) == furn_id("f_rack"));
 }
 
+/// Build the bar and greenhouse on bare terrain, then extend the bar without disturbing its
+/// counter.
+TEST_CASE("tacoma_community_map_updates", "[mapgen][tacoma]") {
+    const auto static_npcs = override_option("STATIC_NPC", "false");
+    auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());
+    auto site = mapgen_constructor(buffer);
+    site.reset_scratch_omt(
+        tripoint_abs_omt(11, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto bar = mapgendata(site, mapgendata::dummy_settings);
+    const auto counter = point_omt_ms(12, 12);
+    const auto still = point_omt_ms(16, 11);
+    REQUIRE(run_mapgen_update_func("tacoma_open_bar", bar));
+    REQUIRE(site.furn(counter) == furn_id("f_counter"));
+    CHECK(site.furn(still) == furn_id("f_still"));
+    site.spawn_item(counter, itype_id("hammer"));
+    REQUIRE(run_mapgen_update_func("tacoma_expand_brewery", bar));
+    CHECK(site.furn(counter) == furn_id("f_counter"));
+    CHECK(site.furn(still) == furn_id("f_still"));
+    CHECK(site.furn(point_omt_ms(16, 8)) == furn_id("f_fvat_empty"));
+    CHECK(site.ter(point_omt_ms(9, 7)) == ter_id("t_door_c"));
+    CHECK(site.ter(point_omt_ms(9, 6)) == ter_id("t_floor"));
+    CHECK(site.i_at(counter).size() == 1);
+
+    site.reset_scratch_omt(
+        tripoint_abs_omt(12, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto greenhouse = mapgendata(site, mapgendata::dummy_settings);
+    REQUIRE(run_mapgen_update_func("tacoma_build_greenhouse", greenhouse));
+    CHECK(site.ter(point_omt_ms(6, 10)) == ter_id("t_door_c"));
+    CHECK(site.ter(point_omt_ms(5, 10)) == ter_id("t_window"));
+    CHECK(site.furn(point_omt_ms(2, 11)) == furn_id("f_planter"));
+}
+
 TEST_CASE("mapgen_items_stay_on_sealed_container_tiles", "[mapgen][item][regression]") {
     clear_all_state();
     auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());

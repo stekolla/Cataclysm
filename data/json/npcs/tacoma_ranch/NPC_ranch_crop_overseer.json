@@ -50,6 +50,12 @@
     "shopkeeper_item_group": "tacoma_crop_overseer_sell_expanded"
   },
   {
+    "type": "npc_class",
+    "id": "NC_TACOMA_CROP_MERCHANT_GREENHOUSE",
+    "copy-from": "NC_TACOMA_CROP_MERCHANT_EXPANDED",
+    "shopkeeper_item_group": "tacoma_crop_overseer_sell_greenhouse"
+  },
+  {
     "type": "item_group",
     "id": "tacoma_staple_seeds",
     "subtype": "collection",
@@ -92,18 +98,35 @@
     ]
   },
   {
+    "type": "item_group",
+    "id": "tacoma_crop_overseer_sell_greenhouse",
+    "subtype": "collection",
+    "entries": [
+      { "group": "tacoma_crop_overseer_sell_expanded" },
+      { "item": "seed_tomato", "charges": [ 8, 16 ] },
+      { "item": "seed_cucumber", "charges": [ 8, 16 ] },
+      { "item": "seed_chili_pepper", "prob": 65, "charges": [ 4, 8 ] },
+      { "item": "seed_strawberries", "prob": 65, "charges": [ 4, 8 ] },
+      { "item": "tomato", "count": [ 2, 4 ] },
+      { "item": "cucumber", "prob": 65, "count": [ 2, 4 ] },
+      { "item": "strawberries", "prob": 35, "count": [ 2, 4 ] },
+      { "item": "fertilizer_commercial", "charges": [ 4, 8 ] },
+      { "item": "g_shovel", "prob": 45 }
+    ]
+  },
+  {
     "id": "TALK_RANCH_CROP_OVERSEER",
     "type": "talk_topic",
     "dynamic_line": "Need something for your garden?",
     "responses": [
       { "text": "What do you do here?", "topic": "TALK_RANCH_CROP_OVERSEER_JOB" },
       {
-        "text": "Do you need help with the fields?",
+        "text": "Do you need help with any farm projects?",
         "topic": "TALK_MISSION_LIST",
         "condition": "has_available_mission"
       },
       {
-        "text": "About the fertilizer…",
+        "text": "About the farm project…",
         "topic": "TALK_MISSION_LIST_ASSIGNED",
         "condition": "has_assigned_mission"
       },
@@ -123,6 +146,7 @@
     "item": "fertilizer_liquid",
     "count": 30,
     "origins": [ "ORIGIN_SECONDARY" ],
+    "followup": "MISSION_TACOMA_BUILD_GREENHOUSE",
     "dialogue": {
       "describe": "We could use fertilizer for the new plot.",
       "offer": "Bring me 30 units of liquid fertilizer and I'll pay you 5 Merch.  I'll have more seed and supplies for sale after the next restock.",
@@ -143,9 +167,46 @@
     }
   },
   {
+    "type": "mission_definition",
+    "id": "MISSION_TACOMA_BUILD_GREENHOUSE",
+    "name": "Build the Greenhouse",
+    "description": "Deliver 30 glass sheets to Tacoma's Crop Overseer to build the greenhouse. Payment: <reward_count:FMCNote> Merch.",
+    "goal": "MGOAL_FIND_ITEM",
+    "difficulty": 5,
+    "value": 4000,
+    "item": "glass_sheet",
+    "count": 30,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "dialogue": {
+      "describe": "We need glass for a greenhouse.",
+      "offer": "The fields are doing well, but the weather limits what we can grow.  We can build the frame and make the planting beds.  Bring me 30 glass sheets and I'll pay 16 Merch.",
+      "accepted": "We'll get the planting beds ready.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Try salvaging intact windows.  The sheets are bulky, so you might want a vehicle.",
+      "inquire": "Have you found all 30 sheets?",
+      "success": "The greenhouse is ready.  We can protect more delicate plants now.  I'll have a wider variety of seed and produce at the next restock.",
+      "success_lie": "I still need 30 glass sheets.",
+      "failure": "We'll stick to the open fields for now."
+    },
+    "end": {
+      "effect": [ { "u_buy_item": "FMCNote", "count": 16 }, { "npc_change_class": "NC_TACOMA_CROP_MERCHANT_GREENHOUSE" } ],
+      "update_mapgen": [
+        { "om_terrain": "ranch_camp_52", "mapgen_update_id": "tacoma_build_greenhouse" },
+        {
+          "om_terrain": "ranch_camp_52_z1",
+          "place_nested": [ { "chunks": [ "tacoma_commune_greenhouse_roof_1" ], "x": 0, "y": 0 } ]
+        }
+      ]
+    }
+  },
+  {
     "type": "talk_topic",
     "id": "TALK_RANCH_CROP_OVERSEER_JOB",
-    "dynamic_line": "I manage the fields and make sure Tacoma has enough seed and food.  I also sell seed, tools, and whatever we can spare.",
+    "dynamic_line": {
+      "npc_has_class": "NC_TACOMA_CROP_MERCHANT_GREENHOUSE",
+      "yes": "I look after the fields and the greenhouse.  Under glass we can keep more delicate crops sheltered and offer a wider choice of seed and produce.",
+      "no": "I manage the fields and make sure Tacoma has enough seed and food.  I also sell seed, tools, and whatever we can spare."
+    },
     "responses": [ { "text": "Good to know.", "topic": "TALK_RANCH_CROP_OVERSEER" } ]
   },
   {
