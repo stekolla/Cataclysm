@@ -109,6 +109,6 @@ match the brief's structure.
 If removing the faction or location would only cost the player another source of generic quests
 or goods, clarify what experience it should provide before adding more content.
 
-Once the brief is clear, use the [NPC dialogue and quest design guide](dialogue_and_quest_design.md)
-to design individual interactions and the [faction JSON reference](../reference/creatures/factions.md)
-for implementation details.
+Once the brief is clear, [design individual quests and NPC stories](../../../dev/design/quests_and_npc_stories.md).
+For implementation, see [authoring NPC dialogue and quests](dialogue_and_quest_design.md)
+and the [faction JSON reference](../reference/creatures/factions.md).

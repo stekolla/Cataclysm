@@ -1,166 +1,121 @@
-# Designing NPC dialogue and quests
+# Authoring NPC dialogue and quests
 
-Read this guide before designing a new NPC or quest. For a faction storyline, start with the
-[faction and settlement design guide](faction_and_settlement_design.md). Use the
-[NPC dialogue reference](../reference/creatures/npcs.md) and
-[mission reference](../reference/creatures/missions_json.md) when you are ready to implement it.
+Use this guide to turn a quest outline into mission data, dialogue, and world changes. Start
+with [Designing Quests and NPC Stories](../../../dev/design/quests_and_npc_stories.md) if you
+are still deciding what should make the player curious, what they should learn, or why this
+character would ask for help. A working mission proves that its mechanics run, not that the
+story is clear or worth playing.
 
-## Give the NPC a reason to be there
+Use the [mission JSON reference](../reference/creatures/missions_json.md) and
+[NPC dialogue reference](../reference/creatures/npcs.md) for exact syntax and supported behavior.
 
-Start with the character's role, motivation, and perspective. Decide what they need, what they
-can do for themselves, and what they think of a stranger offering help. A request should follow
-from their circumstances, not from a gameplay system that needs an owner.
+## Plan the quest's states
 
-Not every named NPC needs a quest. Information, trade, services, relationships, and even a short
-conversation can make a character worth meeting. Give the player a reason to remember the person,
-not just the task attached to them.
+For each scene, record how the player reaches it, what action or condition moves the quest
+forward, and what the player can see afterward. Sketch the offer, active objective, completion,
+and any refusal or failure paths before writing dialogue branches. Note which services and
+other quests should remain available in each state.
 
-At the Refugee Center, staff generally deal with operational needs. Refugees can have personal
-concerns, relationships, and useful skills without being responsible for running the Center.
-Both groups help establish what life there is like.
+Check whether a player can arrive with the work partly done, lose a required item, or find a
+contact unavailable. Decide which cases should still allow completion. If a failure should
+close off later work, encode that deliberately rather than relying on an unreachable topic.
 
-## Give the quest a purpose
+Boris needs five volunteers to clean up the Refugee Center's back bay. The offer and advice
+point to guards, merchants, and refugees. Players can find different people to meet the same
+goal; the author does not need a separate mission for each recruitment route.
 
-Before writing an offer, answer five questions:
+## Choose existing mechanisms
 
-1. Why does this person need help?
-2. Why can't they reasonably do the work themselves?
-3. What does the player actually do?
-4. Why is it worth doing?
-5. What changes when the job is done?
+Map each player action and visible consequence to the simplest supported behavior that
+preserves it. An incidental conversation can use talk topics without a mission.
 
-The change can be physical, economic, narrative, or personal. Recovering Dana's family sourdough
-starter gives her something she thought she had lost and eventually improves the bread she sells.
-It does not need to transform the Center or start a new chain to matter.
+| Requirement | Mechanism to check |
+| --- | --- |
+| Record information or decisions | Player and NPC dialogue variables |
+| Complete after a condition established across conversations | `MGOAL_CONDITION` with dialogue conditions and persistent state |
+| Show different dialogue by quest state | Dialogue conditions and talk topics |
+| Offer persuasion, intimidation, or deception | Dialogue trials |
+| Reveal skill-dependent information | Skill conditions and dialogue |
+| Recover evidence | Mission-specific items |
+| Send the player to an authored location | `assign_mission_target` |
+| Place an encounter | Mission mapgen |
+| Track a combat objective | Existing monster and NPC mission goals |
+| Change a location | `update_mapgen` |
+| Change a merchant's stock | NPC class changes |
+| Change relationships | NPC opinion and faction effects |
+| Deliver a reward | Mission completion effects |
 
-Fetching an item can serve a good story. If the item could be swapped for anything else without
-changing the request or its outcome, revisit why the quest belongs here.
+If mission completion already records the state you need, check it instead of adding a second
+flag. A new service at one settlement does not need a simulated settlement economy, and an NPC
+remembering a favor does not need a generic reputation system. If no existing mechanism
+preserves the intended experience, [revisit the design or justify the missing capability](../../../dev/design/quests_and_npc_stories.md#13-let-the-experience-drive-the-implementation).
 
-## Plan progression before writing branches
+## Implement the offer and conversation
 
-Sketch when the offer appears, what counts as completion, and what happens after success or
-failure. Keep the chain short enough that the player understands why one job leads to the next.
-Do not gate an otherwise independent character's work behind another NPC just to impose an order.
+Keep trading, available work, and progress reports close to the main conversation. Group
+optional background questions under clear topics and give each submenu a way back. Use
+shared responses where appropriate without forcing NPCs into the same conversational template.
+Keep the actual accept-or-decline choice; skip extra confirmations that add no decision.
+Don't offer reputation or reward negotiation if it changes neither the outcome nor the reaction.
 
-Check that ordinary play leaves a reasonable path to completion. Consider whether a required
-item can be lost, whether a contact can become unavailable, and whether rejecting or failing one
-job should close off later work. If a failure is meant to have lasting consequences, make them
-deliberate rather than the result of an unreachable dialogue branch.
+Gate each line on the event that makes it true. At the Refugee Center, Milton's clearing
+mission and the opening of Boris's workshop are separate milestones. Accepting a job is not
+the same as completing it. Check what residents say between milestones, and keep unaffected
+topics and services accessible.
 
-Boris needs five volunteers to clean up the back bay. The player can ask across the Center,
-including guards, merchants, and refugees. The offer and advice point to those groups so players
-can find several ways to meet the same goal without replacing the recruitment mechanic.
+Read both sides of the exchange in order. Check that the player's response makes sense after
+the line they actually see and that return visits don't replay introductions unnecessarily.
 
-A choice matters when it changes the approach, cost, risk, or outcome. A second confirmation
-that leads to the same result is not another choice. Keep the actual accept-or-decline decision;
-skip extra prompts that do not help the player decide.
+## Keep the objective clear in the journal
 
-## Make conversations natural and easy to navigate
+Dialogue conveys why the work matters and what the NPC is promising. The journal lets players
+resume after a break. Give them the objective, a place to start, any required quantities or
+conditions, whom to report to, and the promised outcome. Avoid giving away discoveries the
+player is meant to make on site.
 
-Put the request in the NPC's own words. Let a busy guard and a worried refugee ask for help
-differently. Avoid making every interaction start with the same generic question about work.
-Use shared mechanics without forcing characters into the same conversational template.
-
-Keep frequent actions such as trading, asking about available work, and reporting progress
-close to the main conversation. If background questions accumulate, group them under a clear
-topic so they do not crowd out those actions.
-
-Give each submenu a sensible way back. Avoid nesting a useful response behind several layers of
-questions. Read the exchange in order, including the player's responses, to catch awkward
-transitions or replies that only make sense on the first visit.
-
-Let conversations change when a relationship or an important objective changes. Keep ordinary
-services and unaffected topics accessible. See the [NPC dialogue reference](../reference/creatures/npcs.md)
-for entry topics, shared responses, and back navigation.
-
-At the Occupied Lumbermill, the manager sells lumber before any jobs are done. The jobs
-improve the crew's quarters, machinery, and perimeter, not the player's access to trade.
-Tacoma's foreman can mark the mill as an optional lead; the player can still bring planks from
-any source.
-
-The Scrap Yard uses the same separation: its salvage trade is open from the start. The
-trader's two retrieval jobs place their items only at the selected warehouse and military
-helipad. The repaired rifle is a one-time quest reward, not part of the trader's stock.
-
-## Match the reward to the job
-
-Consider the difficulty, risk, and usefulness of the work. For cash or faction currency, use the
-[merchant economy guide](postapoc_price_guide.md) to compare the payment with what it buys.
-Money is not the only useful reward: a personal favor might earn a service, information, access
-to resources, or a change to the settlement.
-
-Tell the player what the NPC is promising before they accept. Grant the defined reward
-automatically on completion rather than making the player find a second dialogue option to
-claim it. If the reward is access to a service that becomes available later, explain the delay
-and whether using the service costs anything.
-
-Do not add generic reputation or reward negotiation choices unless the result has a gameplay
-effect. A response that implies a benefit the game does not deliver undermines the next offer.
-
-## Write for both the conversation and the journal
-
-Dialogue conveys why the work matters and how the character feels about it. The journal
-should let a player resume the quest after a long break without recalling the conversation.
-Together, they should establish:
-
-- What the player must accomplish.
-- Where to go or how to start looking.
-- How many items or people are needed, and any special conditions.
-- What the player receives, including any delayed benefit.
-- Who to report to, if a report is needed.
-
-For example, a short version of Dana's request could read:
+For example, Dana can say:
 
 > My family kept that starter alive for generations. I left it at the bakery when I ran.
 > Bring it back, and in a couple of weeks I'll have better bread to sell you.
 
-The journal instead needs directions and a clear outcome:
+The journal can give directions without repeating the family history:
 
 > Find one jar of Dana's family sourdough starter in the right-hand fridge at the marked
 > bakery. Return it to Dana at the Refugee Center.
 >
 > Reward: Dana sells improved sourdough after two weeks.
 
-The journal does not need to repeat the family history. The NPC does not need to recite the
-journal entry, but should give the player enough information to decide whether to take the job.
+## Implement rewards and lasting changes
 
-## Let the world respond where it matters
+Grant the promised reward on completion rather than hiding it behind a second dialogue
+option. Say before acceptance whether a service costs money or only becomes available later.
+If stock changes at the next restock, explain the delay. Don't describe a facility as
+operational if the player can't use what it was built to provide. For cash or faction currency,
+use the [merchant economy guide](postapoc_price_guide.md) to check what the payment buys.
 
-Reserve physical changes for developments that meaningfully affect the setting. Use dialogue
-for effects that are personal or best seen through a character's perspective. Two people can
-react differently to the same event, and most people need not mention it at all.
+Keep ordinary trade separate from mission rewards. At the Occupied Lumbermill, the manager
+sells lumber from the start. The jobs improve the crew's quarters, machinery, and perimeter.
+Tacoma's foreman can mark the mill as an optional lead; the player can still bring planks from
+any source.
 
-The Refugee Center's back bay illustrates the difference. Milton's clearing mission addresses
-an immediate problem; Boris's workshop gives the space a new use. Comments from refugees who
-care about the bay make the developments feel connected without making every local quest part
-of one chain.
+The Scrap Yard's salvage trade is also open from the start. Its trader's retrieval jobs place
+their items only at the selected warehouse and military helipad. The repaired rifle is a
+one-time quest reward, not part of the trader's stock.
 
-Gate each line on the event that makes it true. Clearing a space is not the same as opening a
-workshop, and accepting a job is not the same as doing it. Check what the NPC says between
-milestones, not just before the first quest and after the last.
+## Verify the mechanics in game
 
-## Keep the implementation proportional
-
-Prefer existing mission goals, dialogue conditions, and effects. If a completed mission already
-represents the state you need, check that state instead of introducing a second flag that could
-get out of sync.
-
-Start with the smallest implementation that delivers the visible result. A new service at one
-settlement does not require a simulated settlement economy, and a character remembering a favor
-does not require a generic reputation system.
-
-## Review the player experience
-
-- Is the request believable for this NPC?
-- Is the objective understandable and achievable?
-- Can players discover the available approaches?
-- Is the reward clear and worthwhile?
-- Does dialogue reflect what has actually happened?
-- Can players navigate the conversation without unnecessary steps?
-- Do quest effects, services, and follow-ups work as promised?
-- Does the quest fit the setting without imposing unnecessary dependencies?
-
-Use the [testing guide](../../../dev/guides/testing.md) and
+Use the [testing guide](../../../dev/guides/testing.md) and the
 [dialogue validator](../reference/creatures/npcs.md#validating-dialogues). The validator checks
-topic links, not the player experience. Play through the offer, objective, and turn-in, and check
-the refusal, failure, and return-visit paths that your change affects.
+topic links, not whether the player can complete the quest or understand it. Use existing
+repository patterns for data validation and relevant gameplay tests.
+
+Play through the offer, objective, turn-in, and return visits. Verify that:
+
+- The offer appears when intended, with no unnecessary prerequisites.
+- The journal and markers point to the right objective, and supported alternative routes work.
+- Refusal, failure, and out-of-order actions leave the intended dialogue and services available.
+- The turn-in recognizes the right state and delivers the reward and world changes as promised.
+- Subsequent visits show the correct dialogue and make any new service usable at the expected time.
+
+A separate [player-experience review](../../../dev/design/quests_and_npc_stories.md#step-8-play-through-the-experience)
+asks whether players understood the situation, found it worth pursuing, and noticed what changed.

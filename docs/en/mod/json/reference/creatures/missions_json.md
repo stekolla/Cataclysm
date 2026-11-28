@@ -1,7 +1,7 @@
 # Creating missions
 
-NPCs can assign missions to the player. See the [dialogue and quest design guide](../../guides/dialogue_and_quest_design.md)
-for narrative and gameplay design principles. This example shows a basic item turn-in:
+NPCs can assign missions to the player. See the [quest authoring guide](../../guides/dialogue_and_quest_design.md)
+for how to combine mission goals, dialogue, and rewards. This example shows a basic item turn-in:
 
 ```json
 {

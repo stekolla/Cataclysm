@@ -17,6 +17,7 @@ Start with the [development workflow](../contribute/contributing.md#quickstart) 
 
 - [Regional recovery and faction roles](design/factions_and_settlements.md)
 - [Start a JSON or Lua mod](../mod/index.md)
-- [Design NPC dialogue and quests](../mod/json/guides/dialogue_and_quest_design.md)
+- [Design quests and NPC stories](design/quests_and_npc_stories.md)
+- [Author NPC dialogue and quests](../mod/json/guides/dialogue_and_quest_design.md)
 - [Work with items](guides/items.md)
 - [Work on the UI](explanation/user_interface.md)

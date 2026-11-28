@@ -2,8 +2,8 @@
 
 ## Writing Dialogues
 
-See the [dialogue and quest design guide](../../guides/dialogue_and_quest_design.md) for narrative
-and gameplay guidance.
+See the [dialogue and quest authoring guide](../../guides/dialogue_and_quest_design.md) for
+structuring and testing conversations across quest states.
 
 TODO: document the "npc" structure, used to load NPC template
 

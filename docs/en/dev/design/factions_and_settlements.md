@@ -179,7 +179,7 @@ faction.
 - [Tacoma progression and save compatibility](tacoma_progression.md)
   for designing or reviewing individual locations
 - [General game design principles](../explanation/design_document.md)
-- [NPC dialogue and quest design](../../mod/json/guides/dialogue_and_quest_design.md)
+- [Designing quests and NPC stories](quests_and_npc_stories.md)
 - [Merchant and item economy](../../mod/json/guides/postapoc_price_guide.md)
 
 This document defines the intended regional experience. The linked guides help authors apply
