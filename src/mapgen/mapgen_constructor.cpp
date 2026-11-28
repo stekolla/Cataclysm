@@ -992,9 +992,8 @@ auto mapgen_constructor::add_spawn(
 
 auto mapgen_constructor::add_vehicle(
     const std::variant<vgroup_id, vproto_id>& type_, const point_omt_ms& p, const units::angle dir,
-    const int veh_fuel, const int veh_status, const bool /*merge_wrecks*/,
-    std::optional<bool> locked, std::optional<bool> has_keys, bool place_beyond_bounds)
-    -> vehicle* {
+    const int veh_fuel, const int veh_status, const bool merge_wrecks, std::optional<bool> locked,
+    std::optional<bool> has_keys, bool place_beyond_bounds) -> vehicle* {
     const auto type = std::visit(
         [](const auto& v) -> vproto_id {
             using T = std::decay_t<decltype(v)>;
@@ -1020,7 +1019,7 @@ auto mapgen_constructor::add_vehicle(
     auto* const place_on_submap = submap_at_grid(
         project_remain<coords::omt>(veh->abs_sm_pos).remainder);
     if (place_on_submap == nullptr) { return nullptr; }
-    auto result = add_vehicle(std::move(veh), true);
+    auto result = add_vehicle(std::move(veh), merge_wrecks);
     if (result) {
         auto* const real_result = result.get();
         place_on_submap->vehicles.push_back(std::move(result));

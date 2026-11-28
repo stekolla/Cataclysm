@@ -844,6 +844,7 @@ The actual monsters are spawned when the map is loaded. Fields:
 | fuel                | (optional, integer) the fuel status. Default is -1 which makes the tanks 1-7% full. Positive values are interpreted as percentage of the vehicles tanks to fill (e.g. 100 means completely full). |
 | status              | (optional, integer) default is -1 (light damage), a value of 0 means perfect condition, 1 means heavily damaged.                                                                                  |
 | place_beyond_bounds | (optional, integer) semi-dangerous value that allows for all collisions outside the 24x24 OMT to be ignored, allowing for larger vehicles to spawn                                                |
+| merge_wrecks        | (optional, boolean) Defaults to `true`. Set to `false` in updates to skip vehicle placement instead of wrecking another vehicle or smashing an obstacle in the way. |
 
 ### Place a specific item with "item"
 

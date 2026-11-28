@@ -7,7 +7,8 @@
     "attitude": 0,
     "mission": 7,
     "chat": "TALK_RANCH_CROP_OVERSEER",
-    "faction": "tacoma_commune"
+    "faction": "tacoma_commune",
+    "mission_offered": "MISSION_TACOMA_IMPROVE_FIELDS"
   },
   {
     "type": "npc_class",
@@ -43,6 +44,12 @@
     }
   },
   {
+    "type": "npc_class",
+    "id": "NC_TACOMA_CROP_MERCHANT_EXPANDED",
+    "copy-from": "NC_TACOMA_CROP_MERCHANT",
+    "shopkeeper_item_group": "tacoma_crop_overseer_sell_expanded"
+  },
+  {
     "type": "item_group",
     "id": "tacoma_staple_seeds",
     "subtype": "collection",
@@ -71,16 +78,69 @@
     ]
   },
   {
+    "type": "item_group",
+    "id": "tacoma_crop_overseer_sell_expanded",
+    "subtype": "collection",
+    "entries": [
+      { "group": "tacoma_crop_overseer_sell" },
+      { "item": "seed_wheat", "charges": [ 32, 48 ] },
+      { "item": "seed_corn", "charges": [ 32, 48 ] },
+      { "item": "seed_beans", "charges": [ 24, 40 ] },
+      { "item": "seed_barley", "charges": [ 20, 32 ] },
+      { "item": "fertilizer_commercial", "charges": [ 8, 12 ] },
+      { "item": "dry_beans", "charges": [ 6, 10 ] }
+    ]
+  },
+  {
     "id": "TALK_RANCH_CROP_OVERSEER",
     "type": "talk_topic",
     "dynamic_line": "Need something for your garden?",
-    "speaker_effect": { "condition": { "npc_has_class": "NC_BOUNTY_HUNTER" }, "effect": { "npc_change_class": "NC_TACOMA_CROP_MERCHANT" } },
     "responses": [
       { "text": "What do you do here?", "topic": "TALK_RANCH_CROP_OVERSEER_JOB" },
+      {
+        "text": "Do you need help with the fields?",
+        "topic": "TALK_MISSION_LIST",
+        "condition": "has_available_mission"
+      },
+      {
+        "text": "About the fertilizer…",
+        "topic": "TALK_MISSION_LIST_ASSIGNED",
+        "condition": "has_assigned_mission"
+      },
       { "text": "What do you have for sale?", "effect": "start_trade", "topic": "TALK_RANCH_CROP_OVERSEER" },
       { "text": "Are you buying agricultural supplies?", "topic": "TALK_RANCH_CROP_OVERSEER_BUYING" },
       { "text": "I've got to go…", "topic": "TALK_DONE" }
     ]
+  },
+  {
+    "type": "mission_definition",
+    "id": "MISSION_TACOMA_IMPROVE_FIELDS",
+    "name": "Improve the Fields",
+    "description": "Bring Tacoma's Crop Overseer 30 units of liquid fertilizer for <reward_count:FMCNote> Merch and better stock at the shop's next restock.",
+    "goal": "MGOAL_FIND_ITEM",
+    "difficulty": 5,
+    "value": 1250,
+    "item": "fertilizer_liquid",
+    "count": 30,
+    "origins": [ "ORIGIN_SECONDARY" ],
+    "dialogue": {
+      "describe": "We could use fertilizer for the new plot.",
+      "offer": "Bring me 30 units of liquid fertilizer and I'll pay you 5 Merch.  I'll have more seed and supplies for sale after the next restock.",
+      "accepted": "I'll have the crew ready to work the new rows.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Try farm supply sheds, or make it from commercial fertilizer or bone meal.",
+      "inquire": "Have you brought the liquid fertilizer?",
+      "success": "The extra rows are ready and another farmer is here to work them.  I'll have more seed and supplies at the next restock.",
+      "success_lie": "I still need the fertilizer.",
+      "failure": "The new rows will have to wait."
+    },
+    "end": {
+      "effect": [ { "u_buy_item": "FMCNote", "count": 5 }, { "npc_change_class": "NC_TACOMA_CROP_MERCHANT_EXPANDED" } ],
+      "update_mapgen": [
+        { "om_terrain": "ranch_camp_65", "mapgen_update_id": "tacoma_expand_fields" },
+        { "om_terrain": "ranch_camp_66", "place_npcs": [ { "class": "ranch_farmer_2", "x": 9, "y": 22 } ] }
+      ]
+    }
   },
   {
     "type": "talk_topic",

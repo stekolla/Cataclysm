@@ -19,6 +19,7 @@
 #include "npc.h"
 #include "npc_favor.h"
 #include "npctalk.h"
+#include "options.h"
 #include "pimpl.h"
 #include "player.h"
 #include "player_helpers.h"
@@ -136,8 +137,9 @@ TEST_CASE("cabin_chemist_mission_rewards", "[npc][mission][dialogue]") {
     CHECK(player.charges_of(itype_id("mutagen")) == 1);
     CHECK(player.charges_of(itype_id("purifier")) == 1);
     alpha->get_type().end(alpha);
-    const auto serums = player.items_with(
-        [](const auto& it) { return it.typeId() == itype_id("iv_mutagen_alpha"); });
+    const auto serums = player.items_with([](const auto& it) {
+        return it.typeId() == itype_id("iv_mutagen_alpha");
+    });
     REQUIRE(serums.size() == 2);
     CHECK(player.charges_of(itype_id("iv_mutagen_alpha")) == 2);
 }
@@ -286,7 +288,100 @@ TEST_CASE("tacoma_field_seed_delivery", "[npc][mission]") {
     CHECK_FALSE(job->is_complete(giver));
     give("seed_wheat", 1);
     CHECK(job->is_complete(giver));
-    CHECK(job->get_follow_up() == mission_type_id("MISSION_RANCH_FOREMAN_4"));
+    CHECK(job->get_follow_up() == mission_type_id("MISSION_TACOMA_SECURE_WATER"));
+}
+
+/// Take the Overseer's offer before any foreman infrastructure job, then turn in an exact
+/// fertilizer delivery to check the reward, stock upgrade, and one-time offer.
+TEST_CASE("tacoma_crop_overseer_offers_independent_work", "[npc][mission][tacoma]") {
+    const auto restore_turn = restore_on_out_of_scope(calendar::turn);
+    auto& player = get_avatar();
+    auto previous_avatar = avatar();
+    std::swap(player, previous_avatar);
+    const auto restore_avatar = on_out_of_scope([&] { std::swap(player, previous_avatar); });
+    clear_all_state();
+    const auto cleanup = on_out_of_scope([] { clear_all_state(); });
+    player.setID(g->assign_npc_id(), true);
+    g->faction_manager_ptr->create_if_needed();
+    const auto npc_id = get_map().place_npc(
+        player.bub_pos() + point_rel_ms(1, 0), string_id<npc_template>("ranch_crop_overseer"),
+        true);
+    g->load_npcs();
+    auto* overseer = g->find_npc(npc_id);
+    REQUIRE(overseer != nullptr);
+
+    auto d = dialogue();
+    d.alpha = &player;
+    d.beta = overseer;
+    const auto greeting = talk_topic("TALK_RANCH_CROP_OVERSEER");
+    const auto offer = talk_topic("TALK_MISSION_LIST");
+    const auto find_response = [&](const auto& next) {
+        return std::ranges::find_if(d.responses, [&](const auto& reply) {
+            return reply.success.next_topic.id == next.id;
+        });
+    };
+    d.gen_responses(greeting);
+    REQUIRE(find_response(offer) != d.responses.end());
+    d.add_topic(offer.id);
+    REQUIRE(d.topic_stack.back().id == "TALK_MISSION_OFFER");
+    d.gen_responses(d.topic_stack.back());
+    const auto accept = find_response(talk_topic("TALK_MISSION_ACCEPTED"));
+    REQUIRE(accept != d.responses.end());
+    accept->success.apply(d);
+    const auto jobs = player.get_active_missions();
+    REQUIRE(jobs.size() == 1);
+    auto* job = jobs.front();
+    CHECK(job->get_type().id == mission_type_id("MISSION_TACOMA_IMPROVE_FIELDS"));
+    d.gen_responses(greeting);
+    CHECK(find_response(offer) == d.responses.end());
+
+    const auto add_fertilizer = [&](const int amount) {
+        auto jug = item::spawn("jug_plastic");
+        jug->put_in(item::spawn("fertilizer_liquid", calendar::turn, amount));
+        player.i_add(std::move(jug));
+        player.invalidate_crafting_inventory();
+    };
+    add_fertilizer(29);
+    CHECK_FALSE(job->is_complete(npc_id));
+    add_fertilizer(1);
+    REQUIRE(job->is_complete(npc_id));
+
+    auto& overmap = ACTIVE_OVERMAP_BUFFER;
+    const auto fields = player.abs_omt_pos();
+    const auto barn = fields + point_rel_omt(1, 0);
+    const auto previous_fields = overmap.ter(fields);
+    const auto previous_barn = overmap.ter(barn);
+    auto previous_visibility = std::vector<std::pair<tripoint_abs_omt, bool>>();
+    for (auto y = -1; y <= 1; ++y) {
+        for (auto x = -1; x <= 2; ++x) {
+            const auto tile = fields + point_rel_omt(x, y);
+            previous_visibility.emplace_back(tile, overmap.seen(tile));
+        }
+    }
+    const auto restore_overmap = on_out_of_scope([&] {
+        overmap.ter_set(fields, previous_fields);
+        overmap.ter_set(barn, previous_barn);
+        for (const auto& [tile, seen] : previous_visibility) { overmap.set_seen(tile, seen); }
+    });
+    overmap.ter_set(fields, oter_id("ranch_camp_65_north"));
+    overmap.ter_set(barn, oter_id("ranch_camp_66_north"));
+
+    const auto wheat = itype_id("seed_wheat");
+    overseer->shop_restock();
+    const auto original_stock = overseer->charges_of(wheat);
+    REQUIRE(original_stock >= 24);
+    job->wrap_up();
+    CHECK_FALSE(job->in_progress());
+    CHECK(player.charges_of(itype_id("fertilizer_liquid")) == 0);
+    CHECK(player.charges_of(itype_id("FMCNote")) == 5);
+    CHECK(overseer->myclass == npc_class_id("NC_TACOMA_CROP_MERCHANT_EXPANDED"));
+    overseer->shop_restock();
+    CHECK(overseer->charges_of(wheat) == original_stock);
+    calendar::turn += 3_days * get_option<float>("RESTOCK_DELAY_MULT");
+    overseer->shop_restock();
+    CHECK(overseer->charges_of(wheat) >= 56);
+    d.gen_responses(greeting);
+    CHECK(find_response(offer) == d.responses.end());
 }
 
 static const efftype_id effect_gave_quest_item("gave_quest_item");

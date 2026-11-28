@@ -1,5 +1,62 @@
 [
   {
+    "type": "terrain",
+    "id": "t_tacoma_water_pump",
+    "copy-from": "t_water_pump",
+    "looks_like": "t_water_pump",
+    "examine_action": "clean_water_source"
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_complete_well",
+    "object": {
+      "set": [
+        { "square": "terrain", "id": "t_sidewalk", "x": 5, "y": 17, "x2": 7, "y2": 19 },
+        { "point": "terrain", "id": "t_tacoma_water_pump", "x": 6, "y": 18 }
+      ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_barn_fireplaces",
+    "object": {
+      "set": [
+        { "point": "furniture", "id": "f_fireplace", "x": 6, "y": 12 },
+        { "point": "furniture", "id": "f_fireplace", "x": 8, "y": 12 }
+      ],
+      "place_item": [
+        { "item": "log", "x": 3, "y": 11 },
+        { "item": "log", "x": 3, "y": 12 },
+        { "item": "log", "x": 3, "y": 13 },
+        { "item": "log", "x": 11, "y": 11 },
+        { "item": "log", "x": 11, "y": 12 },
+        { "item": "log", "x": 11, "y": 13 }
+      ]
+    }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_complete_sawmill",
+    "object": { "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_8_done" ], "x": 0, "y": 0 } ] }
+  },
+  {
+    "type": "mapgen",
+    "method": "json",
+    "update_mapgen_id": "tacoma_expand_fields",
+    "object": {
+      "set": [
+        { "square": "terrain", "id": "t_dirt", "x": 0, "y": 4, "x2": 12, "y2": 18 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 1, "y": 5, "x2": 2, "y2": 17 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 4, "y": 5, "x2": 5, "y2": 17 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 7, "y": 5, "x2": 8, "y2": 17 },
+        { "square": "terrain", "id": "t_dirtmound", "x": 10, "y": 5, "x2": 11, "y2": 17 }
+      ]
+    }
+  },
+  {
     "type": "mapgen",
     "method": "json",
     "update_mapgen_id": "tacoma_field_rows_46",
@@ -1200,105 +1257,6 @@
   {
     "type": "mapgen",
     "method": "json",
-    "nested_mapgen_id": "tacoma_commune_lumbermill_4",
-    "object": {
-      "mapgensize": [ 12, 13 ],
-      "rows": [
-        "            ",
-        "            ",
-        " WWW....WWW ",
-        " W........W ",
-        " W........W ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W........W ",
-        " W........W ",
-        " WWW....WWW ",
-        "            "
-      ],
-      "terrain": { ".": "t_region_soil", "W": "t_wall_log_half" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_lumbermill_5",
-    "object": {
-      "mapgensize": [ 12, 13 ],
-      "rows": [
-        "            ",
-        "            ",
-        " WWW....WWW ",
-        " W........W ",
-        " W........W ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W........W ",
-        " W........W ",
-        " WWW....WWW ",
-        "            "
-      ],
-      "terrain": { ".": "t_dirtfloor", "W": "t_wall_log" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_lumbermill_6",
-    "object": {
-      "mapgensize": [ 12, 13 ],
-      "rows": [
-        "            ",
-        "            ",
-        " WWW....WWW ",
-        " W........W ",
-        " W........W ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W.......rW ",
-        " W.......rW ",
-        " WWW....WWW ",
-        "            "
-      ],
-      "terrain": { ".": "t_dirtfloor", "r": "t_dirtfloor", "W": "t_wall_log" },
-      "furniture": { "r": "f_rack_wood" },
-      "place_item": [ { "item": "frame", "x": 4, "y": 6 }, { "item": "frame", "x": 4, "y": 7 }, { "item": "frame", "x": 4, "y": 8 } ]
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
-    "nested_mapgen_id": "tacoma_commune_lumbermill_7",
-    "object": {
-      "mapgensize": [ 12, 13 ],
-      "rows": [
-        "            ",
-        "            ",
-        " WWWc...WWW ",
-        " W..c....rW ",
-        " W..c....rW ",
-        " W..c...... ",
-        " W......... ",
-        " W......... ",
-        " W......... ",
-        " W.......rW ",
-        " W.......rW ",
-        " WWW....WWW ",
-        "            "
-      ],
-      "terrain": { ".": "t_dirtfloor", "r": "t_dirtfloor", "W": "t_wall_log", "c": "t_conveyor" },
-      "furniture": { "r": "f_rack_wood" }
-    }
-  },
-  {
-    "type": "mapgen",
-    "method": "json",
     "nested_mapgen_id": "tacoma_commune_lumbermill_8_done",
     "object": {
       "mapgensize": [ 12, 13 ],
@@ -1317,7 +1275,6 @@
         " WWW....WWW ",
         "            "
       ],
-      "remove_all": { "m": {  }, "M": {  } },
       "terrain": {
         ".": "t_dirtfloor",
         "r": "t_dirtfloor",
@@ -1335,7 +1292,7 @@
         { "item": "log", "x": 2, "y": 1, "amount": [ 1, 5 ] },
         { "item": "2x4", "x": 4, "y": 8, "amount": [ 1, 10 ] }
       ],
-      "place_npcs": [ { "class": "ranch_woodcutter_1", "x": 5, "y": 7 } ]
+      "place_npcs": [ { "class": "ranch__woodcutter_2", "x": 5, "y": 7 } ]
     }
   },
   {

@@ -28,6 +28,8 @@
 #include "map/submap_fields.h"
 #include "map_helpers.h"
 #include "mapgen/mapgen_constructor.h"
+#include "mapgen/mapgen_functions.h"
+#include "mapgen/mapgendata.h"
 #include "messages.h"
 #include "monster.h"
 #include "npc.h"
@@ -170,6 +172,40 @@ TEST_CASE("mapgen_water_fixtures_are_already_plumbed", "[mapgen][fluid_grid][reg
     vars->set("fluid_grid_assigned_liquid", "water");
     CHECK_FALSE(tm.furn_set(target, furniture));
     CHECK(vars->get("fluid_grid_assigned_liquid", "") == "water");
+}
+
+/// Run the actual Tacoma updates in both project orders and check that the well, buildings,
+/// existing crops, and items on the sawmill work site survive.
+TEST_CASE("tacoma_phase_two_map_updates", "[mapgen][tacoma]") {
+    const auto static_npcs = override_option("STATIC_NPC", "false");
+    auto& buffer = MAPBUFFER_REGISTRY.get(mapbuffer_registry::primary_dimension_id());
+    auto worksite = mapgen_constructor(buffer);
+    auto fields = mapgen_constructor(buffer);
+    worksite.reset_scratch_omt(
+        tripoint_abs_omt(11, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    fields.reset_scratch_omt(
+        tripoint_abs_omt(12, 13, 0), ter_id("t_dirt"), furn_id("f_null"), trap_id("tr_null"));
+    auto construction = mapgendata(worksite, mapgendata::dummy_settings);
+    auto agriculture = mapgendata(fields, mapgendata::dummy_settings);
+    const auto machinery = point_omt_ms(4, 6);
+    const auto pump = point_omt_ms(6, 18);
+    const auto existing_crop = point_omt_ms(14, 8);
+    worksite.spawn_item(machinery, itype_id("hammer"));
+    fields.furn_set(existing_crop, furn_id("f_plant_seed"));
+
+    const auto fields_first = GENERATE(false, true);
+    if (fields_first) { REQUIRE(run_mapgen_update_func("tacoma_expand_fields", agriculture)); }
+    REQUIRE(run_mapgen_update_func("tacoma_complete_well", construction));
+    CHECK(worksite.ter(pump).obj().examine == &iexamine::clean_water_source);
+    REQUIRE(run_mapgen_update_func("tacoma_complete_sawmill", construction));
+    if (!fields_first) { REQUIRE(run_mapgen_update_func("tacoma_expand_fields", agriculture)); }
+
+    CHECK(worksite.ter(pump).obj().examine == &iexamine::clean_water_source);
+    CHECK(worksite.ter(machinery) == ter_id("t_machinery_old"));
+    REQUIRE(worksite.i_at(machinery).size() == 1);
+    CHECK(worksite.i_at(machinery).only_item().typeId() == itype_id("hammer"));
+    CHECK(fields.ter(point_omt_ms(1, 5)) == ter_id("t_dirtmound"));
+    CHECK(fields.furn(existing_crop) == furn_id("f_plant_seed"));
 }
 
 TEST_CASE("mapgen_items_stay_on_sealed_container_tiles", "[mapgen][item][regression]") {

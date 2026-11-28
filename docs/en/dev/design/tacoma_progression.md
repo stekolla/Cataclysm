@@ -7,35 +7,31 @@ introduction and optional Occupied Lumbermill lead are unchanged.
 
 The Overseer uses standard curated stock, Merch, and normal shop restocking. Wheat,
 corn, beans, and seed potatoes are always stocked. Fresh produce is optional, ages
-normally, and is replaced on restock. Later upgrades should keep the staple collection
-and add separate stock tiers when the relevant project is complete. If using the existing
-`npc_change_class` dialogue effect to select a class with a larger collection, account
-for when the next normal restock will make that collection visible.
+normally, and is replaced on restock. Phase 2 keeps the staple collection and uses
+`npc_change_class` to select an expanded collection, which becomes visible on the next
+normal restock.
 
-## Existing saves
+## Phase 2 projects
 
-- Saves before the third quest play the new sequence. The first two rewards are not
-  retroactive.
-- An active nail quest keeps its mission ID but now checks the new group and quantity.
-  Nails are not accepted. The standard item-group objective checks one item type at a
-  time, so separate crop types do not add up to 40.
-- If the old third quest was completed but the fourth was not, accept the salt quest and
-  return to the foreman's main greeting. It adds the missing rows and Overseer once.
-  If you turn the salt in without visiting that greeting, the next greeting still applies
-  the legacy update.
-- If the old fourth quest was already completed, its fields and Overseer stay in place.
-  The existing Overseer changes class on conversation and stocks goods at the next
-  eligible trade restock. This does not replace dead or missing NPCs.
+After Prepare the Fields the foreman requests 50 steel pipes for a well and clean-water pump
+(24 Merch), then two motors to complete the sawmill (18 Merch). The sawmill supports Tacoma
+itself; the lumberjack's existing service is unchanged. The next foreman mission remains
+stage 9. In parallel, the Crop Overseer requests 30 units of liquid fertilizer (5 Merch).
+The expanded stock uses the same prices and appears at the next normal restock.
+
+| Legacy stages | New owner and location |
+| --- | --- |
+| 5–7: pit, covered well, pump and fireplaces | Secure Clean Water installs the finished pump on the existing sidewalk apron (58), with the original fireplaces and logs (66). |
+| 5, 7–8: second farmer, plot clearance and rows | Improve the Fields adds the rows (65) and second farmer (66), independently of the foreman. |
+| 4–8: sawmill stages and roof | Complete the Sawmill places the final layout (58) and roof (58 z+1), without the temporary frames and destructive tile clearing. The mill gets the woodworker; the original lumberjack stays at the barn. |
+| 4–8: vehicles, defenses, tool shed, outhouse | Complete the Sawmill preserves these updates (56, 59, 66, 67, 68). Vehicle placement skips obstructed footprints rather than merging with parked vehicles. |
+
+The former stages 4–8 are removed. Only the new project route is supported.
 
 ## Remaining foreman work
 
 | Stage | Delivery | Existing effects to preserve in later restructuring |
 | --- | --- | --- |
-| 4 | Salt | Flatbed, sawmill start, palisade |
-| 5 | Liquid fertilizer | Car chassis, sawmill and roof, second farmer, palisades |
-| 6 | Rocks | Sawmill and barn work |
-| 7 | Pipes | Well, sawmill, western palisade, more field space |
-| 8 | Electric motors | Finish sawmill and western palisade, till more soil, start tool shed and outhouse |
 | 9 | Bleach | Finish tool shed and outhouse, start clinic |
 | 10 | First aid kits | Clinic and roof, start vehicle workshop |
 | 11 | Arc welders | Finish clinic, workshop and roof, supporting site work |
@@ -46,6 +42,5 @@ for when the next normal restock will make that collection visible.
 | 16 | Sugar | Finish bar, start greenhouse |
 | 17 | Glass sheets | Finish greenhouse and roof |
 
-Salt and fertilizer still advance unrelated construction. Clean water, clinic, workshops,
-commerce, and greenhouse access still depend on the linear chain. Field expansion and
-greenhouse stock upgrades are follow-up work, not part of this phase.
+Clinic, workshop, commerce, and greenhouse development still follow the existing linear
+chain. Their quest ownership and greenhouse stock upgrades are follow-up work.

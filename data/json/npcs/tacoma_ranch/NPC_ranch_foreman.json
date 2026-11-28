@@ -19,25 +19,6 @@
       "yes": "Can I help you, marshal?",
       "no": { "u_male": true, "yes": "Morning sir, how can I help you?", "no": "Morning ma'am, how can I help you?" }
     },
-    "speaker_effect": {
-      "condition": {
-        "and": [
-          {
-            "or": [
-              { "u_has_mission": "MISSION_RANCH_FOREMAN_4" },
-              { "npc_has_var": "salt_delivered", "type": "settlement", "context": "tacoma", "value": "yes" }
-            ]
-          },
-          { "not": { "npc_has_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" } }
-        ]
-      },
-      "effect": [
-        { "mapgen_update": "tacoma_field_rows_46", "om_terrain": "ranch_camp_46", "origin_npc": true },
-        { "mapgen_update": "tacoma_field_rows_55", "om_terrain": "ranch_camp_55", "origin_npc": true },
-        { "mapgen_update": "tacoma_spawn_crop_overseer", "om_terrain": "ranch_camp_57", "origin_npc": true },
-        { "npc_add_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" }
-      ]
-    },
     "responses": [
       {
         "text": "[MISSION] The merchant at the Refugee Center sent me to get a prospectus from you.",
@@ -259,7 +240,7 @@
     "item_group": "tacoma_staple_seeds",
     "count": 40,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_4",
+    "followup": "MISSION_TACOMA_SECURE_WATER",
     "dialogue": {
       "describe": "We need help…",
       "offer": "We have beds for the workers and land to grow on, but not enough seed to plant a field.  Bring 40 seeds of one crop: wheat, corn, barley, beans, potatoes, or carrots.  I'll pay you 10 Merch.",
@@ -272,10 +253,7 @@
       "failure": "It was a lost cause anyways…"
     },
     "end": {
-      "effect": [
-        { "u_buy_item": "FMCNote", "count": 10 },
-        { "npc_add_var": "fields_ready", "type": "settlement", "context": "tacoma", "value": "yes" }
-      ],
+      "effect": { "u_buy_item": "FMCNote", "count": 10 },
       "update_mapgen": [
         {
           "om_terrain": "ranch_camp_46",
@@ -312,240 +290,91 @@
     }
   },
   {
-    "id": "MISSION_RANCH_FOREMAN_4",
+    "id": "MISSION_TACOMA_SECURE_WATER",
     "type": "mission_definition",
-    "name": { "str": "Gather 300 Salt" },
+    "name": "Secure Clean Water",
+    "description": "Bring 50 steel pipes to Tacoma's foreman for <reward_count:FMCNote> Merch so the workers can finish the well and install a hand pump.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
-    "value": 50000,
-    "item": "salt",
-    "count": 300,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_5",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "We're ready to start work on the sawmill.  I've arranged a trade for supplies, but the merchants want 300 units of salt.  Can you find that much?",
-      "accepted": "Salt is key to preserving meat and other perishables… without any excess food it wouldn't do us much good now but I imagine we'll need to send you out to get more in the future.  ",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "If you can find a source of salt water you should be able to boil it down.",
-      "inquire": "Do you have the salt?",
-      "success": "That covers the trade.  We can start work on the sawmill now.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "effect": { "npc_add_var": "salt_delivered", "type": "settlement", "context": "tacoma", "value": "yes" },
-      "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_56",
-          "place_vehicles": [ { "vehicle": "flatbed_truck", "x": 18, "y": 3, "rotation": 0, "chance": 100 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_58",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_4" ], "x": 0, "y": 0 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_67",
-          "set": [ { "square": "terrain", "id": "t_palisade", "x": 21, "y": 19, "x2": 23, "y2": 19 } ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_5",
-    "type": "mission_definition",
-    "name": { "str": "30 Liquid Fertilizer" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "fertilizer_liquid",
-    "count": 30,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_6",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "We've got seed and the fields are ready, but better soil would help us get more from each row.  Could you bring us 30 units of liquid fertilizer?",
-      "accepted": "I don't know the exact recipe but I'm sure you could make it from a commercial fertilizer or produce it from bonemeal.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "I'd look through a few basic chemistry books to find a simple recipe.",
-      "inquire": "Do you have the liquid fertilizer?",
-      "success": "This really should make the first winter easier to survive.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_56",
-          "place_vehicles": [ { "vehicle": "car_chassis", "x": 17, "y": 11, "rotation": 90, "chance": 100 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_58",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_5" ], "x": 0, "y": 0 } ],
-          "set": [ { "point": "terrain", "id": "t_pit", "x": 6, "y": 18 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_58_z1",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_roof_1" ], "x": 0, "y": 0 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_66",
-          "set": [ { "point": "terrain", "id": "t_palisade", "x": 23, "y": 22 } ],
-          "place_npcs": [ { "class": "ranch_farmer_2", "x": 9, "y": 22 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_67",
-          "set": [ { "square": "terrain", "id": "t_palisade", "x": 0, "y": 22, "x2": 5, "y2": 22 } ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_6",
-    "type": "mission_definition",
-    "name": { "str": "Gather 75 Rocks" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
-    "item": "rock",
-    "count": 75,
-    "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_7",
-    "dialogue": {
-      "describe": "We need help…",
-      "offer": "Our current assessment for survivability has increased significantly thanks to your efforts.  The next priority issue is securing a cleaner water source.  Drinking from the pond on the back end of the ranch has led to an outbreak of dysentery.  As quickly as possible we need to improve the sanitary conditions in the camp.  To do so the first step is to dig a well and construct stone fireplaces in the barn for the migrants to boil water.  We are going to need at least 75 rocks from you if we hope to accomplish the task before we all get sick.  After we have them installed you will have free access to them, guaranteed. ",
-      "accepted": "If you take a shovel to a pile of rubble you should be able to pull out structural grade stone.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Mining would always be an option if you had the resources.",
-      "inquire": "Do you have the stone?",
-      "success": "I appreciate the work you do.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
-    },
-    "end": {
-      "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_58",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_6" ], "x": 0, "y": 0 } ],
-          "set": [ { "point": "terrain", "id": "t_covered_well", "x": 6, "y": 18 } ]
-        },
-        {
-          "om_terrain": "ranch_camp_66",
-          "set": [
-            { "point": "furniture", "id": "f_fireplace", "x": 6, "y": 12 },
-            { "point": "furniture", "id": "f_fireplace", "x": 8, "y": 12 }
-          ],
-          "place_item": [
-            { "item": "log", "x": 3, "y": 11 },
-            { "item": "log", "x": 3, "y": 12 },
-            { "item": "log", "x": 3, "y": 13 },
-            { "item": "log", "x": 11, "y": 11 },
-            { "item": "log", "x": 11, "y": 12 },
-            { "item": "log", "x": 11, "y": 13 }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "id": "MISSION_RANCH_FOREMAN_7",
-    "type": "mission_definition",
-    "name": { "str": "Gather 50 Pipes" },
-    "goal": "MGOAL_FIND_ITEM",
-    "difficulty": 5,
-    "value": 50000,
+    "value": 6000,
     "item": "pipe",
     "count": 50,
     "origins": [ "ORIGIN_SECONDARY" ],
-    "followup": "MISSION_RANCH_FOREMAN_8",
+    "followup": "MISSION_TACOMA_COMPLETE_SAWMILL",
     "dialogue": {
-      "describe": "We need help…",
-      "offer": "To fabricate the well's hand pump and construct components for several other projects we are going to need to find or fabricate a number of steel pipes.  Plumbing is a distant possibility for now but some form of irrigation will eventually become desirable.  You could assist us with procuring 50 steel pipes, if you so have the chance.",
-      "accepted": "Hopefully we will be able to assign new migrants to help fulfill our needs in the future.",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Pipes are used in numerous metal constructions.  Smashing abandoned furniture may provide the material we need.",
-      "inquire": "Do you have the pipes?",
-      "success": "I appreciate the work you do.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
+      "describe": "We need safe drinking water.",
+      "offer": "People are getting sick from the water we've been using.  We can dig and line a well ourselves, but we need 50 steel pipes for the hand pump and its fittings.  I'll pay you 24 Merch.",
+      "accepted": "We'll handle the digging and stonework while you're out.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Look for steel pipes in workshops or salvage them from plumbing.",
+      "inquire": "Have you brought the pipes?",
+      "success": "The pump is ready.  We've finally got dependable drinking water, and you're welcome to draw from it.",
+      "success_lie": "I still need those pipes.",
+      "failure": "We'll have to keep making do until we can finish the well."
     },
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 24 },
       "update_mapgen": [
-        {
-          "om_terrain": "ranch_camp_56",
-          "//": "western palisade",
-          "set": [
-            { "square": "terrain", "id": "t_palisade", "x": 16, "y": 16, "x2": 16, "y2": 23 },
-            { "square": "terrain", "id": "t_palisade", "x": 16, "y": 14, "x2": 19, "y2": 14 },
-            { "square": "terrain", "id": "t_palisade", "x": 19, "y": 11, "x2": 19, "y2": 13 }
-          ]
-        },
-        {
-          "om_terrain": "ranch_camp_58",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_7" ], "x": 0, "y": 0 } ],
-          "//": "finish the well",
-          "set": [
-            { "square": "terrain", "id": "t_sidewalk", "x": 5, "y": 17, "x2": 7, "y2": 19 },
-            { "point": "terrain", "id": "t_water_pump", "x": 6, "y": 18 }
-          ]
-        },
-        {
-          "om_terrain": "ranch_camp_65",
-          "//": "untilled soil in the fields",
-          "set": [ { "square": "terrain", "id": "t_dirt", "x": 0, "y": 4, "x2": 12, "y2": 18 } ]
-        }
+        { "om_terrain": "ranch_camp_58", "mapgen_update_id": "tacoma_complete_well" },
+        { "om_terrain": "ranch_camp_66", "mapgen_update_id": "tacoma_barn_fireplaces" }
       ]
     }
   },
   {
-    "id": "MISSION_RANCH_FOREMAN_8",
+    "id": "MISSION_TACOMA_COMPLETE_SAWMILL",
     "type": "mission_definition",
-    "name": { "str": "Gather 2 Electric Motors" },
+    "name": "Complete the Sawmill",
+    "description": "Bring two electric motors to Tacoma's foreman for <reward_count:FMCNote> Merch to finish the local sawmill.",
     "goal": "MGOAL_FIND_ITEM",
     "difficulty": 5,
-    "value": 50000,
+    "value": 4500,
     "item": "motor",
     "count": 2,
     "origins": [ "ORIGIN_SECONDARY" ],
     "followup": "MISSION_RANCH_FOREMAN_9",
     "dialogue": {
-      "describe": "We need help…",
-      "offer": "With the well's completion we are rapidly closing the sustainability gap.  In order to expand from here we will need massive quantities of lumber to construct fortifications and new buildings.  We have already begun work on a manually operated sawmill but we will need two motors to control the actual blades.  We were hoping you might be able to secure the motors for us.",
-      "accepted": "Power for the motors will be provided by a salvaged truck battery, you need not bring additional mechanical components.  ",
-      "rejected": "Come back when you get a chance.  We need skilled survivors.",
-      "advice": "Motors of this kind are pretty commonplace in industrial machinery.",
-      "inquire": "Do you have the motors?",
-      "success": "I appreciate the work you do.",
-      "success_lie": "What good does this do us?",
-      "failure": "It was a lost cause anyways…"
+      "describe": "We need to start cutting our own lumber.",
+      "offer": "We've got clean water and the crew can put up a sawmill, but the machinery needs two electric motors.  Bring them here and I'll pay you 18 Merch.",
+      "accepted": "We'll use the mill for our own building and repairs.",
+      "rejected": "Let me know if you change your mind.",
+      "advice": "Check workshops and salvage yards for ordinary electric motors.",
+      "inquire": "Did you find both motors?",
+      "success": "The sawmill is ready.  We've also started the tool shed and outhouse.  Now we can turn our attention to the clinic.",
+      "success_lie": "I still need both motors.",
+      "failure": "The machinery will have to wait."
     },
     "end": {
+      "effect": { "u_buy_item": "FMCNote", "count": 18 },
       "update_mapgen": [
         {
           "om_terrain": "ranch_camp_56",
-          "//": "finish western palisade",
+          "place_vehicles": [
+            { "vehicle": "flatbed_truck", "x": 18, "y": 3, "rotation": 0, "chance": 100, "merge_wrecks": false },
+            { "vehicle": "car_chassis", "x": 17, "y": 11, "rotation": 90, "chance": 100, "merge_wrecks": false }
+          ],
           "set": [
+            { "square": "terrain", "id": "t_palisade", "x": 16, "y": 16, "x2": 16, "y2": 23 },
+            { "square": "terrain", "id": "t_palisade", "x": 16, "y": 14, "x2": 19, "y2": 14 },
+            { "square": "terrain", "id": "t_palisade", "x": 19, "y": 11, "x2": 19, "y2": 13 },
             { "square": "terrain", "id": "t_palisade", "x": 23, "y": 7, "x2": 23, "y2": 10 },
             { "square": "terrain", "id": "t_palisade", "x": 20, "y": 11, "x2": 23, "y2": 11 }
           ]
         },
+        { "om_terrain": "ranch_camp_58", "mapgen_update_id": "tacoma_complete_sawmill" },
         {
-          "om_terrain": "ranch_camp_58",
-          "//": "finish the lumbermill",
-          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_8_done" ], "x": 0, "y": 0 } ]
+          "om_terrain": "ranch_camp_58_z1",
+          "place_nested": [ { "chunks": [ "tacoma_commune_lumbermill_roof_1" ], "x": 0, "y": 0 } ]
         },
         {
           "om_terrain": "ranch_camp_59",
           "place_nested": [ { "chunks": [ "tacoma_commune_toolshed_8" ], "x": 13, "y": 16 } ]
         },
+        { "om_terrain": "ranch_camp_66", "set": [ { "point": "terrain", "id": "t_palisade", "x": 23, "y": 22 } ] },
         {
-          "om_terrain": "ranch_camp_65",
-          "//": "tilled soil in the fields",
+          "om_terrain": "ranch_camp_67",
           "set": [
-            { "square": "terrain", "id": "t_dirtmound", "x": 1, "y": 5, "x2": 2, "y2": 17 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 4, "y": 5, "x2": 5, "y2": 17 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 7, "y": 5, "x2": 8, "y2": 17 },
-            { "square": "terrain", "id": "t_dirtmound", "x": 10, "y": 5, "x2": 11, "y2": 17 }
+            { "square": "terrain", "id": "t_palisade", "x": 21, "y": 19, "x2": 23, "y2": 19 },
+            { "square": "terrain", "id": "t_palisade", "x": 0, "y": 22, "x2": 5, "y2": 22 }
           ]
         },
         {
